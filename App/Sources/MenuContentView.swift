@@ -21,10 +21,10 @@ struct MenuContentView: View {
             } else if store.groups.isEmpty {
                 Text("No emails in your inboxes.")
                     .foregroundStyle(.secondary)
-                    .padding()
+                    .padding(.horizontal, 4)
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 8) {
+                    LazyVStack(alignment: .leading, spacing: 4) {
                         ForEach(store.groups) { group in
                             SenderCard(group: group,
                                        isOpen: isOpen(group),
@@ -33,8 +33,7 @@ struct MenuContentView: View {
                                        toggle: { toggle(group) })
                         }
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.bottom, 10)
+                    .padding(.horizontal, 4)
                 }
                 .frame(maxHeight: 560)
             }
@@ -60,9 +59,7 @@ struct MenuContentView: View {
             .buttonStyle(.borderless)
             .help("Go through the emails one by one: delete, archive, file, or send to PARAGON")
         }
-        .padding(.horizontal, 14)
-        .padding(.top, 12)
-        .padding(.bottom, 10)
+        .padding(.horizontal, 4)
     }
 
     private var footer: some View {
@@ -76,7 +73,7 @@ struct MenuContentView: View {
                         .buttonStyle(.borderless)
                         .accessibilityLabel("Close message")
                 }
-                .padding(10)
+                .padding(.horizontal, 4)
             }
             if let undo = store.undoInfo {
                 HStack(spacing: 10) {
@@ -89,11 +86,9 @@ struct MenuContentView: View {
                 }
                 .font(.system(size: 13))
                 .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 9)
+                .padding(.horizontal, 4)
                 .background(RoundedRectangle(cornerRadius: 10).fill(Color(white: 0.11)))
-                .padding(.horizontal, 10)
-                .padding(.bottom, 8)
+                .padding(.horizontal, 4)
             }
             footerBar
         }
@@ -101,7 +96,11 @@ struct MenuContentView: View {
 
     private var footerBar: some View {
         HStack(spacing: 12) {
-            if let last = store.lastRefresh {
+            if store.isLoading {
+                Text("Reading Mail…")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .accessibilityIdentifier("readingMail")
+            } else if let last = store.lastRefresh {
                 Text("Checked \(last.formatted(date: .omitted, time: .shortened))")
                     .font(.caption).foregroundStyle(.secondary)
             }
@@ -114,8 +113,7 @@ struct MenuContentView: View {
                 .help("Quit AMS Mail Menu")
         }
         .buttonStyle(.borderless)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 4)
         .overlay(alignment: .top) { Divider() }
     }
 
@@ -194,8 +192,7 @@ struct SenderCard: View {
                     }
                     Text("\(group.unreadCount) new")
                         .font(.system(size: 11, weight: .semibold))
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 1)
+                        .padding(.horizontal, 3)
                         .background(RoundedRectangle(cornerRadius: 4).fill(Color.accentColor.opacity(0.15)))
                         .foregroundStyle(Color.accentColor)
                 } else {
@@ -204,8 +201,7 @@ struct SenderCard: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 4)
 
             if isOpen {
                 ForEach(group.messages) { message in
@@ -254,8 +250,7 @@ struct MessageRow: View {
                     .lineLimit(1)
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 4)
         .background(hovering ? Color.accentColor.opacity(0.10) : Color.clear)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
@@ -320,7 +315,7 @@ struct ProblemView: View {
     @EnvironmentObject private var store: MailStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(problem.title).font(.headline)
             Text(problem.explanation).fixedSize(horizontal: false, vertical: true)
             HStack {
@@ -338,6 +333,6 @@ struct ProblemView: View {
                 Button("Try again") { store.refresh() }
             }
         }
-        .padding()
+        .padding(.horizontal, 4)
     }
 }

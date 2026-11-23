@@ -14,7 +14,7 @@ struct MessageWindowView: View {
             if let message = store.selectedMessage {
                 content(for: message)
             } else {
-                Text("No email selected.").padding()
+                Text("No email selected.").padding(.horizontal, 4)
             }
         }
         .frame(minWidth: 420, minHeight: 360)
@@ -37,10 +37,9 @@ struct MessageWindowView: View {
                     .toggleStyle(.checkbox)
                     .font(.caption)
             }
-            .padding(.horizontal, 14)
-            .padding(.top, 8)
+            .padding(.horizontal, 4)
 
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(message.subject.isEmpty ? "(no subject)" : message.subject)
                     .font(.system(size: 19, weight: .bold))
                     .textSelection(.enabled)
@@ -57,8 +56,7 @@ struct MessageWindowView: View {
                     }
                 }
             }
-            .padding(.horizontal, 18)
-            .padding(.bottom, 10)
+            .padding(.horizontal, 4)
 
             Divider()
             ScrollView {
@@ -67,7 +65,7 @@ struct MessageWindowView: View {
                     .lineSpacing(3)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)
-                    .padding(18)
+                    .padding(.horizontal, 4)
             }
             Divider()
 
@@ -89,7 +87,7 @@ struct MessageWindowView: View {
                 Button("Spark") { MailStore.bringSparkForward() }
                     .help("Brings Spark to the front. Spark cannot be told which email to show.")
             }
-            .padding(12)
+            .padding(.horizontal, 4)
         }
     }
 

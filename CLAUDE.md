@@ -40,8 +40,12 @@ Claude's reading (interpretation, not the owner's words):
   `GuideView`, `WhatsNewView`, Settings in three tabs, 22 tests. Installed and running.
 - Menu bar place: the owner's bar is full, a new icon lands off screen. The app saves
   `NSStatusItem Preferred Position Item-0` = 290 at first start (just left of Deck Mate). Seen on screen at x 952.
-- NOT checked yet: reading real mail (Mail was closed, the icon showed the warning triangle; the Mac's question
-  "may control Mail" is the owner's to answer), the list, Triage, the Settings window, the keeper with the switch on.
+- The owner allowed Mail on 2026-11-23. NOT checked yet by a click: archive, delete, reply, the message window,
+  Triage, send to PARAGON, the Settings window, the keeper with the switch on.
 - 0.3 (3), 2026-11-23: app icon (`App/Resources/AppIcon.icns`, `Tools/make_icon.py`); the envelope was added to
   AMS-Icons as hand-drawn icon "envelope" ("Mail", Everyday).
+- 0.4 (4), 2026-11-23 14:28: reading Mail moved off the main thread (the list froze for minutes when Mail had just
+  started), a box Mail refuses as a range is read one email at a time, "Apple Mail is busy" after 30 s, all padding
+  removed (owner: "take away all padding. Absolute all padding everywhere"), self-check `--check` / `--probe`.
+  Checked with the self-check on his real mail: 24 emails, 6 unread, 2 accounts, 10 sender groups, 0.4 s.
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

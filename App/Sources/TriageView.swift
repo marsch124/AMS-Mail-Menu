@@ -68,11 +68,11 @@ struct TriageView: View {
                 .onChange(of: unreadOnly) { start() }
             Button("Start over") { start() }
         }
-        .padding(12)
+        .padding(.horizontal, 4)
     }
 
     private func emailView(_ message: MailMessage) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 8) {
                 Circle().fill(AccountKind.from(accountName: message.accountName).color).frame(width: 8, height: 8)
                 Text(message.sender.displayName).font(.system(size: 14, weight: .semibold))
@@ -95,11 +95,11 @@ struct TriageView: View {
                     .textSelection(.enabled)
             }
         }
-        .padding(16)
+        .padding(.horizontal, 4)
     }
 
     private var finished: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 4) {
             Image(systemName: "checkmark.circle").font(.system(size: 40)).foregroundStyle(.green)
             Text(queue.isEmpty ? "No emails to go through." : "All done.").font(.title3)
             Button("Close") { dismiss() }.keyboardShortcut(.defaultAction)
@@ -125,7 +125,7 @@ struct TriageView: View {
             Button("") { dismiss() }.keyboardShortcut(.cancelAction).hidden().frame(width: 0)
         }
         .disabled(showFile || showParagon)
-        .padding(10)
+        .padding(.horizontal, 4)
     }
 
     // MARK: - Logic
@@ -172,7 +172,7 @@ struct KeyButton: View {
             HStack(spacing: 5) {
                 Text(label ?? String(key.character).uppercased())
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, 3)
                     .background(RoundedRectangle(cornerRadius: 3).strokeBorder(Color.secondary.opacity(0.6)))
                 Text(title)
             }
@@ -200,7 +200,7 @@ struct FilePicker: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("File in a folder of “\(message.accountName)”").font(.headline)
             TextField("Type to find a folder", text: $search)
                 .textFieldStyle(.roundedBorder)
@@ -219,7 +219,7 @@ struct FilePicker: View {
                 Button("Cancel") { finish(nil) }.keyboardShortcut(.cancelAction)
             }
         }
-        .padding(16)
+        .padding(.horizontal, 4)
         .frame(width: 380, height: 420)
         .onAppear { folders = store.mailboxes(for: message.accountName) }
     }
@@ -245,7 +245,7 @@ struct ParagonSheet: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("To PARAGON").font(.headline)
             TextField("Task", text: $words).textFieldStyle(.roundedBorder)
             TextField("Tags, e.g. family bills", text: $tags).textFieldStyle(.roundedBorder)
@@ -278,7 +278,7 @@ struct ParagonSheet: View {
                 .disabled(words.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
-        .padding(16)
+        .padding(.horizontal, 4)
         .frame(width: 440)
         .onAppear {
             words = ParagonLink.suggestedWords(for: message)

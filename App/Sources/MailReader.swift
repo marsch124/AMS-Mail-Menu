@@ -10,8 +10,25 @@ enum MailReader {
         !NSRunningApplication.runningApplications(withBundleIdentifier: mailBundleID).isEmpty
     }
 
-    /// Runs a script. Must be called on the main thread (NSAppleScript is not thread-safe).
+    /// Every script runs here, one after another, never on the main thread: a slow answer from Mail
+    /// must not freeze the list. (NSAppleScript must not run twice at the same time.)
+    private static let queue = DispatchQueue(label: "com.schabbauer.AMSMailMenu.mail", qos: .userInitiated)
+
+    /// Runs a script and waits for the answer. For one quick action (archive, delete, mark as read).
     static func run(_ source: String) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
+        queue.sync { execute(source) }
+    }
+
+    /// Runs a script in the background and hands the answer back on the main thread.
+    static func runInBackground(_ source: String,
+                                then: @escaping @MainActor (Result<NSAppleEventDescriptor, MailAccessProblem>) -> Void) {
+        queue.async {
+            let result = execute(source)
+            DispatchQueue.main.async { MainActor.assumeIsolated { then(result) } }
+        }
+    }
+
+    private static func execute(_ source: String) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
         guard isMailRunning else { return .failure(.mailNotRunning) }
         guard let script = NSAppleScript(source: source) else {
             return .failure(.other("Internal error: script could not be created."))

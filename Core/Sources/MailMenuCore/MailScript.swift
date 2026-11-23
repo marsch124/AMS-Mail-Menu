@@ -12,39 +12,83 @@ public enum MailScript {
         """
         on readBox(mb, wantPreview, limit)
             tell application "Mail"
-                set acctName to ""
-                try
-                    set acctName to name of account of mb
-                end try
-                set mbName to name of mb
-                repeat 3 times
-                    set n to count of messages of mb
-                    set k to limit
-                    if n < k then set k to n
-                    if k = 0 then return {acctName, mbName, {}, {}, {}, {}, {}, {}, {}}
-                    set theIDs to id of messages 1 thru k of mb
-                    set theMIDs to message id of messages 1 thru k of mb
-                    set theSenders to sender of messages 1 thru k of mb
-                    set theSubjects to subject of messages 1 thru k of mb
-                    set theDates to date received of messages 1 thru k of mb
-                    set theReads to read status of messages 1 thru k of mb
+                with timeout of 30 seconds
+                    set acctName to ""
+                    try
+                        set acctName to name of account of mb
+                    end try
+                    set mbName to name of mb
+                    -- First the quick way: whole columns at once. Mail refuses this ("Invalid index")
+                    -- while it is still loading a mailbox, or when the mailbox changes meanwhile.
+                    repeat 2 times
+                        try
+                            set n to count of messages of mb
+                            set k to limit
+                            if n < k then set k to n
+                            if k = 0 then return {acctName, mbName, {}, {}, {}, {}, {}, {}, {}}
+                            set theIDs to id of messages 1 thru k of mb
+                            set theMIDs to message id of messages 1 thru k of mb
+                            set theSenders to sender of messages 1 thru k of mb
+                            set theSubjects to subject of messages 1 thru k of mb
+                            set theDates to date received of messages 1 thru k of mb
+                            set theReads to read status of messages 1 thru k of mb
+                            set thePreviews to {}
+                            if wantPreview then
+                                repeat with i from 1 to k
+                                    set c to ""
+                                    try
+                                        set c to content of message i of mb
+                                        if (length of c) > 400 then set c to text 1 thru 400 of c
+                                    end try
+                                    set end of thePreviews to c
+                                end repeat
+                            end if
+                            set checkIDs to id of messages 1 thru k of mb
+                            if checkIDs = theIDs then
+                                return {acctName, mbName, theIDs, theMIDs, theSenders, theSubjects, theDates, theReads, thePreviews}
+                            end if
+                        on error errMsg number errNum
+                            if errNum is -1712 or errNum is -1743 or errNum is -1744 or errNum is -600 or errNum is -609 then error errMsg number errNum
+                        end try
+                    end repeat
+                    -- The slow, sure way: one email at a time, as far as Mail gives them.
+                    set theIDs to {}
+                    set theMIDs to {}
+                    set theSenders to {}
+                    set theSubjects to {}
+                    set theDates to {}
+                    set theReads to {}
                     set thePreviews to {}
-                    if wantPreview then
-                        repeat with i from 1 to k
-                            set c to ""
-                            try
-                                set c to content of message i of mb
-                                if (length of c) > 400 then set c to text 1 thru 400 of c
-                            end try
-                            set end of thePreviews to c
-                        end repeat
-                    end if
-                    set checkIDs to id of messages 1 thru k of mb
-                    if checkIDs = theIDs then
-                        return {acctName, mbName, theIDs, theMIDs, theSenders, theSubjects, theDates, theReads, thePreviews}
-                    end if
-                end repeat
-                error "Mail kept changing while reading. Please try again." number 9001
+                    repeat with i from 1 to limit
+                        try
+                            set m to message i of mb
+                            set a to id of m
+                            set b to message id of m
+                            set c to sender of m
+                            set d to subject of m
+                            set e to date received of m
+                            set f to read status of m
+                            set p to ""
+                            if wantPreview then
+                                try
+                                    set p to content of m
+                                    if (length of p) > 400 then set p to text 1 thru 400 of p
+                                end try
+                            end if
+                            set end of theIDs to a
+                            set end of theMIDs to b
+                            set end of theSenders to c
+                            set end of theSubjects to d
+                            set end of theDates to e
+                            set end of theReads to f
+                            if wantPreview then set end of thePreviews to p
+                        on error errMsg number errNum
+                            if errNum is -1712 or errNum is -1743 or errNum is -1744 or errNum is -600 or errNum is -609 then error errMsg number errNum
+                            exit repeat
+                        end try
+                    end repeat
+                    return {acctName, mbName, theIDs, theMIDs, theSenders, theSubjects, theDates, theReads, thePreviews}
+                end timeout
             end tell
         end readBox
 

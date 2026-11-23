@@ -6,6 +6,7 @@ struct AMSMailMenuApp: App {
     @StateObject private var store = MailStore()
 
     init() {
+        SelfCheck.runIfAsked()
         KeeperStartup.begin()
         // A saved place in the menu bar (points from the right edge): just left of Deck Mate (272), right of
         // Tidy Bar's line (302), so the icon always shows and never sits behind the notch.

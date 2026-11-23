@@ -60,20 +60,32 @@ final class MailStore: ObservableObject {
         }
     }
 
+    /// A check asked for while one is still running: it runs once more when that one ends.
+    private var refreshWanted = false
+
+    /// Reads the inboxes in the background; the list stays usable while Mail answers.
     func refresh() {
+        guard !isLoading else { refreshWanted = true; return }
         let count = max(1, defaults.integer(forKey: SettingsKey.emailCount))
         let preview = defaults.bool(forKey: SettingsKey.showPreview)
         isLoading = true
-        defer { isLoading = false }
         // Each inbox is asked for `count` emails; the newest `count` across all inboxes are kept.
-        switch MailReader.run(MailScript.fetchInboxes(perMailbox: count, includePreview: preview)) {
-        case .success(let descriptor):
-            groups = SenderGrouping.group(MailScript.parseInboxes(descriptor), limit: count)
-            problem = nil
-            lastRefresh = Date()
-        case .failure(let p):
-            problem = p
-            if p == .mailNotRunning { groups = [] }
+        MailReader.runInBackground(MailScript.fetchInboxes(perMailbox: count, includePreview: preview)) { [weak self] result in
+            guard let self else { return }
+            self.isLoading = false
+            switch result {
+            case .success(let descriptor):
+                self.groups = SenderGrouping.group(MailScript.parseInboxes(descriptor), limit: count)
+                self.problem = nil
+                self.lastRefresh = Date()
+            case .failure(let p):
+                self.problem = p
+                if p == .mailNotRunning { self.groups = [] }
+            }
+            if self.refreshWanted {
+                self.refreshWanted = false
+                self.refresh()
+            }
         }
     }
 

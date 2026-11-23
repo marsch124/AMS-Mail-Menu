@@ -144,6 +144,8 @@ final class ScriptTests: XCTestCase {
         XCTAssertEqual(MailAccessProblem.from(errorNumber: -1743, message: ""), .permissionDenied)
         XCTAssertEqual(MailAccessProblem.from(errorNumber: -1744, message: ""), .permissionNotYetAsked)
         XCTAssertEqual(MailAccessProblem.from(errorNumber: -600, message: ""), .mailNotRunning)
+        XCTAssertEqual(MailAccessProblem.from(errorNumber: -1712, message: ""), .mailBusy)
+        XCTAssertEqual(MailAccessProblem.mailBusy.title, "Apple Mail is busy")
     }
 }
 

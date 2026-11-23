@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.3 (3), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.4 (4), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -53,11 +53,22 @@ Mail not open (button "Open Mail (hidden)"), access turned off (button to System
 - Whether PARAGON makes the `[Mail](message://…)` link clickable.
 - Speed of reading with "first line of text" on.
 
+## Reading Mail (0.4)
+- Every script runs on one background queue, one after another, never on the main thread (`MailReader`). The regular reading (`MailStore.refresh`) does not wait: the list stays usable, the bottom left says "Reading Mail…", and a reading asked for meanwhile runs once when the first ends. One action (archive, delete, mark as read, open) still waits for its own answer.
+- Each inbox: first whole columns at once (`… of messages 1 thru k`); if Mail refuses that ("Invalid index": fewer emails than asked, still loading, or changed meanwhile), one email at a time as far as Mail gives them. Seen 23 Nov 2026: inboxes of 18 and 6 emails, one reading 0.4 s; right after Mail started, 75 s.
+- Every question to Mail gives up after 30 seconds: "Apple Mail is busy" (`MailAccessProblem.mailBusy`, AppleScript -1712); the next regular reading tries again.
+
+## Self-check (0.4, `SelfCheck.swift`)
+`open -n "AMS Mail Menu.app" --args --check <file>` reads the inboxes once and writes into the file: how many emails, how many unread, how many per account, how many sender groups, how long it took. Never the words of an email. `--probe <file>` times 13 fixed small questions to Mail. Both run as the app itself (its own permission for Mail), before the one-copy rule, and quit.
+
+## Layout: no padding (0.4, the owner's word: "take away all padding")
+No empty space above or below anything. 4 points at the sides (3 inside the small tags), so letters do not touch an edge or a rounded corner. Gaps between stacked things: 4 points at most. Rows are as tall as their words.
+
 ## Place in the menu bar
 The icon gets a saved place at first start: 290 points from the right edge (`NSStatusItem Preferred Position Item-0`), just left of Deck Mate (272) and right of Tidy Bar's line (302). Without it the Mac puts a new icon at the far left of a full menu bar, where it is hidden. A place the owner drags it to is kept.
 
 ## Settings window
-Three tabs, 480 x 560: Settings, How it works, What's new. The Settings tab ends with the section "Start" ("Open at login", off at first) and the version line ("Version 0.3 (3)").
+Three tabs, 480 x 560: Settings, How it works, What's new. The Settings tab ends with the section "Start" ("Open at login", off at first) and the version line ("Version 0.4 (4)").
 
 ## How it works and What's new
 - How it works (`GuideView`): a guide to every part of the app, ending with "Signs in this app": every mark and colour with its meaning.

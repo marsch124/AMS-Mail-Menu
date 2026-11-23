@@ -22,6 +22,14 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.4 (4)", date: "23 Nov 2026", items: [
+            "Fixed: the list froze while Apple Mail answered. Right after Mail starts it can take more than a minute to answer, and all that time nothing in the list could be clicked. Now the app reads Mail in the background and the list stays usable.",
+            "New: \"Reading Mail…\" at the bottom left while the app reads. When it is done you see \"Checked\" and the time again.",
+            "Fixed: \"Mail could not be read … Invalid index\". It showed when an inbox held fewer emails than the list asks for, or while Mail was still loading. Now the app takes the emails that are there.",
+            "New: \"Apple Mail is busy\". If Mail does not answer within 30 seconds, the list says so in plain words and tries again by itself.",
+            "Changed: the padding is gone, in every window. Before, there were 8 to 18 points of empty space around the heading, the rows, the cards and the buttons. Now there is none above and below, and 4 points at the sides so letters do not touch an edge. Gaps between rows are 4 points at most, before up to 12.",
+            "New: the app can check itself. Started with a special word, it reads the inboxes once and writes down how many emails it found and how long it took. It is used for testing; you do not need it.",
+        ]),
         Release(version: "0.3 (3)", date: "23 Nov 2026", items: [
             "New: the app has its own icon. A white hand-drawn envelope on calm blue, the same blue as the envelope in the menu bar while new mail waits. Before, it showed the Mac's plain stand-in icon. You see it in the Applications folder, in Login Items and next to the Mac's questions.",
             "New in the icon library: the envelope, called \"Mail\", under Everyday. It is drawn in the same style as the other icons, so any of your apps can use it.",
@@ -63,7 +71,7 @@ enum WhatsNew {
 /// The list of versions as a page for a settings screen.
 struct WhatsNewView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 4) {
             ForEach(WhatsNew.releases) { release in
                 VStack(alignment: .leading, spacing: 3) {
                     Text("\(release.version) · \(release.date)").font(.headline).foregroundStyle(Color.accentColor)

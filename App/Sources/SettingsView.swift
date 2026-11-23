@@ -7,9 +7,9 @@ struct SettingsView: View {
         TabView {
             GeneralSettingsView()
                 .tabItem { Text("Settings") }
-            ScrollView { GuideView().padding(16) }
+            ScrollView { GuideView().padding(.horizontal, 4) }
                 .tabItem { Text("How it works") }
-            ScrollView { WhatsNewView().padding(16) }
+            ScrollView { WhatsNewView().padding(.horizontal, 4) }
                 .tabItem { Text("What's new") }
         }
         .frame(width: 480, height: 560)
