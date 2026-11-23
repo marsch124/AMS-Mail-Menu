@@ -1,6 +1,6 @@
 # AMS Mail Menu
 
-A small Mac menu bar app, version 0.9 (build 9). It shows your newest emails from Apple Mail, grouped by sender.
+A small Mac menu bar app, version 0.9.1 (build 10). It shows your newest emails from Apple Mail, grouped by sender.
 
 **Not yet built on a Mac.** The rules in `Core` pass their tests; the app itself has not been compiled yet (see "State" below).
 

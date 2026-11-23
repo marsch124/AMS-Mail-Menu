@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.8 (8), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.9.1 (10), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -150,6 +150,9 @@ Before Triage or the message window opens, the list panel closes (`SelfCheck.clo
 
 ## Width of the list
 `Look.panelWidth` = 260 points since 0.7 (the owner's pick, option 4 of four shown in one picture; 400 before). The heading row never wraps: when it is too narrow the words "Newest 20" give way (`ViewThatFits`). `--picture … --width N` draws a candidate.
+
+## The Triage button (0.9.1)
+Before (0.9): at the top right of the list, Triage was opened by a tray-with-an-arrow symbol plus the word "Triage" in blue letters, 11 points, with no background. Now (0.9.1): a small button, a filled capsule in `Color.mailButtonBlue` (day 10/92/196, the blue of the app icon; night 26/112/224, so white letters read on it) with the word "Triage" in white letters, 10 points, no symbol. It is drawn by hand (not the Mac's own filled button), so it is full colour even when the panel is not the front window. Same place, same action: it opens Triage, and the list closes first (see "The list closes for a window"). The owner: "Make Triage into a small button". The tray symbol is used nowhere in the list any more, and its line in "Signs in this app" (guide) is replaced by one for the small blue button. The button is about 44 points wide (before about 62), so "Newest N" fits in the 260-point heading row again (seen in the real panel, 23 Nov 21:25; `ViewThatFits` still drops it when it does not fit). `--picture … --light` draws the day look when the Mac is on night. Code: `MenuContentView.headerRow`.
 
 ## The narrow list (0.7)
 260 points wide. A sender's bar: arrow, name (cut with "…" when too long), "Mark read" (tooltip "Mark all emails of this sender as read"; "Mark all read" before, which left the name eight letters), the "N new" tag. No scroll bar (`scrollIndicators(.never)`): a Mac set to always show scroll bars gave it 15 of the 260 points. The heading row drops "Newest N" when it does not fit.

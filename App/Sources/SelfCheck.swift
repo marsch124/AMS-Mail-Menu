@@ -267,6 +267,7 @@ enum SelfCheck {
             .environmentObject(store)
             .background(Color(nsColor: .windowBackgroundColor)))
         if arguments.contains("--dark") { host.appearance = NSAppearance(named: .darkAqua) }
+        if arguments.contains("--light") { host.appearance = NSAppearance(named: .aqua) }
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.borderless],
                               backing: .buffered, defer: false)
         window.contentView = host

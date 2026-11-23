@@ -22,6 +22,12 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9.1 (10)", date: "23 Nov 2026", items: [
+            "Changed: Triage in the list is now a small button. Before (0.9), it was a tray-with-an-arrow symbol and the word \"Triage\" in blue letters, 11 points, with no background. Now it is a small filled blue pill with the word \"Triage\" in white letters, 10 points, and no symbol.",
+            "Changed: the tray-with-an-arrow symbol is gone from the list. Before, it was 1 of the marks in \"Signs in this app\"; now that line says \"Small blue button Triage\", and \"How it works\" calls it the small blue Triage button.",
+            "Changed: the button is narrower (about 44 points, before about 62), so the small grey words \"Newest 20\" fit in the top row again. Since 0.7 they were left out there for lack of room.",
+            "Nothing else changed: the button is in the same place (top right of the list) and does the same thing as before (the list closes, then Triage opens).",
+        ]),
         Release(version: "0.9 (9)", date: "23 Nov 2026", items: [
             "New: archiving a Gmail email works. Before (0.6 to 0.8), Archive on a Gmail email changed nothing and said \"Archiving does not work for Gmail yet\". Now the app talks to Gmail directly: the email leaves your Gmail inbox and stays in \"All Mail\", exactly like Archive in Gmail itself. No label is added.",
             "New: Settings has a new part \"Gmail\" with \"Gmail address\", \"App password\" (the letters are hidden), \"Account in Mail\" (which of your accounts in Apple Mail is the Gmail one, for example \"Gmail\"; the app proposes the one with \"gmail\" or \"google\" in its name) and a blue button \"Connect\". After connecting it says \"Connected to Gmail\", with a button \"Disconnect\". If Google refuses, a plain sentence says why: wrong address or app password, or no internet.",

@@ -77,4 +77,5 @@ Claude's reading (interpretation, not the owner's words):
   (`mailbox "X" of account` fails -1728; `findBox`/`resolveBox` fall back). Warnings kept: never send
   `set deleted status`; `archiveUndo` only with the owner's yes for that run; `archiveUndoTest` touches ONLY the
   email with the subject exactly "Mail Menu test". See SPEC "Gmail archive: the direct connection (0.9)".
+- 0.9.1 (10), 2026-11-23: Triage in the list is a small filled blue button with the word, no symbol (the owner: "Make Triage into a small button").
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

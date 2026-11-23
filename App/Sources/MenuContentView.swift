@@ -75,9 +75,19 @@ struct MenuContentView: View {
                 openWindow(id: "triage")
                 NSApp.activate(ignoringOtherApps: true)
             } label: {
-                Label("Triage", systemImage: "tray.and.arrow.down").fixedSize()
+                // A small filled button (the owner, 23 Nov 2026: "Make Triage into a small button").
+                // Drawn by hand, so it is full colour even when the panel is not the front window.
+                Text("Triage")
+                    .font(Look.f(12))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 1)
+                    .background(Capsule().fill(Color.mailButtonBlue))
+                    .contentShape(Capsule())
+                    .fixedSize()
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("triageButton")
             .help("Go through the emails one by one: delete, archive, file, or send to PARAGON")
         }
     }

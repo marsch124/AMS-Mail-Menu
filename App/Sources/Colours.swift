@@ -13,6 +13,11 @@ extension Color {
     static let accountGreen = dayNight(NSColor(red: 0.13, green: 0.55, blue: 0.30, alpha: 1),
                                        NSColor(red: 0.36, green: 0.80, blue: 0.50, alpha: 1))
 
+    /// The fill of a small button with a white word on it (the Triage button in the list): the blue of the
+    /// app icon by day, a little brighter at night, always dark enough for white letters.
+    static let mailButtonBlue = dayNight(NSColor(red: 0.04, green: 0.36, blue: 0.77, alpha: 1),
+                                         NSColor(red: 0.10, green: 0.44, blue: 0.88, alpha: 1))
+
     /// The app's own colour: the blue of the envelope. A lighter blue at night, so it reads on dark.
     /// Used for headings, tags and main buttons instead of the Mac's highlight colour.
     static let mailBlue = Color(nsColor: NSColor(name: nil) { appearance in
