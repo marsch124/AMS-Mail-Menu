@@ -51,11 +51,11 @@ struct MenuContentView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            Text("Mail").font(.system(size: 15, weight: .bold))
+            Text("Mail").font(Look.f(15, .bold))
             AccountKey(kind: .iCloud, name: "iCloud")
             AccountKey(kind: .gmail, name: "Gmail")
             Spacer()
-            Text("Newest \(emailCount)").font(.caption).foregroundStyle(.secondary)
+            Text("Newest \(emailCount)").font(Look.f(10)).foregroundStyle(.secondary)
             Button {
                 openWindow(id: "triage")
                 NSApp.activate(ignoringOtherApps: true)
@@ -73,7 +73,7 @@ struct MenuContentView: View {
             if let error = store.actionError {
                 HStack(alignment: .top) {
                     Image(systemName: "exclamationmark.triangle").foregroundStyle(.orange)
-                    Text(error).font(.callout).fixedSize(horizontal: false, vertical: true)
+                    Text(error).font(Look.f(12)).fixedSize(horizontal: false, vertical: true)
                     Spacer()
                     Button { store.actionError = nil } label: { Image(systemName: "xmark") }
                         .buttonStyle(.borderless)
@@ -90,7 +90,7 @@ struct MenuContentView: View {
                         .foregroundStyle(Color(red: 0.56, green: 0.76, blue: 1.0))
                         .fontWeight(.semibold)
                 }
-                .font(.system(size: 13))
+                .font(Look.f(13))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 4)
                 .background(RoundedRectangle(cornerRadius: 5).fill(Color(white: 0.11)))
@@ -102,13 +102,17 @@ struct MenuContentView: View {
 
     private var footerBar: some View {
         HStack(spacing: 12) {
-            if store.isLoading {
+            if let note = store.workNote {
+                Text(note)
+                    .font(Look.f(10)).foregroundStyle(.secondary)
+                    .accessibilityIdentifier("workNote")
+            } else if store.isLoading {
                 Text("Reading Mail…")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(Look.f(10)).foregroundStyle(.secondary)
                     .accessibilityIdentifier("readingMail")
             } else if let last = store.lastRefresh {
                 Text("Checked \(last.formatted(date: .omitted, time: .shortened))")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(Look.f(10)).foregroundStyle(.secondary)
             }
             Spacer()
             Button { store.refresh() } label: { Image(systemName: "arrow.clockwise") }
@@ -157,7 +161,7 @@ struct AccountKey: View {
     var body: some View {
         HStack(spacing: 4) {
             Circle().fill(kind.color).frame(width: 8, height: 8)
-            Text(name).font(.caption).foregroundStyle(.secondary)
+            Text(name).font(Look.f(10)).foregroundStyle(.secondary)
         }
     }
 }
@@ -177,11 +181,11 @@ struct SenderCard: View {
                 Button(action: toggle) {
                     HStack(spacing: 8) {
                         Image(systemName: isOpen ? "chevron.down" : "chevron.right")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(Look.f(10, .bold))
                             .foregroundStyle(.secondary)
                             .frame(width: 12)
                         Text(group.sender.displayName)
-                            .font(.system(size: 14))
+                            .font(Look.f(14))
                             .lineLimit(1)
                         Spacer()
                     }
@@ -193,17 +197,17 @@ struct SenderCard: View {
                 if group.unreadCount > 0 {
                     if isOpen {
                         Button("Mark all read") { store.markRead(group.messages) }
-                            .font(.system(size: 12))
+                            .font(Look.f(12))
                             .buttonStyle(.borderless)
                     }
                     Text("\(group.unreadCount) new")
-                        .font(.system(size: 11))
+                        .font(Look.f(11))
                         .padding(.horizontal, 3)
                         .background(RoundedRectangle(cornerRadius: 4).fill(Color.mailBlue.opacity(0.15)))
                         .foregroundStyle(Color.mailBlue)
                 } else {
                     Text("\(group.messages.count) read")
-                        .font(.caption)
+                        .font(Look.f(10))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -241,19 +245,19 @@ struct MessageRow: View {
                 }
                 Text(message.subject.isEmpty ? "(no subject)" : message.subject)
                     // No bold (the owner: "Not bold - it looks terrible"). New mail: full-strength letters; read: grey.
-                    .font(.system(size: 13))
+                    .font(Look.f(13))
                     .foregroundStyle(message.isRead ? Color.secondary : Color.primary)
                     .lineLimit(1)
                 Spacer()
                 if hovering {
                     actionButtons
                 } else {
-                    Text(timeText).font(.system(size: 12)).foregroundStyle(.secondary)
+                    Text(timeText).font(Look.f(12)).foregroundStyle(.secondary)
                 }
             }
             if showPreview, let preview = message.preview, !preview.isEmpty {
                 Text(preview)
-                    .font(.system(size: 12.5))
+                    .font(Look.f(12.5))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     // Starts under the subject, not under the account dot (dot 8 + gap 7).
@@ -308,7 +312,7 @@ struct RowButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 12, weight: .semibold))
+                .font(Look.f(12, .semibold))
                 .foregroundStyle(tint)
                 .frame(width: 24, height: 24)
                 .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .controlBackgroundColor)))
@@ -326,7 +330,7 @@ struct ProblemView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(problem.title).font(.headline)
+            Text(problem.title).font(Look.f(13, .semibold))
             Text(problem.explanation).fixedSize(horizontal: false, vertical: true)
             HStack {
                 switch problem {

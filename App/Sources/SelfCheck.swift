@@ -86,6 +86,10 @@ enum SelfCheck {
                     case "settings":
                         openSettings()
                         NSApp.activate(ignoringOtherApps: true)
+                    case "report":
+                        store.reportReadEmails()
+                    case "archiveUndo":
+                        store.checkArchiveAndUndo()
                     case "close":
                         for window in NSApp.windows where window.isVisible && window.styleMask.contains(.titled) {
                             window.close()
@@ -116,6 +120,7 @@ enum SelfCheck {
             mail(5, "Example Bank <bank@example.com>", "Your monthly statement", minutesAgo: 2000, read: true, account: "iCloud"),
             mail(6, "Example News <news@example.com>", "This week in the news", minutesAgo: 4000, read: true, account: "Gmail"),
         ])
+        if let l = arguments.firstIndex(of: "--look"), l + 1 < arguments.count { Look.choose(Int(arguments[l + 1]) ?? 1) }
         var which = "list"
         if let v = arguments.firstIndex(of: "--view"), v + 1 < arguments.count { which = arguments[v + 1] }
         let first = store.allMessagesNewestFirst[0]

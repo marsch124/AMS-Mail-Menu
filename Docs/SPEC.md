@@ -92,6 +92,14 @@ The icon gets a saved place at first start: 290 points from the right edge (`NSS
 - Main buttons filled blue (`borderedProminent`): Reply, Send to PARAGON, Close, Done. Delete in the message window red.
 - Sheets ("File in a folder", "To PARAGON"): 8 points all round; the folder list is plain rows with hairlines.
 
+## Actions never hold the window (0.5)
+Archive, delete, file, mark as read, reply, Undo and the folder list all go through the helper (`MailStore.perform` → `MailReader.runInBackground`). The email leaves the list at once (`hide`); `workNote` shows "Archiving…", "Deleting…", "Filing…" or "Putting the email back…" at the bottom left; if Mail refuses, the next reading brings the email back and the reason shows at the bottom. Undo is offered when Mail has answered, for 10 seconds.
+
+## Tried on real mail, 23 Nov 2026 (with the owner's yes)
+- iCloud: one read email archived to "Archive" (3.3 s) and brought back with Undo (11.3 s, then on the main thread). Back in the inbox, checked by its Message-ID.
+- 🚨 Gmail, NOT working: `move m to mailbox "All Mail"` answers without error after 26.7 s, but the email stays in the inbox (still there 4 minutes later); Undo then answers "The email could not be found to move it back". Nothing was lost. Open: how Apple Mail really archives a Gmail email by script. Also open: `archive` returns only the last part of the mailbox name, so Undo could miss a mailbox that sits inside another.
+- The check itself: the notice `show` with the word `archiveUndo` archives the newest READ email and undoes it; `report` only lists which read emails the inboxes hold. 🚨 `archiveUndo` changes the owner's mail: only with his yes for that very run.
+
 ## Seeing the real windows (0.5)
 The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail. Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.
 

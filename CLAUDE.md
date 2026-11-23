@@ -54,6 +54,9 @@ Claude's reading (interpretation, not the owner's words):
   Settings rebuilt without boxes, own tab row, Done; Triage key bar never cut, waits for the first reading;
   email text through `MessageLinks.tidyBody`; main buttons filled blue, Delete red; no bold in the windows.
   How to look: SPEC "Seeing the real windows" and "Checking the real panel without a click". 23 tests.
-  NOT done on purpose: archive, delete, mark as read, reply, file, send to PARAGON on a real email (they change
-  the owner's mail; ask first).
+  All actions run through the helper since 15:13 (no more freezes). Tried on real mail with the owner's yes:
+  iCloud archive + Undo works; 🚨 Gmail archive does NOT (the email stays in the inbox, Undo cannot find it;
+  nothing lost) - open, see SPEC "Tried on real mail". Never run `archiveUndo` without his yes for that run:
+  on 23 Nov a second run picked a different email than the one he had agreed to.
+  NOT tried: delete, mark as read, reply, file, send to PARAGON on a real email.
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

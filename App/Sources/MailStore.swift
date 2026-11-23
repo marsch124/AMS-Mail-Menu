@@ -117,6 +117,64 @@ final class MailStore: ObservableObject {
         }
     }
 
+    // MARK: - A check on one real email (asked for by the owner, 23 Nov 2026)
+
+    /// Changes nothing: writes into the diary which read emails the inboxes hold (account and time received).
+    func reportReadEmails() {
+        let read = listed.sorted(by: { $0.dateReceived > $1.dateReceived }).filter(\.isRead)
+        diary.notice("report: \(self.listed.count) emails in the inboxes, \(read.count) of them read")
+        for message in read {
+            diary.notice("report: read email of \(message.accountName, privacy: .public), received \(message.dateReceived.formatted(date: .abbreviated, time: .shortened), privacy: .public)")
+        }
+    }
+
+    /// Archives the newest email that is already read, then takes it back with Undo, and writes each step
+    /// into the diary (never the words of the email). Started by the notice "show" with the word "archiveUndo".
+    func checkArchiveAndUndo() {
+        // From everything read from Mail, not only the newest that the list shows.
+        guard let message = listed.sorted(by: { $0.dateReceived > $1.dateReceived }).first(where: { $0.isRead }) else {
+            diary.notice("check: no read email in the list, nothing done")
+            return
+        }
+        let key = message.messageID
+        diary.notice("check: archiving one read email of \(message.accountName, privacy: .public), received \(message.dateReceived.formatted(date: .abbreviated, time: .shortened), privacy: .public)")
+        let began = Date()
+        actionError = nil
+        archive(message)
+        waitUntil({ self.undoInfo != nil || self.actionError != nil }, tries: 60) {
+            guard let info = self.undoInfo else {
+                self.diary.notice("check: archive FAILED: \(self.actionError ?? "no answer in a minute", privacy: .public)")
+                return
+            }
+            self.diary.notice("check: archive done in \(Date().timeIntervalSince(began), format: .fixed(precision: 1)) s, the email is now in \(info.fromBoxes.joined(separator: " or "), privacy: .public)")
+            let undoBegan = Date()
+            self.undoLast()
+            self.waitUntil({ self.workNote == nil }, tries: 90) {
+                self.diary.notice("check: undo \(self.actionError == nil ? "done" : "FAILED: " + (self.actionError ?? ""), privacy: .public) in \(Date().timeIntervalSince(undoBegan), format: .fixed(precision: 1)) s")
+                let undone = Date()
+                self.waitForList(after: undone, tries: 90) {
+                    let back = self.listed.contains { $0.messageID == key }
+                    self.diary.notice("check: after undo the email is \(back ? "back in the inbox list" : "NOT in the inbox list", privacy: .public); the list has \(self.listed.count) emails")
+                }
+            }
+        }
+    }
+
+    private func waitUntil(_ ready: @escaping @MainActor () -> Bool, tries: Int, then: @escaping @MainActor () -> Void) {
+        if ready() || tries <= 0 { then(); return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.waitUntil(ready, tries: tries - 1, then: then)
+        }
+    }
+
+    private func waitForList(after moment: Date, tries: Int, then: @escaping @MainActor () -> Void) {
+        if let last = lastRefresh, last > moment { then(); return }
+        guard tries > 0 else { diary.notice("check: the list was not read again in time"); return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.waitForList(after: moment, tries: tries - 1, then: then)
+        }
+    }
+
     // MARK: - First lines of text
 
     /// The emails as last read from Mail, before grouping.
@@ -209,10 +267,19 @@ final class MailStore: ObservableObject {
     }
 
     // MARK: - Actions
+    // Every action is done by the helper copy: the window never waits for Mail (an undo took 11 seconds
+    // on 23 Nov 2026). The email leaves the list at once; if Mail refuses, the next reading brings it back
+    // and the reason shows at the bottom.
+
+    /// What the app is doing for you right now, for the bottom bar ("Archiving…").
+    @Published private(set) var workNote: String?
 
     func markRead(_ messages: [MailMessage]) {
         let unread = messages.filter { !$0.isRead }
         guard !unread.isEmpty else { return }
+        let ids = Set(unread.map(\.id))
+        for i in listed.indices where ids.contains(listed[i].id) { listed[i].isRead = true }
+        regroup()
         perform(MailScript.setRead(unread, read: true))
     }
 
@@ -221,44 +288,59 @@ final class MailStore: ObservableObject {
     }
 
     func archive(_ message: MailMessage) {
-        if case .success(let result) = perform(MailScript.archive(message)) {
-            let box = result.stringValue ?? ""
-            showUndo(UndoInfo(message: message, text: "Archived “\(message.subject)”",
-                              fromBoxes: box.isEmpty ? MailScript.archiveMailboxNames : [box]))
+        hide(message)
+        perform(MailScript.archive(message), note: "Archiving…") { [weak self] result in
+            guard case .success(let answer) = result else { return }
+            let box = answer.stringValue ?? ""
+            self?.showUndo(UndoInfo(message: message, text: "Archived “\(message.subject)”",
+                                    fromBoxes: box.isEmpty ? MailScript.archiveMailboxNames : [box]))
         }
     }
 
     func delete(_ message: MailMessage) {
-        if case .success = perform(MailScript.delete(message)) {
-            showUndo(UndoInfo(message: message, text: "Deleted “\(message.subject)”",
-                              fromBoxes: MailScript.trashMailboxNames))
+        hide(message)
+        perform(MailScript.delete(message), note: "Deleting…") { [weak self] result in
+            guard case .success = result else { return }
+            self?.showUndo(UndoInfo(message: message, text: "Deleted “\(message.subject)”",
+                                    fromBoxes: MailScript.trashMailboxNames))
         }
     }
 
     /// Moves an email to one of its account's Mail folders. Offers Undo.
     func file(_ message: MailMessage, toMailboxPath path: String) {
-        if case .success = perform(MailScript.move(message, toMailboxPath: path)) {
-            rememberRecent(path, key: "recentFolders")
-            showUndo(UndoInfo(message: message, text: "Filed “\(message.subject)” in \(path)",
-                              fromBoxes: [path]))
+        hide(message)
+        perform(MailScript.move(message, toMailboxPath: path), note: "Filing…") { [weak self] result in
+            guard case .success = result else { return }
+            self?.rememberRecent(path, key: "recentFolders")
+            self?.showUndo(UndoInfo(message: message, text: "Filed “\(message.subject)” in \(path)",
+                                    fromBoxes: [path]))
         }
+    }
+
+    /// Takes an email out of the list at once, before Mail has answered.
+    private func hide(_ message: MailMessage) {
+        guard !isSample else { return }
+        listed.removeAll { $0.id == message.id }
+        regroup()
     }
 
     /// Folder paths of one account, read from Mail once and then kept.
     private var mailboxCache: [String: [String]] = [:]
 
-    func mailboxes(for account: String) -> [String] {
-        if isSample { return ["Archive", "Bills", "Family", "Family/Holidays", "Receipts", "Work"] }
-        if let cached = mailboxCache[account] { return cached }
-        switch MailReader.run(MailScript.listMailboxes(account: account)) {
-        case .success(let d):
-            var seen = Set<String>()
-            let names = MailScript.items(of: d).compactMap(\.stringValue).filter { seen.insert($0).inserted }
-            mailboxCache[account] = names
-            return names
-        case .failure(let p):
-            actionError = "\(p.title). \(p.explanation)"
-            return []
+    func loadMailboxes(for account: String, then: @escaping @MainActor ([String]) -> Void) {
+        if isSample { then(["Archive", "Bills", "Family", "Family/Holidays", "Receipts", "Work"]); return }
+        if let cached = mailboxCache[account] { then(cached); return }
+        MailReader.runInBackground(MailScript.listMailboxes(account: account)) { [weak self] result in
+            switch result {
+            case .success(let d):
+                var seen = Set<String>()
+                let names = MailScript.items(of: d).compactMap(\.stringValue).filter { seen.insert($0).inserted }
+                self?.mailboxCache[account] = names
+                then(names)
+            case .failure(let p):
+                self?.actionError = "\(p.title). \(p.explanation)"
+                then([])
+            }
         }
     }
 
@@ -296,7 +378,7 @@ final class MailStore: ObservableObject {
     func undoLast() {
         guard let info = undoInfo else { return }
         hideUndo()
-        perform(MailScript.moveBack(info.message, fromAnyOf: info.fromBoxes))
+        perform(MailScript.moveBack(info.message, fromAnyOf: info.fromBoxes), note: "Putting the email back…")
     }
 
     func hideUndo() {
@@ -312,21 +394,26 @@ final class MailStore: ObservableObject {
         }
     }
 
-    @discardableResult
-    private func perform(_ source: String, refreshAfter: Bool = true) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
-        let result = MailReader.run(source)
-        switch result {
-        case .success:
-            actionError = nil
-        case .failure(let p):
-            if case .other(let text) = p {
-                actionError = text
-            } else {
-                actionError = "\(p.title). \(p.explanation)"
+    private func perform(_ source: String, refreshAfter: Bool = true, note: String? = nil,
+                         then: (@MainActor (Result<NSAppleEventDescriptor, MailAccessProblem>) -> Void)? = nil) {
+        if isSample { return }
+        workNote = note
+        MailReader.runInBackground(source) { [weak self] result in
+            guard let self else { return }
+            if self.workNote == note { self.workNote = nil }
+            switch result {
+            case .success:
+                self.actionError = nil
+            case .failure(let p):
+                if case .other(let text) = p {
+                    self.actionError = text
+                } else {
+                    self.actionError = "\(p.title). \(p.explanation)"
+                }
             }
+            then?(result)
+            if refreshAfter { self.refresh() }
         }
-        if refreshAfter { refresh() }
-        return result
     }
 
     /// Spark registers the `readdle-spark://` link type; the app that handles it is opened.

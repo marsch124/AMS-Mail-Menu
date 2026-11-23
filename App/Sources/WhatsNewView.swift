@@ -33,6 +33,9 @@ enum WhatsNew {
             "Changed: the main buttons are in full blue: Reply, Send to PARAGON, Close, Done. Delete in the message window is red.",
             "Changed: the text of an email has no empty lines at its start and never more than one empty line in a row. Many emails come with three or more.",
             "Changed: opening an email, and each email in Triage, no longer holds the window while Mail fetches the text. You see \"Loading…\" for a moment; a heavy email can take a few seconds.",
+            "Changed: archive, delete, file in a folder, mark as read and Undo no longer hold the window while Mail works. The email leaves the list at once, and the bottom left says what is going on: \"Archiving…\", \"Deleting…\", \"Filing…\", \"Putting the email back…\". Before, an Undo held the whole app for 11 seconds.",
+            "Tried on real mail: one iCloud email was archived and brought back with Undo. It worked.",
+            "Not working yet: archiving a Gmail email. Mail says it moved the email to \"All Mail\", but the email stays in the inbox, and Undo then says it cannot find it. Nothing is lost. iCloud is not affected.",
             "Changed: the small windows for \"File in a folder\" and \"To PARAGON\" have a thin edge all round, and the folder list has tight rows instead of the Mac's roomy list.",
         ]),
         Release(version: "0.4 (4)", date: "23 Nov 2026", items: [

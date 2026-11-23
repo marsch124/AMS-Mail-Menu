@@ -201,6 +201,7 @@ struct FilePicker: View {
     @EnvironmentObject private var store: MailStore
     @State private var search = ""
     @State private var folders: [String] = []
+    @State private var loading = false
 
     private var shown: [String] {
         let recent = store.recentFolders.filter(folders.contains)
@@ -229,7 +230,7 @@ struct FilePicker: View {
             }
             .frame(minHeight: 240)
             if folders.isEmpty {
-                Text("No folders found in this account.").font(.caption).foregroundStyle(.secondary)
+                Text(loading ? "Reading the folders…" : "No folders found in this account.").font(.caption).foregroundStyle(.secondary)
             }
             HStack {
                 Text("Enter files in the first folder shown.").font(.caption).foregroundStyle(.secondary)
@@ -239,7 +240,13 @@ struct FilePicker: View {
         }
         .padding(8)     // a sheet has round corners too
         .frame(width: 380, height: 420)
-        .onAppear { folders = store.mailboxes(for: message.accountName) }
+        .onAppear {
+            loading = true
+            store.loadMailboxes(for: message.accountName) { names in
+                folders = names
+                loading = false
+            }
+        }
     }
 }
 
