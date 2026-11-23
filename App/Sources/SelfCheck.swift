@@ -136,7 +136,8 @@ enum SelfCheck {
             "news": (AnyView(WhatsNewView().padding(.horizontal, 4).frame(width: 480)), nil),
         ]
         guard let (screen, fixed) = screens[which] else { exit(2) }
-        let host = NSHostingView(rootView: screen.tint(.mailBlue).environmentObject(store)
+        let host = NSHostingView(rootView: screen.tint(.mailBlue).font(Look.f(13)).controlSize(which == "list" ? .regular : .small)
+            .environmentObject(store)
             .background(Color(nsColor: .windowBackgroundColor)))
         if arguments.contains("--dark") { host.appearance = NSAppearance(named: .darkAqua) }
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.borderless],

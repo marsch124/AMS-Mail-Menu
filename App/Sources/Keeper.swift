@@ -195,7 +195,7 @@ struct OpenAtLoginSection: View {
                 }
                 .accessibilityIdentifier("openAtLoginToggle")
             Text("While this is on, the app also comes back by itself if it ever stops unexpectedly.")
-                .font(.caption)
+                .font(Look.f(11))
                 .foregroundStyle(.secondary)
         }
     }

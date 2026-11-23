@@ -1,9 +1,11 @@
 import SwiftUI
 
-/// The letters of the list panel, in one place: every size there goes through `Look.f`.
-/// `choose` switches to a candidate look for the test pictures (`--picture … --look N`).
+/// The letters of the whole app, in one place: every size goes through `Look.f`.
+/// The sizes written in the screens are the ones of 0.5; `delta` makes them smaller. The owner chose
+/// option 2 of six on 23 Nov 2026 ("another smaller and not so intrusive font"): 2 points smaller, the Mac's
+/// own letters, regular weight. `choose` switches to another candidate for the test pictures (`--look N`).
 enum Look {
-    static var delta: CGFloat = 0
+    static var delta: CGFloat = -2
     static var design: Font.Design = .default
     static var weight: Font.Weight = .regular
     static var face: String?
@@ -16,6 +18,7 @@ enum Look {
 
     static func choose(_ number: Int) {
         switch number {
+        case 1: delta = 0
         case 2: delta = -2
         case 3: delta = -2; weight = .light
         case 4: delta = -2; face = "Avenir Next"

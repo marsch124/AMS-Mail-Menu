@@ -59,7 +59,7 @@ struct TriageView: View {
 
     private var topBar: some View {
         HStack {
-            Text("Triage").font(.headline)
+            Text("Triage").font(Look.f(14))
             if !queue.isEmpty {
                 Text("\(min(index + 1, queue.count)) of \(queue.count)")
                     .foregroundStyle(.secondary)
@@ -77,22 +77,22 @@ struct TriageView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 8) {
                 Circle().fill(AccountKind.from(accountName: message.accountName).color).frame(width: 8, height: 8)
-                Text(message.sender.displayName).font(.system(size: 14))
+                Text(message.sender.displayName).font(Look.f(14))
                 if !message.sender.address.isEmpty, !message.sender.name.isEmpty {
-                    Text(message.sender.address).font(.caption).foregroundStyle(.secondary)
+                    Text(message.sender.address).font(Look.f(11)).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Text(message.dateReceived.formatted(date: .abbreviated, time: .shortened))
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(Look.f(11)).foregroundStyle(.secondary)
             }
             Text(message.subject.isEmpty ? "(no subject)" : message.subject)
-                .font(.system(size: 18))
+                .font(Look.f(16))
             if done.contains(message.id) {
                 Label("Already handled", systemImage: "checkmark.circle").foregroundStyle(.secondary)
             }
             ScrollView {
                 Text(body_)
-                    .font(.system(size: 13.5))
+                    .font(Look.f(14))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)
             }
@@ -103,10 +103,10 @@ struct TriageView: View {
     private var finished: some View {
         VStack(spacing: 4) {
             if store.lastRefresh == nil {
-                Text("Reading Mail…").font(.title3).foregroundStyle(.secondary)
+                Text("Reading Mail…").font(Look.f(15)).foregroundStyle(.secondary)
             } else {
-                Image(systemName: "checkmark.circle").font(.system(size: 40)).foregroundStyle(.green)
-                Text(queue.isEmpty ? "No emails to go through." : "All done.").font(.title3)
+                Image(systemName: "checkmark.circle").font(Look.f(32)).foregroundStyle(.green)
+                Text(queue.isEmpty ? "No emails to go through." : "All done.").font(Look.f(15))
             }
             Button("Close") { dismiss() }.keyboardShortcut(.defaultAction).buttonStyle(.borderedProminent)
         }
@@ -182,7 +182,7 @@ struct KeyButton: View {
         Button(action: action) {
             HStack(spacing: 5) {
                 Text(label ?? String(key.character).uppercased())
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(.system(size: max(9, 11 + Look.delta), design: .monospaced))
                     .padding(.horizontal, 3)
                     .background(RoundedRectangle(cornerRadius: 3).strokeBorder(Color.secondary.opacity(0.6)))
                 Text(title).fixedSize()
@@ -213,7 +213,7 @@ struct FilePicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("File in a folder of “\(message.accountName)”").font(.headline)
+            Text("File in a folder of “\(message.accountName)”").font(Look.f(14))
             TextField("Type to find a folder", text: $search)
                 .textFieldStyle(.roundedBorder)
                 .onSubmit { if let first = shown.first { finish(first) } }
@@ -230,10 +230,10 @@ struct FilePicker: View {
             }
             .frame(minHeight: 240)
             if folders.isEmpty {
-                Text(loading ? "Reading the folders…" : "No folders found in this account.").font(.caption).foregroundStyle(.secondary)
+                Text(loading ? "Reading the folders…" : "No folders found in this account.").font(Look.f(11)).foregroundStyle(.secondary)
             }
             HStack {
-                Text("Enter files in the first folder shown.").font(.caption).foregroundStyle(.secondary)
+                Text("Enter files in the first folder shown.").font(Look.f(11)).foregroundStyle(.secondary)
                 Spacer()
                 Button("Cancel") { finish(nil) }.keyboardShortcut(.cancelAction)
             }
@@ -271,7 +271,7 @@ struct ParagonSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("To PARAGON").font(.headline)
+            Text("To PARAGON").font(Look.f(14))
             TextField("Task", text: $words).textFieldStyle(.roundedBorder)
             TextField("Tags, e.g. family bills", text: $tags).textFieldStyle(.roundedBorder)
             Picker("Put it in", selection: $choice) {
@@ -291,7 +291,7 @@ struct ParagonSheet: View {
                 }
             }
             Text("The task gets a link back to this email. Afterwards the email is archived.")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(Look.f(11)).foregroundStyle(.secondary)
             HStack {
                 Spacer()
                 Button("Cancel") { finish(false) }.keyboardShortcut(.cancelAction)

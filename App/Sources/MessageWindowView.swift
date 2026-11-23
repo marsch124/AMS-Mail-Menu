@@ -35,24 +35,24 @@ struct MessageWindowView: View {
                 Spacer()
                 Toggle("Keep on top", isOn: $keepOnTop)
                     .toggleStyle(.checkbox)
-                    .font(.caption)
+                    .font(Look.f(11))
             }
             .padding(.horizontal, 4)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(message.subject.isEmpty ? "(no subject)" : message.subject)
-                    .font(.system(size: 19))
+                    .font(Look.f(16))
                     .textSelection(.enabled)
                 HStack(spacing: 10) {
                     Text(initials(message.sender.displayName))
-                        .font(.system(size: 13))
+                        .font(Look.f(13))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
                         .background(Circle().fill(Color(red: 0.71, green: 0.33, blue: 0.16)))
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(senderLine(message)).font(.system(size: 13.5)).textSelection(.enabled)
+                        Text(senderLine(message)).font(Look.f(14)).textSelection(.enabled)
                         Text("\(message.accountName) · \(message.dateReceived.formatted(date: .abbreviated, time: .shortened))")
-                            .font(.caption).foregroundStyle(.secondary)
+                            .font(Look.f(11)).foregroundStyle(.secondary)
                     }
                 }
             }
@@ -61,7 +61,7 @@ struct MessageWindowView: View {
             Divider()
             ScrollView {
                 Text(store.selectedContent)
-                    .font(.system(size: 14))
+                    .font(Look.f(14))
                     .lineSpacing(3)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .textSelection(.enabled)

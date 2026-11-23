@@ -78,16 +78,16 @@ struct GuideView: View {
         VStack(alignment: .leading, spacing: 4) {
             ForEach(Guide.howItWorks) { section in
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(section.title).font(.headline).foregroundStyle(Color.mailBlue)
+                    Text(section.title).font(Look.f(14)).foregroundStyle(Color.mailBlue)
                     ForEach(Array(section.body.components(separatedBy: "\n\n").enumerated()), id: \.offset) { _, paragraph in
-                        Text(paragraph).font(.callout).fixedSize(horizontal: false, vertical: true)
+                        Text(paragraph).font(Look.f(13)).fixedSize(horizontal: false, vertical: true)
                     }
                     if section.title == "Signs in this app" {
                         ForEach(Array(Guide.signs.enumerated()), id: \.offset) { _, row in
                             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                                Text(row.sign).font(.callout.weight(.semibold))
+                                Text(row.sign).font(Look.f(13))
                                     .frame(width: 170, alignment: .leading)
-                                Text(row.meaning).font(.callout)
+                                Text(row.meaning).font(Look.f(13))
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .fixedSize(horizontal: false, vertical: true)

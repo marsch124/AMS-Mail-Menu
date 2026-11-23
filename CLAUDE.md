@@ -59,4 +59,6 @@ Claude's reading (interpretation, not the owner's words):
   nothing lost) - open, see SPEC "Tried on real mail". Never run `archiveUndo` without his yes for that run:
   on 23 Nov a second run picked a different email than the one he had agreed to.
   NOT tried: delete, mark as read, reply, file, send to PARAGON on a real email.
+- 0.6 (6), 2026-11-23 15:25: the owner's font pick, option 2 of six: all sizes 2 points smaller through
+  `Look.f` (`Look.delta = -2`), small controls, no bold except the list title "Mail". See SPEC "Letters".
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

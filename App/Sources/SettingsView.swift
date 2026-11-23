@@ -107,6 +107,6 @@ struct GeneralSettingsView: View {
     }
 
     private func note(_ text: String) -> some View {
-        Text(text).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+        Text(text).font(Look.f(11)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
     }
 }

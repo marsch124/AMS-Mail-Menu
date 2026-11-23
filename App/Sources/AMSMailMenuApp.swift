@@ -39,6 +39,8 @@ struct AMSMailMenuApp: App {
             MessageWindowView()
                 .padding(6)     // the window's round corners would cut into the words otherwise
                 .tint(.mailBlue)
+                .font(Look.f(13))
+                .controlSize(.small)
                 .environmentObject(store)
         }
         .defaultSize(width: 480, height: 560)
@@ -48,6 +50,8 @@ struct AMSMailMenuApp: App {
             TriageView()
                 .padding(6)
                 .tint(.mailBlue)
+                .font(Look.f(13))
+                .controlSize(.small)
                 .environmentObject(store)
         }
         .defaultSize(width: 800, height: 600)
@@ -55,6 +59,8 @@ struct AMSMailMenuApp: App {
         Settings {
             SettingsView()
                 .tint(.mailBlue)
+                .font(Look.f(13))
+                .controlSize(.small)
                 .environmentObject(store)
         }
     }

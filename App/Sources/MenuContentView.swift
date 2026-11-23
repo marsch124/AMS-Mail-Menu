@@ -46,6 +46,7 @@ struct MenuContentView: View {
         .padding(.vertical, 6)
         .frame(width: 400)
         .tint(.mailBlue)
+        .font(Look.f(13))
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
@@ -88,7 +89,6 @@ struct MenuContentView: View {
                     Button("Undo") { store.undoLast() }
                         .buttonStyle(.borderless)
                         .foregroundStyle(Color(red: 0.56, green: 0.76, blue: 1.0))
-                        .fontWeight(.semibold)
                 }
                 .font(Look.f(13))
                 .foregroundStyle(.white)
@@ -330,7 +330,7 @@ struct ProblemView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(problem.title).font(Look.f(13, .semibold))
+            Text(problem.title).font(Look.f(14))
             Text(problem.explanation).fixedSize(horizontal: false, vertical: true)
             HStack {
                 switch problem {

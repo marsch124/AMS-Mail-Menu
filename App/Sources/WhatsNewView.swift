@@ -22,6 +22,13 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.6 (6)", date: "23 Nov 2026", items: [
+            "Changed: smaller, quieter letters in the whole app. You chose option 2 of six. In the list the sender is 12 points (before 14), the subject 11 (before 13), the first line of text 10.5 (before 12.5), the time 10 (before 12). The letters are still the Mac's own, in normal weight.",
+            "Changed: the same in the windows. In the message window and in Triage the subject is 14 points (before 19 and 18) and the text of the email 12 (before 14 and 13.5). Settings, How it works and What's new are 11 points (before 13 and 12). Buttons and tick boxes are the Mac's small size to match.",
+            "Changed: the list is shorter for the same emails. Six emails from four senders took 263 points before and take 234 now.",
+            "Changed: Triage can be 747 points narrow, before 761.",
+            "Changed: no bold in the headings of How it works and What's new, in the titles of the small windows, in \"Undo\" and in the title of a problem. The blue colour marks a heading. Only the title \"Mail\" of the list is bold.",
+        ]),
         Release(version: "0.5 (5)", date: "23 Nov 2026", items: [
             "Checked: the message window, Triage, its two small windows and Settings, each drawn by day and by night and then photographed on the Mac with real mail. What was wrong is fixed below.",
             "Fixed: in Triage the buttons at the bottom were cut off (\"Del…\", \"Arc…\", \"Re…\" twice). All nine now show their whole word, and the window cannot be made narrower than the row of buttons. It opens 800 points wide, before 620.",
@@ -97,13 +104,13 @@ struct WhatsNewView: View {
         VStack(alignment: .leading, spacing: 4) {
             ForEach(WhatsNew.releases) { release in
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("\(release.version) · \(release.date)").font(.headline).foregroundStyle(Color.mailBlue)
+                    Text("\(release.version) · \(release.date)").font(Look.f(14)).foregroundStyle(Color.mailBlue)
                     ForEach(release.items, id: \.self) { item in
                         HStack(alignment: .firstTextBaseline, spacing: 5) {
                             Text("–").foregroundStyle(.secondary)
                             Text(item).fixedSize(horizontal: false, vertical: true)
                         }
-                        .font(.callout)
+                        .font(Look.f(13))
                     }
                 }
             }
@@ -117,7 +124,7 @@ struct WhatsNewView: View {
 struct VersionLine: View {
     var body: some View {
         Text(AppInfo.line)
-            .font(.caption)
+            .font(Look.f(11))
             .foregroundStyle(.secondary)
             .accessibilityIdentifier("settingsVersion")
     }
