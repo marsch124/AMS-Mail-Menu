@@ -22,6 +22,12 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9.2 (11)", date: "23 Nov 2026", items: [
+            "Fixed: the gear did not always get you into Settings. Before (0.2 to 0.9.1), if the Settings window was already open behind other windows, pressing the gear showed nothing. And a new Settings window could open behind the window you were working in. Now Settings always comes to the front, in front of every other window.",
+            "Fixed: the list stayed open over Settings. Before, it stayed on the screen after you pressed the gear. Now the list closes first, then Settings opens.",
+            "Changed: the words in \"How it works\", part \"Settings\", now say that the list closes and Settings comes to the front, also when it was open behind other windows.",
+            "Nothing else changed: the gear is in the same place at the bottom of the list and looks the same.",
+        ]),
         Release(version: "0.9.1 (10)", date: "23 Nov 2026", items: [
             "Changed: Triage in the list is now a small button. Before (0.9), it was a tray-with-an-arrow symbol and the word \"Triage\" in blue letters, 11 points, with no background. Now it is a small filled blue pill with the word \"Triage\" in white letters, 10 points, and no symbol.",
             "Changed: the tray-with-an-arrow symbol is gone from the list. Before, it was 1 of the marks in \"Signs in this app\"; now that line says \"Small blue button Triage\", and \"How it works\" calls it the small blue Triage button.",

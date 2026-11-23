@@ -78,4 +78,5 @@ Claude's reading (interpretation, not the owner's words):
   `set deleted status`; `archiveUndo` only with the owner's yes for that run; `archiveUndoTest` touches ONLY the
   email with the subject exactly "Mail Menu test". See SPEC "Gmail archive: the direct connection (0.9)".
 - 0.9.1 (10), 2026-11-23: Triage in the list is a small filled blue button with the word, no symbol (the owner: "Make Triage into a small button").
+- 0.9.2 (11), 2026-11-23: the gear brings Settings to the front (the owner: "I cannot access Settings"). Before: the gear opened Settings without bringing the app forward, so an already-open Settings behind other windows showed nothing and the list stayed open. Now: the list closes and Settings comes to the front of every window. Notice word `pressGear` presses the gear (`settingsGear`) for checks.
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

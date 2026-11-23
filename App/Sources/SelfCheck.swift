@@ -153,6 +153,53 @@ enum SelfCheck {
         statusButton()?.performClick(nil)
     }
 
+    /// Opens Settings in front of every other window: closes the list, opens the window, brings the app
+    /// forward, and lifts the window itself (an app without a Dock icon is not always let forward, and a
+    /// Settings window that is already open behind other windows would stay there). `open` is the
+    /// screen's own `openSettings`.
+    @MainActor
+    static func showSettings(_ open: @escaping () -> Void) {
+        closePanel()
+        open()
+        NSApp.activate(ignoringOtherApps: true)
+        // The window may be made a moment after `open`; lift it now and twice more.
+        for delay in [0.0, 0.15, 0.5] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                guard let window = settingsWindow() else { return }
+                if window.isMiniaturized { window.deminiaturize(nil) }
+                NSApp.activate(ignoringOtherApps: true)
+                window.makeKeyAndOrderFront(nil)
+                window.orderFrontRegardless()
+            }
+        }
+    }
+
+    /// The Settings window, open or not yet shown.
+    @MainActor
+    static func settingsWindow() -> NSWindow? {
+        NSApp.windows.first { $0.styleMask.contains(.titled) && $0.title.hasSuffix("Settings") }
+    }
+
+    /// Where the gear sits in the open list (the list's own points, from its top left corner), noted by
+    /// the list itself, so a check can click it.
+    @MainActor static var gearFrame: CGRect = .zero
+
+    /// For checks: clicks the real gear in the open list, with a mouse press and release sent to the list.
+    @MainActor
+    static func pressGear() -> Bool {
+        guard let panel = openPanel(), let content = panel.contentView, gearFrame.width > 0 else { return false }
+        let spot = NSPoint(x: gearFrame.midX, y: content.bounds.height - gearFrame.midY)
+        for kind in [NSEvent.EventType.leftMouseDown, .leftMouseUp] {
+            guard let event = NSEvent.mouseEvent(
+                with: kind, location: spot, modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
+                windowNumber: panel.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 1)
+            else { return false }
+            // Queued, not sent: a press that is sent waits inside the button for a release that never comes.
+            NSApp.postEvent(event, atStart: false)
+        }
+        return true
+    }
+
     /// For checks: another program on this Mac can ask the running app to press its own menu bar icon
     /// (the notice "com.schabbauer.AMSMailMenu.openPanel"), so the real panel can be photographed.
     static func listenForOpenPanel() {
@@ -199,12 +246,15 @@ enum SelfCheck {
                         openWindow(id: "triage")
                         NSApp.activate(ignoringOtherApps: true)
                     case "settings":
-                        openSettings()
-                        NSApp.activate(ignoringOtherApps: true)
+                        SelfCheck.showSettings { openSettings() }
+                    case "pressGear":
+                        // The real gear in the open list (open the list first with the notice openPanel).
+                        let pressed = SelfCheck.pressGear()
+                        Logger(subsystem: "com.schabbauer.AMSMailMenu", category: "reading")
+                            .notice("gear pressed: \(pressed, privacy: .public)")
                     case "gmail":
                         // The Settings window on its Gmail tab, to look at the real window.
-                        openSettings()
-                        NSApp.activate(ignoringOtherApps: true)
+                        SelfCheck.showSettings { openSettings() }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             NotificationCenter.default.post(name: SettingsView.showTab, object: "gmail")
                         }

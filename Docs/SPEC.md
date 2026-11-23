@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.9.1 (10), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.9.2 (11), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -97,6 +97,9 @@ The icon gets a saved place at first start: 290 points from the right edge (`NSS
 ## Settings window (0.5)
 480 x 440. At the top the app's own row of three tabs (a segmented picker, not the Mac's tab bar: that one writes the chosen tab in the Mac's highlight colour and leaves an empty band): Settings, How it works, What's new. At the bottom the version line ("Version 0.8 (8)") on the left and Done (filled blue; Escape too) on the right. The Settings tab is plain rows without boxes: blue group headings, tick boxes, two menus, three radio buttons, ending with "Start" ("Open at login", off at first). Every change counts at once.
 
+### Opening (0.9.2)
+Before (0.2 to 0.9.1): the gear at the bottom of the list opened the Settings window without bringing the app to the front. A Settings window already open behind other programs' windows (open since the afternoon) showed nothing when the gear was pressed, a new one could open behind the window in use, and the list stayed open over it. Now (0.9.2): the gear closes the list, opens Settings and puts the Settings window in front of every other window, also when it was already open behind something. Nothing else changed: same place, same look. The owner: "I cannot access Settings". Code: `SelfCheck.showSettings` (the gear and the notice word `settings` both go this way).
+
 ## Triage and message window (0.5)
 - The key bar never cuts a word: each button has its fixed size, small controls, and the window cannot be narrower than the bar (761 points); it opens 800 x 600.
 - Opened before the first reading is done: "Reading Mail…"; it starts when `lastRefresh` arrives.
@@ -158,7 +161,7 @@ Before (0.9): at the top right of the list, Triage was opened by a tray-with-an-
 260 points wide. A sender's bar: arrow, name (cut with "…" when too long), "Mark read" (tooltip "Mark all emails of this sender as read"; "Mark all read" before, which left the name eight letters), the "N new" tag. No scroll bar (`scrollIndicators(.never)`): a Mac set to always show scroll bars gave it 15 of the 260 points. The heading row drops "Newest N" when it does not fit.
 
 ## Seeing the real windows (0.5)
-The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail. Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.
+The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings`, `pressGear` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail; `pressGear` makes the running app press its own gear button in the open list (found by its identifier `settingsGear`), so the real button can be tried without a mouse; `settings` goes the same way as the gear (`SelfCheck.showSettings`). Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.
 
 ## How it works and What's new
 - How it works (`GuideView`): a guide to every part of the app, ending with "Signs in this app": every mark and colour with its meaning.

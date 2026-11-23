@@ -5,6 +5,7 @@ import SwiftUI
 struct MenuContentView: View {
     @EnvironmentObject private var store: MailStore
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.openSettings) private var openSettings
     @AppStorage(SettingsKey.emailCount) private var emailCount = SettingsDefault.emailCount
     @AppStorage(SettingsKey.showPreview) private var showPreview = SettingsDefault.showPreview
     @AppStorage(SettingsKey.showAccount) private var showAccount = SettingsDefault.showAccount
@@ -140,8 +141,17 @@ struct MenuContentView: View {
             Spacer()
             Button { store.refresh() } label: { Image(systemName: "arrow.clockwise") }
                 .help("Check now")
-            SettingsLink { Image(systemName: "gearshape") }
+            // Not a SettingsLink: that opens the window without bringing this app forward, so an
+            // already open Settings window stayed hidden behind other windows (the owner, 23 Nov 2026:
+            // "I cannot access Settings").
+            Button { SelfCheck.showSettings { openSettings() } } label: { Image(systemName: "gearshape") }
                 .help("Settings")
+                .accessibilityIdentifier("settingsGear")
+                .background(GeometryReader { place in
+                    Color.clear
+                        .onAppear { SelfCheck.gearFrame = place.frame(in: .global) }
+                        .onChange(of: place.frame(in: .global)) { _, now in SelfCheck.gearFrame = now }
+                })
             Button { NSApp.terminate(nil) } label: { Image(systemName: "power") }
                 .help("Quit AMS Mail Menu")
         }
