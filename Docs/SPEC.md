@@ -62,6 +62,7 @@ Mail not open (button "Open Mail (hidden)"), access turned off (button to System
 - A diary in the Mac's log (subsystem `com.schabbauer.AMSMailMenu`, category `reading`): "reading starts", "read N emails, U unread, in X s". Counts and times only.
 - Each inbox: first whole columns at once (`… of messages 1 thru k`); if Mail refuses that ("Invalid index": fewer emails than asked, still loading, or changed meanwhile), one email at a time as far as Mail gives them. Seen 23 Nov 2026: inboxes of 18 and 6 emails, one reading 0.4 s; right after Mail started, 75 s.
 - The first line of text is not part of the reading: `content` makes Mail open the whole email (seconds each; 24 emails took over a minute, at every check). After the list is shown, `MailStore.readNextPreview` reads one first line at a time in the background, newest first, and keeps it (`previewCache`, until the email leaves the list). Settings says so under the switch.
+- "Is Mail open?" (`MailReader.isMailRunning`): the Mac's list of running apps, and when that is empty for an instant (seen twice in two minutes) the process last seen as Mail, if it is still alive and still Mail. Measured after this fix: 20 first lines in under two minutes, 0.3 s each, none failed.
 - Every question to Mail gives up after 30 seconds: "Apple Mail is busy" (`MailAccessProblem.mailBusy`, AppleScript -1712); the next regular reading tries again.
 
 ## Self-check (0.4, `SelfCheck.swift`)

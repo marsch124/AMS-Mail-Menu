@@ -1,13 +1,26 @@
 import MailMenuCore
 import AppKit
+import Darwin
 import Foundation
 
 /// Talks to Apple Mail through AppleScript. Never starts Mail by itself.
 enum MailReader {
     static let mailBundleID = "com.apple.mail"
 
+    private static var lastMailPID: pid_t = 0
+
     static var isMailRunning: Bool {
-        !NSRunningApplication.runningApplications(withBundleIdentifier: mailBundleID).isEmpty
+        if let mail = NSRunningApplication.runningApplications(withBundleIdentifier: mailBundleID).first {
+            lastMailPID = mail.processIdentifier
+            return true
+        }
+        // The Mac's list of running apps is now and then empty for an instant while Mail is open (seen
+        // 23 Nov 2026: "Apple Mail is not open" after 0.0 s, twice in two minutes). The process itself is
+        // the proof: the one last seen as Mail is still alive and still is Mail.
+        guard lastMailPID > 0, kill(lastMailPID, 0) == 0 else { return false }
+        var path = [CChar](repeating: 0, count: 4096)
+        guard proc_pidpath(lastMailPID, &path, UInt32(path.count)) > 0 else { return false }
+        return String(cString: path).hasSuffix("/Mail.app/Contents/MacOS/Mail")
     }
 
     // Asking Mail is only quick from a program's main thread: the answers arrive there. From any other
@@ -23,8 +36,12 @@ enum MailReader {
     }
 
     /// Runs a script in a helper copy of the app and hands the answer back on the main thread.
+    @MainActor
     static func runInBackground(_ source: String,
                                 then: @escaping @MainActor (Result<NSAppleEventDescriptor, MailAccessProblem>) -> Void) {
+        // Asked here, on the main thread: from a background thread the Mac sometimes answers "not open"
+        // while Mail is open (seen 23 Nov 2026: the first lines stopped after two).
+        guard isMailRunning else { then(.failure(.mailNotRunning)); return }
         DispatchQueue.global(qos: .userInitiated).async {
             let result = runInWorker(source)
             DispatchQueue.main.async { MainActor.assumeIsolated { then(result) } }
@@ -34,7 +51,6 @@ enum MailReader {
     /// Starts the helper copy, gives it the script, waits for its answer. Never call on the main thread
     /// of the app with its window open (the self-check does, on purpose).
     static func runInWorker(_ source: String) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
-        guard isMailRunning else { return .failure(.mailNotRunning) }
         guard let program = Bundle.main.executableURL else { return .failure(.other("Internal error: the app could not find itself.")) }
         let worker = Process()
         worker.executableURL = program

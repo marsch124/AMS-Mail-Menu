@@ -130,9 +130,15 @@ final class MailStore: ObservableObject {
         guard !previewRunning, defaults.bool(forKey: SettingsKey.showPreview) else { return }
         guard let next = allMessagesNewestFirst.first(where: { previewCache[$0.id] == nil }) else { return }
         previewRunning = true
+        let began = Date()
         MailReader.runInBackground(MailScript.fetchContent(of: next)) { [weak self] result in
             guard let self else { return }
             self.previewRunning = false
+            let seconds = Date().timeIntervalSince(began)
+            switch result {
+            case .success: self.diary.notice("first line read in \(seconds, format: .fixed(precision: 1)) s")
+            case .failure(let p): self.diary.notice("first line failed after \(seconds, format: .fixed(precision: 1)) s: \(p.title, privacy: .public)")
+            }
             switch result {
             case .success(let d):
                 self.previewCache[next.id] = MessageLinks.firstLine(of: String((d.stringValue ?? "").prefix(2000)))
