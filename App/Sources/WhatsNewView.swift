@@ -22,6 +22,19 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9 (9)", date: "23 Nov 2026", items: [
+            "New: archiving a Gmail email works. Before (0.6 to 0.8), Archive on a Gmail email changed nothing and said \"Archiving does not work for Gmail yet\". Now the app talks to Gmail directly: the email leaves your Gmail inbox and stays in \"All Mail\", exactly like Archive in Gmail itself. No label is added.",
+            "New: Settings has a new part \"Gmail\" with \"Gmail address\", \"App password\" (the letters are hidden), \"Account in Mail\" (which of your accounts in Apple Mail is the Gmail one, for example \"Gmail\"; the app proposes the one with \"gmail\" or \"google\" in its name) and a blue button \"Connect\". After connecting it says \"Connected to Gmail\", with a button \"Disconnect\". If Google refuses, a plain sentence says why: wrong address or app password, or no internet.",
+            "New: the app password is made once at myaccount.google.com/apppasswords (2-Step Verification must be on). It is not your normal Google password. \"How it works\" has a new part \"The Gmail connection\" with the steps.",
+            "New: the app password is kept in your Mac's Keychain and sent only to Google, encrypted. It is never written to a file, a note or the diary. Apple Mail is not involved in this archive; Mail shows the change the next time it checks Gmail.",
+            "New: the email leaves the list at once and stays out of it even if Apple Mail has not caught up yet (the app remembers for 10 minutes which emails it archived).",
+            "Changed: Undo (the dark bar, 10 seconds) on a Gmail email puts it back in the Gmail inbox, again straight at Gmail. Before, Undo could not find it.",
+            "Changed: without the connection, Archive on a Gmail email still changes nothing, but now says: \"Archiving a Gmail email needs the Gmail connection. Open Settings and connect Gmail. Nothing was changed.\" If the email is not found in the Gmail inbox, nothing is changed and the app says so.",
+            "Changed: \"Send to PARAGON\" on a Gmail email now archives the email afterwards the same way.",
+            "Changed: iCloud and other accounts archive as before, through Apple Mail, to \"Archive\". Delete, filing in a folder, mark as read and reply still go through Apple Mail for every account (not tried on a Gmail email).",
+            "Fixed: Mail's scripting could not find ordinary folders inside the Gmail account (error -1728); the app now finds them in a second way.",
+            "Not tried on a real email yet: the Gmail connection needs your app password first. So far the conversation with Gmail was only tested against a stand-in. Tried on a test email on 23 Nov: Apple Mail's own Archive and Undo work for Gmail; a move ordered by this app through Mail does not.",
+        ]),
         Release(version: "0.8 (8)", date: "23 Nov 2026", items: [
             "Changed: blue now means one thing, the app's own colour. It marks what you can press, the headings, and new mail (the envelope in the menu bar and the \"new\" tag). An account is never blue any more.",
             "Changed: the dot of an iCloud account is violet, before blue. A blue dot on every line also looked like \"unread\", as in Apple Mail.",

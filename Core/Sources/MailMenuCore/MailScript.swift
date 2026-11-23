@@ -130,6 +130,9 @@ public enum MailScript {
     /// Mailbox names tried, in order, when archiving. Checked on the Mac at run time;
     /// iCloud normally has "Archive", Gmail in Apple Mail normally shows "All Mail".
     public static let archiveMailboxNames = ["Archive", "Archives", "All Mail", "[Gmail]/All Mail", "Archiv", "Alle Nachrichten"]
+    /// The names Apple Mail shows for Gmail's "All Mail". An account whose archive mailbox has one of these
+    /// names is a Gmail account: a move there changes nothing, so its emails are archived at Gmail itself.
+    public static let gmailAllMailNames = ["All Mail", "[Gmail]/All Mail", "Alle Nachrichten"]
     /// Mailbox names tried, in order, when undoing a delete.
     public static let trashMailboxNames = ["Trash", "Deleted Messages", "Bin", "[Gmail]/Trash", "[Gmail]/Bin", "Papierkorb", "Gelöschte Objekte"]
 
@@ -166,8 +169,10 @@ public enum MailScript {
             set destBox to my findBox(account "\(escape(message.accountName))", \(appleScriptList(archiveMailboxNames)))
             if destBox is missing value then error "No archive mailbox found in the account “\(escape(message.accountName))”." number 9002
             -- Gmail keeps every email in "All Mail" already, so moving it there changes nothing and the email
-            -- stays in the inbox (seen 23 Nov 2026). Better to say so than to pretend.
-            if (name of destBox) is "All Mail" then error "Archiving does not work for Gmail yet. Nothing was changed; the email is still in your inbox." number 9005
+            -- stays in the inbox; a move to any other Gmail folder never reaches Gmail either (both seen
+            -- 23 Nov 2026). A Gmail email is archived straight at Gmail instead (`GmailSession.archive`);
+            -- this script is only reached when that connection is not set up.
+            if (name of destBox) is in \(appleScriptList(gmailAllMailNames)) then error "\(escape(GmailProblem.notSetUp.words))" number 9005
             move m to destBox
             return name of destBox
         end tell
@@ -254,6 +259,13 @@ public enum MailScript {
                     get name of b
                     return b
                 end try
+                -- A Gmail account in Apple Mail (seen 23 Nov 2026): `mailbox "X" of acct` fails with -1728
+                -- although the folder is there; asking by `whose name is` finds it, also for a whole path.
+                try
+                    set b to first mailbox of acct whose name is thePath
+                    get name of b
+                    return b
+                end try
                 set AppleScript's text item delimiters to "/"
                 set parts to text items of thePath
                 set AppleScript's text item delimiters to ""
@@ -273,6 +285,12 @@ public enum MailScript {
                 repeat with n in names
                     try
                         set b to mailbox (n as text) of acct
+                        get name of b
+                        return b
+                    end try
+                    -- Gmail folders are only found this way (see resolveBox).
+                    try
+                        set b to first mailbox of acct whose name is (n as text)
                         get name of b
                         return b
                     end try

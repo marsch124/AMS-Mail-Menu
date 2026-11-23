@@ -26,6 +26,11 @@ public enum SettingsKey {
     public static let menuBarShowTime = "menuBarShowTime"
     public static let openTarget = "openTarget"
     public static let refreshSeconds = "refreshSeconds"
+    /// The direct Gmail connection (0.9): the Gmail address, the name of that account in Apple Mail,
+    /// and whether Google accepted the app password (which itself is only in the Keychain).
+    public static let gmailAddress = "gmailAddress"
+    public static let gmailMailAccount = "gmailMailAccount"
+    public static let gmailConnected = "gmailConnected"
 }
 
 public enum SettingsDefault {

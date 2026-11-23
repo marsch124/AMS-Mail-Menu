@@ -201,10 +201,20 @@ enum SelfCheck {
                     case "settings":
                         openSettings()
                         NSApp.activate(ignoringOtherApps: true)
+                    case "gmail":
+                        // The Settings window on its Gmail tab, to look at the real window.
+                        openSettings()
+                        NSApp.activate(ignoringOtherApps: true)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            NotificationCenter.default.post(name: SettingsView.showTab, object: "gmail")
+                        }
                     case "report":
                         store.reportReadEmails()
                     case "archiveUndo":
                         store.checkArchiveAndUndo()
+                    case "archiveUndoTest":
+                        // Only the test email with this exact subject; no real email is ever picked.
+                        store.checkArchiveAndUndo(onlySubject: "Mail Menu test")
                     case "close":
                         for window in NSApp.windows where window.isVisible && window.styleMask.contains(.titled) {
                             window.close()
@@ -248,6 +258,7 @@ enum SelfCheck {
             "file": (AnyView(FilePicker(message: first) { _ in }), nil),
             "paragon": (AnyView(ParagonSheet(message: first) { _ in }), nil),
             "settings": (AnyView(SettingsView()), nil),
+            "gmail": (AnyView(SettingsView(tab: "gmail")), nil),
             "guide": (AnyView(GuideView().padding(.horizontal, 4).frame(width: 480)), nil),
             "news": (AnyView(WhatsNewView().padding(.horizontal, 4).frame(width: 480)), nil),
         ]

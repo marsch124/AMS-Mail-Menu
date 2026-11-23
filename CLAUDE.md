@@ -55,18 +55,26 @@ Claude's reading (interpretation, not the owner's words):
   email text through `MessageLinks.tidyBody`; main buttons filled blue, Delete red; no bold in the windows.
   How to look: SPEC "Seeing the real windows" and "Checking the real panel without a click". 23 tests.
   All actions run through the helper since 15:13 (no more freezes). Tried on real mail with the owner's yes:
-  iCloud archive + Undo works; 🚨 Gmail archive does NOT (the email stays in the inbox, Undo cannot find it;
-  nothing lost) - open, see SPEC "Tried on real mail". Never run `archiveUndo` without his yes for that run:
+  iCloud archive + Undo works; Gmail archive did NOT through Apple Mail (the email stays in the inbox, Undo
+  cannot find it; nothing lost) - solved in 0.9, see below and SPEC "Tried on real mail". Never run `archiveUndo` without his yes for that run:
   on 23 Nov a second run picked a different email than the one he had agreed to.
   NOT tried: delete, mark as read, reply, file, send to PARAGON on a real email.
 - 0.6 (6), 2026-11-23 15:25: the owner's font pick, option 2 of six: all sizes 2 points smaller through
   `Look.f` (`Look.delta = -2`), small controls, no bold except the list title "Mail". See SPEC "Letters".
 - 2026-11-23 15:33: 🚨 a try `set deleted status of m to true` on a Gmail email CRASHED Apple Mail. Never use
-  it. Gmail archive stays open (SPEC "Tried on real mail"); the app now says so instead of pretending.
+  it. Gmail archive was open then (solved in 0.9, see below); the app said so instead of pretending.
   No more tries on the owner's mail without a new yes that names the email and the exact step.
 - 0.7 (7), 2026-11-23 15:45: the owner's width pick, option 4 of four: the list is 260 points wide
   (`Look.panelWidth`), "Mark read" instead of "Mark all read", no scroll bar. See SPEC "The narrow list".
 - 0.8 (8), 2026-11-23 15:53: one meaning per colour (SPEC "Colours"): blue = the app's own colour, iCloud
   violet, Gmail green, orange = warning only, red = delete only. The four side branches of the first cloud
   session were deleted on GitHub with the owner's yes; only `main` is left.
+- 0.9 (9), 2026-11-23: Gmail archive = a DIRECT connection to Gmail (IMAP, imap.gmail.com:993, app password in the
+  Keychain, `GmailConnection.swift` + Core `GmailIMAP.swift`; Settings part "Gmail"). 🚨 A move ordered through Apple
+  Mail's scripting NEVER reaches Gmail (All Mail: nothing; new label folder: back in the inbox after seconds), so
+  filing in a folder probably cannot work for Gmail either (not tried). Mail's OWN menu works (Message > Archive,
+  Edit > Undo Archive Message). In the Gmail account use `first mailbox of account "Gmail" whose name is "X"`
+  (`mailbox "X" of account` fails -1728; `findBox`/`resolveBox` fall back). Warnings kept: never send
+  `set deleted status`; `archiveUndo` only with the owner's yes for that run; `archiveUndoTest` touches ONLY the
+  email with the subject exactly "Mail Menu test". See SPEC "Gmail archive: the direct connection (0.9)".
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

@@ -26,6 +26,8 @@ final class MailStore: ObservableObject {
         let text: String
         /// Mailboxes where the email may now be.
         let fromBoxes: [String]
+        /// True when the email was archived straight at Gmail: Undo goes there too.
+        var atGmail = false
     }
 
     /// A diary in the Mac's log: counts and times only, never the words of an email.
@@ -96,7 +98,7 @@ final class MailStore: ObservableObject {
             let seconds = Date().timeIntervalSince(began)
             switch result {
             case .success(let descriptor):
-                self.listed = MailScript.parseInboxes(descriptor)
+                self.listed = self.withoutArchivedAtGmail(MailScript.parseInboxes(descriptor))
                 self.diary.notice("read \(self.listed.count) emails, \(self.listed.filter { !$0.isRead }.count) unread, in \(seconds, format: .fixed(precision: 1)) s")
                 self.listLimit = count
                 let here = Set(self.listed.map(\.id))
@@ -130,10 +132,19 @@ final class MailStore: ObservableObject {
 
     /// Archives the newest email that is already read, then takes it back with Undo, and writes each step
     /// into the diary (never the words of the email). Started by the notice "show" with the word "archiveUndo".
-    func checkArchiveAndUndo() {
+    /// With `onlySubject` (the word "archiveUndoTest"): only the email with exactly that subject, read or not,
+    /// and nothing at all if there is none. That is how a test email is tried and no real one.
+    func checkArchiveAndUndo(onlySubject: String? = nil) {
         // From everything read from Mail, not only the newest that the list shows.
-        guard let message = listed.sorted(by: { $0.dateReceived > $1.dateReceived }).first(where: { $0.isRead }) else {
-            diary.notice("check: no read email in the list, nothing done")
+        let newestFirst = listed.sorted(by: { $0.dateReceived > $1.dateReceived })
+        let picked: MailMessage?
+        if let onlySubject {
+            picked = newestFirst.first(where: { $0.subject == onlySubject })
+        } else {
+            picked = newestFirst.first(where: { $0.isRead })
+        }
+        guard let message = picked else {
+            diary.notice("check: no such email in the list, nothing done")
             return
         }
         let key = message.messageID
@@ -289,6 +300,10 @@ final class MailStore: ObservableObject {
     }
 
     func archive(_ message: MailMessage) {
+        if !isSample, GmailConnection.handles(accountName: message.accountName) {
+            archiveAtGmail(message)
+            return
+        }
         hide(message)
         perform(MailScript.archive(message), note: "Archiving…") { [weak self] result in
             guard case .success(let answer) = result else { return }
@@ -379,12 +394,86 @@ final class MailStore: ObservableObject {
     func undoLast() {
         guard let info = undoInfo else { return }
         hideUndo()
+        if info.atGmail { putBackAtGmail(info.message); return }
         perform(MailScript.moveBack(info.message, fromAnyOf: info.fromBoxes), note: "Putting the email back…")
     }
 
     func hideUndo() {
         undoTimer?.invalidate()
         undoInfo = nil
+    }
+
+    // MARK: - Straight at Gmail (0.9)
+    // Apple Mail never passes a move ordered by another app on to Gmail (tried 23 Nov 2026), so a Gmail
+    // email is archived, and put back, at Gmail itself. Mail shows the change when it next checks Gmail.
+
+    /// Emails archived at Gmail, by their Message-ID, and when. Until Mail has caught up they would come
+    /// back into the list at the next reading; they are kept out for `gmailQuiet` seconds.
+    private var archivedAtGmail: [String: Date] = [:]
+    private let gmailQuiet: TimeInterval = 600
+
+    /// The names of the accounts the inboxes belong to, for "Account in Mail" in Settings.
+    var accountNames: [String] {
+        var seen: [String] = []
+        let source = everythingRead.isEmpty ? groups.flatMap(\.messages) : everythingRead
+        for name in source.map(\.accountName) where !name.isEmpty && !seen.contains(name) { seen.append(name) }
+        return seen
+    }
+
+    /// Everything the last reading brought, also what `withoutArchivedAtGmail` keeps out of the list.
+    private var everythingRead: [MailMessage] = []
+
+    /// What a reading from Mail may show: not the emails archived at Gmail a moment ago.
+    private func withoutArchivedAtGmail(_ messages: [MailMessage]) -> [MailMessage] {
+        everythingRead = messages
+        let now = Date()
+        archivedAtGmail = archivedAtGmail.filter { now.timeIntervalSince($0.value) < gmailQuiet }
+        guard !archivedAtGmail.isEmpty else { return messages }
+        return messages.filter { archivedAtGmail[$0.messageID] == nil }
+    }
+
+    private func archiveAtGmail(_ message: MailMessage) {
+        hide(message)
+        archivedAtGmail[message.messageID] = Date()
+        workNote = "Archiving…"
+        let began = Date()
+        Task { [weak self] in
+            do {
+                try await GmailConnection.archive(messageID: message.messageID)
+                guard let self else { return }
+                self.workNote = nil
+                self.actionError = nil
+                self.diary.notice("gmail: archived in \(Date().timeIntervalSince(began), format: .fixed(precision: 1)) s")
+                self.showUndo(UndoInfo(message: message, text: "Archived “\(message.subject)”", fromBoxes: [], atGmail: true))
+            } catch {
+                guard let self else { return }
+                self.workNote = nil
+                self.archivedAtGmail[message.messageID] = nil
+                self.actionError = GmailConnection.words(for: error)
+                self.diary.notice("gmail: archive FAILED after \(Date().timeIntervalSince(began), format: .fixed(precision: 1)) s: \(String(describing: error), privacy: .public)")
+                self.refresh()
+            }
+        }
+    }
+
+    private func putBackAtGmail(_ message: MailMessage) {
+        workNote = "Putting the email back…"
+        let began = Date()
+        Task { [weak self] in
+            do {
+                try await GmailConnection.putBack(messageID: message.messageID)
+                guard let self else { return }
+                self.archivedAtGmail[message.messageID] = nil
+                self.actionError = nil
+                self.diary.notice("gmail: put back in \(Date().timeIntervalSince(began), format: .fixed(precision: 1)) s")
+            } catch {
+                guard let self else { return }
+                self.actionError = GmailConnection.words(for: error)
+                self.diary.notice("gmail: put back FAILED after \(Date().timeIntervalSince(began), format: .fixed(precision: 1)) s: \(String(describing: error), privacy: .public)")
+            }
+            self?.workNote = nil
+            self?.refresh()
+        }
     }
 
     private func showUndo(_ info: UndoInfo) {

@@ -119,6 +119,96 @@ final class ScriptTests: XCTestCase {
         }
     }
 
+    /// 0.9: through Apple Mail a Gmail email is never moved (a move there never reaches Gmail); the script
+    /// stops with plain words, and never uses the command that made Apple Mail crash on 23 Nov 2026.
+    func testGmailArchiveThroughMailStopsWithPlainWords() {
+        let message = MailMessage(mailID: 7, messageID: "x@example.com", accountName: "Gmail",
+                                  mailboxName: "INBOX", sender: Sender.parse("a@example.com"),
+                                  subject: "", dateReceived: Date(), isRead: true, preview: nil)
+        let source = MailScript.archive(message)
+        XCTAssertTrue(source.contains("is in {\"All Mail\", \"[Gmail]/All Mail\", \"Alle Nachrichten\"} then error \"Archiving a Gmail email needs the Gmail connection."))
+        XCTAssertTrue(source.contains("number 9005"))
+        XCTAssertFalse(source.contains("deleted status"))
+    }
+
+    /// A scripted mail server: gives the answers in order and keeps what the app sent.
+    final class ScriptedServer: IMAPLineTransport {
+        var answers: [String]
+        var sent: [String] = []
+        init(_ answers: [String]) { self.answers = answers }
+        func send(_ line: String) async throws { sent.append(line) }
+        func readLine() async throws -> String {
+            guard !answers.isEmpty else { throw GmailProblem.noConnection("no more answers") }
+            return answers.removeFirst()
+        }
+    }
+
+    /// 0.9: archiving at Gmail takes exactly the one email out of the inbox and checks that it is gone.
+    func testGmailArchiveConversation() async throws {
+        let server = ScriptedServer([
+            "* OK Gimap ready",
+            "* CAPABILITY IMAP4rev1", "a1 OK signed in",
+            "* 12 EXISTS", "a2 OK [READ-WRITE] INBOX selected",
+            "* SEARCH 4711", "a3 OK SEARCH completed",
+            "a4 OK STORE completed",
+            "a5 OK EXPUNGE completed",
+            "* SEARCH", "a6 OK SEARCH completed",
+        ])
+        let session = GmailSession(transport: server)
+        try await session.signIn(address: "me@example.com", password: "abcd efgh ijkl mnop")
+        try await session.archive(messageID: "x1y2z3@example.com")
+        XCTAssertEqual(server.sent, [
+            "a1 LOGIN \"me@example.com\" \"abcdefghijklmnop\"",
+            "a2 SELECT INBOX",
+            "a3 UID SEARCH HEADER Message-ID \"<x1y2z3@example.com>\"",
+            "a4 UID STORE 4711 +FLAGS.SILENT (\\Deleted)",
+            "a5 UID EXPUNGE 4711",
+            "a6 UID SEARCH HEADER Message-ID \"<x1y2z3@example.com>\"",
+        ])
+    }
+
+    /// 0.9: the safety rules of the Gmail connection. An empty mark would match every email in the inbox.
+    func testGmailSafetyRules() async throws {
+        XCTAssertNil(GmailIMAP.needle(messageID: ""))
+        XCTAssertNil(GmailIMAP.needle(messageID: "  <> "))
+        XCTAssertEqual(GmailIMAP.needle(messageID: "<abc123@example.com>"), "<abc123@example.com>")
+        XCTAssertEqual(GmailIMAP.searchUIDs(in: ["* SEARCH 3 17", "* 5 EXISTS"]), ["3", "17"])
+        XCTAssertEqual(GmailIMAP.searchUIDs(in: ["* SEARCH"]), [])
+        XCTAssertEqual(GmailIMAP.allMailFolder(in: [
+            "* LIST (\\HasNoChildren \\Sent) \"/\" \"[Gmail]/Sent Mail\"",
+            "* LIST (\\All \\HasNoChildren) \"/\" \"[Gmail]/All Mail\"",
+        ]), "[Gmail]/All Mail")
+
+        // Nothing is sent to change an email when it is not found, when too many match, or with no mark.
+        for found in ["* SEARCH", "* SEARCH 1 2 3 4"] {
+            let server = ScriptedServer(["* 12 EXISTS", "a1 OK selected", found, "a2 OK done"])
+            do {
+                try await GmailSession(transport: server).archive(messageID: "x1y2z3@example.com")
+                XCTFail("should have stopped")
+            } catch {}
+            XCTAssertFalse(server.sent.contains { $0.contains("STORE") || $0.contains("EXPUNGE") })
+        }
+        let silent = ScriptedServer([])
+        do { try await GmailSession(transport: silent).archive(messageID: ""); XCTFail("should have stopped") } catch {}
+        XCTAssertEqual(silent.sent, [])
+
+        // Undo: found in "All Mail", copied back to the inbox.
+        let back = ScriptedServer([
+            "* LIST (\\All \\HasNoChildren) \"/\" \"[Gmail]/All Mail\"", "a1 OK listed",
+            "a2 OK selected", "* SEARCH 99", "a3 OK done", "a4 OK copied",
+        ])
+        try await GmailSession(transport: back).putBack(messageID: "x1y2z3@example.com")
+        XCTAssertEqual(back.sent.last, "a4 UID COPY 99 INBOX")
+        XCTAssertEqual(back.sent[1], "a2 SELECT \"[Gmail]/All Mail\"")
+
+        // A refused sign-in is told as a wrong address or app password.
+        let refused = ScriptedServer(["* OK ready", "a1 NO [AUTHENTICATIONFAILED] Invalid credentials (Failure)"])
+        do {
+            try await GmailSession(transport: refused).signIn(address: "me@example.com", password: "wrong")
+            XCTFail("should have been refused")
+        } catch { XCTAssertEqual(error as? GmailProblem, .wrongPassword) }
+    }
+
     func testParseInboxes() {
         func list(_ items: [NSAppleEventDescriptor]) -> NSAppleEventDescriptor {
             let l = NSAppleEventDescriptor.list()

@@ -21,6 +21,7 @@
 		DE831933192AA86F494845E9 /* Keeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10BCD77B7245AC436529F07 /* Keeper.swift */; };
 		F20CFC452235898200AAF19C /* GuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F4076A23395A49D6EA2546 /* GuideView.swift */; };
 		F8D5BB667BAA3E4D1D4727E7 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE35801FF528FAE74BCF9971 /* SettingsView.swift */; };
+		F8EDE780FC1A4A9AA8771E8C /* GmailConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7912C7877E45B0B435D6B42 /* GmailConnection.swift */; };
 		F90EB42D8DEE9D0E4D7460FF /* SelfCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F3A219B3B72A3ACB16AA9F6 /* SelfCheck.swift */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,7 @@
 		A8F4076A23395A49D6EA2546 /* GuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideView.swift; sourceTree = "<group>"; };
 		BFD7F04532FBA6422F048427 /* WhatsNewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewView.swift; sourceTree = "<group>"; };
 		C115EF19F5361D9302C3D428 /* MailReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailReader.swift; sourceTree = "<group>"; };
+		D7912C7877E45B0B435D6B42 /* GmailConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GmailConnection.swift; sourceTree = "<group>"; };
 		DE35801FF528FAE74BCF9971 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		E10BCD77B7245AC436529F07 /* Keeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keeper.swift; sourceTree = "<group>"; };
 		E4608D50AE399FF53638E22F /* Core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Core; path = Core; sourceTree = SOURCE_ROOT; };
@@ -76,6 +78,7 @@
 			children = (
 				EA4602BA781785FDF1C054E6 /* AMSMailMenuApp.swift */,
 				2E2CE7A61E0ACF1EF0436B31 /* Colours.swift */,
+				D7912C7877E45B0B435D6B42 /* GmailConnection.swift */,
 				A8F4076A23395A49D6EA2546 /* GuideView.swift */,
 				E10BCD77B7245AC436529F07 /* Keeper.swift */,
 				2745C5BB0C6956CD11C48FEC /* Look.swift */,
@@ -195,6 +198,7 @@
 			files = (
 				9AD615B98B829BF9BBAEA8EF /* AMSMailMenuApp.swift in Sources */,
 				238DA5B8EEEAE03590C59B8D /* Colours.swift in Sources */,
+				F8EDE780FC1A4A9AA8771E8C /* GmailConnection.swift in Sources */,
 				F20CFC452235898200AAF19C /* GuideView.swift in Sources */,
 				DE831933192AA86F494845E9 /* Keeper.swift in Sources */,
 				3EF093AC9D6AC0608FCB4A57 /* Look.swift in Sources */,
@@ -282,7 +286,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = D24ENP83QQ;
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = App/Config/Info.plist;
@@ -290,7 +294,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.8;
+				MARKETING_VERSION = 0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.schabbauer.AMSMailMenu;
 				PRODUCT_NAME = "AMS Mail Menu";
 				SDKROOT = macosx;
@@ -361,7 +365,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = D24ENP83QQ;
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = App/Config/Info.plist;
@@ -369,7 +373,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.8;
+				MARKETING_VERSION = 0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.schabbauer.AMSMailMenu;
 				PRODUCT_NAME = "AMS Mail Menu";
 				SDKROOT = macosx;

@@ -1,6 +1,6 @@
 # AMS Mail Menu
 
-A small Mac menu bar app, version 0.8 (build 8). It shows your newest emails from Apple Mail, grouped by sender.
+A small Mac menu bar app, version 0.9 (build 9). It shows your newest emails from Apple Mail, grouped by sender.
 
 **Not yet built on a Mac.** The rules in `Core` pass their tests; the app itself has not been compiled yet (see "State" below).
 
@@ -12,7 +12,8 @@ A small Mac menu bar app, version 0.8 (build 8). It shows your newest emails fro
 - The menu bar icon turns blue while new mail waits (Settings: count or dot instead).
 - Settings has three tabs: Settings (with "Open at login"), How it works (the guide, with "Signs in this app") and What's new. The version number shows there.
 - While "Open at login" is on, a keeper opens the app again if it ever stops unexpectedly. Only one copy runs.
-- Apple Mail is read with AppleScript. No passwords are used or stored. Nothing leaves your Mac.
+- Archiving a Gmail email works through a direct connection to Gmail that you set up yourself in Settings (Gmail address and a Google app password, kept in the Mac's Keychain). Without it, Archive on a Gmail email changes nothing and says so. Other accounts archive through Apple Mail.
+- Apple Mail is read with AppleScript. Nothing leaves your Mac except this one connection to Google, which you set up yourself.
 
 Build: `Tools/install.sh` (needs Xcode and XcodeGen). Rules and tests: `Core` (`swift test`). Details: [Docs/SPEC.md](Docs/SPEC.md).
 

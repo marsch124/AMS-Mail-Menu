@@ -111,8 +111,39 @@ Archive, delete, file, mark as read, reply, Undo and the folder list all go thro
 - iCloud: one read email archived to "Archive" (3.3 s) and brought back with Undo (11.3 s, then on the main thread). Back in the inbox, checked by its Message-ID.
 - 🚨 Gmail, NOT working, and why (looked at with `--gmail-look`, which changes nothing): the account is plain IMAP; every email sits in "INBOX" AND in "All Mail" at once. `move m to mailbox "All Mail"` answers without error (26.7 s) but changes nothing: the email stays in the inbox. Undo then answers "The email could not be found to move it back".
 - 🚨🚨 `set deleted status of m to true` (meant as "take it out of the inbox only") made **Apple Mail itself crash** (Mail 16.0, macOS 26.6.2, 23 Nov 2026 15:33:53, abort in `-[MCMessage(ScriptingSupport) setIsDeleted:]`). The email was untouched. Never send Mail that command. The try was removed from the app.
-- Since then `MailScript.archive` stops before the move when the archive mailbox is named "All Mail": "Archiving does not work for Gmail yet. Nothing was changed; the email is still in your inbox." (error 9005). Not tried on real mail. Open: a safe way to archive a Gmail email through Apple Mail; none is known. Also open: `archive` returns only the last part of the mailbox name, so Undo could miss a mailbox that sits inside another.
+- 0.6 to 0.8: `MailScript.archive` stopped before the move when the archive mailbox is named "All Mail": "Archiving does not work for Gmail yet. Nothing was changed; the email is still in your inbox." (error 9005). **SOLVED in 0.9** by the direct Gmail connection, see "Gmail archive: the direct connection (0.9)". Still open: `archive` returns only the last part of the mailbox name, so Undo could miss a mailbox that sits inside another.
 - The check itself: the notice `show` with the word `archiveUndo` archives the newest READ email and undoes it; `report` only lists which read emails the inboxes hold. 🚨 `archiveUndo` changes the owner's mail: only with his yes for that very run.
+
+## Gmail archive: the direct connection (0.9)
+History, 23 Nov 2026:
+- 0.6 to 0.8: archiving a Gmail email did not work; the app said "Archiving does not work for Gmail yet. Nothing was changed; the email is still in your inbox."
+- Tried on a test email "Mail Menu test" (sent to the owner's own Gmail, with his yes): a move ordered by another app through Apple Mail's scripting NEVER reaches Gmail. Moved to "All Mail": nothing happens. Moved to a new label folder "Archived": Mail showed the email there for a few seconds, then it was back in the inbox; Gmail itself still had it in the inbox with no label. So "file in a folder" probably cannot work for a Gmail email either (not tried).
+- Proven to work on the same test email: Apple Mail's own menu, Message > Archive (out of the Gmail inbox within seconds) and Edit > "Undo Archive Message" (back in the inbox).
+- The owner was offered three ways (the app presses Mail's own Archive; a direct Gmail connection; leave it off) and picked "Connect to Gmail directly".
+- In the Gmail account, `mailbox "X" of account "Gmail"` fails (-1728) for ordinary folders; `first mailbox of account "Gmail" whose name is "X"` works (folder names there are whole paths; 924 folders). `findBox` and `resolveBox` in `MailScript` now fall back to that form.
+- 🚨 Never send Mail `set deleted status` (it crashed Apple Mail on 23 Nov 2026).
+- 🚨 The check words that change mail (`archiveUndo`) need the owner's yes for that very run. New check word `archiveUndoTest`: archives and undoes ONLY the email whose subject is exactly "Mail Menu test", never a real email.
+
+Settings, part "Gmail" (keys `gmailAddress` and `gmailMailAccount` in the app's settings):
+- "Gmail address"; "App password" (a secure field, the letters hidden); "Account in Mail" (which account in Apple Mail is the Gmail one, for example "Gmail"; proposed: the account whose name contains "gmail" or "google"); main blue button "Connect"; after connecting the line "Connected to Gmail" and a button "Disconnect".
+- If Google refuses, one plain sentence says why: wrong address or app password; no internet.
+- The app password is made at myaccount.google.com/apppasswords (Google account > Security > 2-Step Verification must be on > App passwords), named "AMS Mail Menu", the 16 letters pasted into "App password". It is not the normal Google password.
+- The app password lives in the Mac's Keychain, service `com.schabbauer.AMSMailMenu.gmail`. It is sent only to Google (imap.gmail.com, port 993, encrypted). It is never written to a file, a note or the diary.
+
+Archive:
+- With the connection on, Archive on an email of the chosen Mail account goes straight to Gmail: the email leaves the Gmail inbox and stays in "All Mail", exactly like Archive in Gmail itself. No label is added. Apple Mail is not involved; Mail shows the change the next time it checks Gmail.
+- The email leaves the app's list at once and stays out of it even if Apple Mail has not caught up yet: the app remembers for 10 minutes which emails it archived directly.
+- Undo (the dark bar, 10 seconds) puts the email back in the Gmail inbox, again straight at Gmail.
+- Without the connection, Archive on a Gmail email changes nothing and says: "Archiving a Gmail email needs the Gmail connection. Open Settings and connect Gmail. Nothing was changed."
+- If the email is not found in the Gmail inbox, nothing is changed and the app says so.
+- iCloud and other accounts archive as before, through Apple Mail, to "Archive". Delete, file in a folder, mark as read and reply still go through Apple Mail for every account (not tried on a Gmail email).
+- Send to PARAGON archives the email afterwards the same way.
+
+How it talks to Gmail: IMAP over TLS with Network.framework (`GmailConnection.swift` in App, the rules in Core `GmailIMAP.swift`).
+- Archive: LOGIN, SELECT INBOX, UID SEARCH HEADER Message-ID, UID STORE +FLAGS.SILENT (\Deleted), UID EXPUNGE, then a second search must find nothing (otherwise the archive is reported as not done).
+- Undo: LIST "" "[Gmail]/%" to find the folder flagged \All, SELECT it, UID SEARCH HEADER Message-ID, UID COPY to INBOX.
+
+- Tried so far (23 Nov 2026): only against a scripted stand-in server (`testGmailArchiveConversation`, `testGmailSafetyRules`). NOT yet tried at Gmail itself: the owner has to make the app password and connect first. Then: the notice `show` with the word `archiveUndoTest` archives and undoes only the email with the subject "Mail Menu test".
 
 ## The list closes for a window (0.6)
 Before Triage or the message window opens, the list panel closes (`SelfCheck.closePanel`: a click on the app's own menu bar button, only while the panel is open), so the window is not hidden under it. The owner, 23 Nov 2026: "The triage window is under the list."
