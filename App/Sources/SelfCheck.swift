@@ -1,4 +1,5 @@
 import AppKit
+import os
 import Foundation
 import SwiftUI
 import MailMenuCore
@@ -24,7 +25,83 @@ enum SelfCheck {
         ("ids 1-20 of the joint inbox", "tell application \"Mail\" to return count of (get id of messages 1 thru 20 of inbox)"),
     ]
 
+    /// `--gmail-look <file>`: looks at the Gmail account without changing anything, to find out why archiving
+    /// leaves an email in the inbox. Writes the account kinds, the names of Gmail's mailboxes, and for the one
+    /// email the owner named (read, received 19 Nov 2026 at 08:02) its marks. Never the words of an email.
+    static let gmailLooks: [(String, String)] = [
+        ("accounts", """
+            tell application "Mail"
+                set out to {}
+                repeat with a in accounts
+                    set end of out to (name of a) & " | " & (account type of a as text) & " | enabled " & (enabled of a as text)
+                end repeat
+                return out
+            end tell
+            """),
+        ("mailboxes of Gmail", MailScript.listMailboxes(account: "Gmail")),
+        ("the email in the inbox", """
+            tell application "Mail"
+                set mb to mailbox "INBOX" of account "Gmail"
+                set out to {"inbox holds " & (count of messages of mb)}
+                repeat with m in messages of mb
+                    set d to date received of m
+                    set mark to ""
+                    if (day of d = 19 and (month of d as integer) = 11 and hours of d = 8 and minutes of d = 2) then set mark to "  <-- the named email"
+                    set end of out to "id " & (id of m) & " | read " & (read status of m as text) & " | deleted " & (deleted status of m as text) & " | junk " & (junk mail status of m as text) & " | day " & (day of d) & "." & (month of d as integer) & " " & (hours of d) & ":" & (minutes of d) & mark
+                end repeat
+                return out
+            end tell
+            """),
+        ("the same email in other mailboxes", """
+            tell application "Mail"
+                set mb to mailbox "INBOX" of account "Gmail"
+                set theKey to ""
+                repeat with m in messages of mb
+                    set d to date received of m
+                    if (day of d = 19 and (month of d as integer) = 11 and hours of d = 8 and minutes of d = 2) then set theKey to message id of m
+                end repeat
+                if theKey is "" then return {"the named email is not in the inbox"}
+                set out to {}
+                repeat with b in mailboxes of account "Gmail"
+                    try
+                        with timeout of 40 seconds
+                            set n to count of (messages of b whose message id is theKey)
+                        end timeout
+                        set end of out to (name of b) & ": " & n & " copy"
+                    on error errMsg
+                        set end of out to (name of b) & ": could not look (" & errMsg & ")"
+                    end try
+                end repeat
+                return out
+            end tell
+            """),
+    ]
+
+    static func gmailLookIfAsked() {
+        let arguments = CommandLine.arguments
+        guard let at = arguments.firstIndex(of: "--gmail-look"), at + 1 < arguments.count else { return }
+        let file = URL(fileURLWithPath: arguments[at + 1])
+        var lines: [String] = []
+        for (name, source) in gmailLooks {
+            let start = Date()
+            lines.append("== \(name)")
+            switch MailReader.run(source) {
+            case .success(let d):
+                let items = MailScript.items(of: d).compactMap(\.stringValue)
+                lines.append(contentsOf: items.isEmpty ? [d.stringValue ?? "(nothing)"] : items)
+            case .failure(let problem):
+                lines.append("problem: \(problem.explanation)")
+            }
+            lines.append(String(format: "   took %.1f s", Date().timeIntervalSince(start)))
+            try? lines.joined(separator: "\n").write(to: file, atomically: true, encoding: .utf8)
+        }
+        lines.append("done")
+        try? lines.joined(separator: "\n").write(to: file, atomically: true, encoding: .utf8)
+        exit(0)
+    }
+
     static func probeIfAsked() {
+        gmailLookIfAsked()
         let arguments = CommandLine.arguments
         guard let at = arguments.firstIndex(of: "--probe"), at + 1 < arguments.count else { return }
         let file = URL(fileURLWithPath: arguments[at + 1])
@@ -42,6 +119,34 @@ enum SelfCheck {
         lines.append("done")
         try? lines.joined(separator: "\n").write(to: file, atomically: true, encoding: .utf8)
         exit(0)
+    }
+
+    /// The app's own menu bar button.
+    @MainActor
+    static func statusButton() -> NSStatusBarButton? {
+        func button(in view: NSView?) -> NSStatusBarButton? {
+            guard let view else { return nil }
+            if let found = view as? NSStatusBarButton { return found }
+            for sub in view.subviews { if let found = button(in: sub) { return found } }
+            return nil
+        }
+        for window in NSApp.windows { if let found = button(in: window.contentView) { return found } }
+        return nil
+    }
+
+    /// The list panel, while it is open.
+    @MainActor
+    static func openPanel() -> NSWindow? {
+        NSApp.windows.first { $0.isVisible && String(describing: type(of: $0)).contains("MenuBarExtra") }
+    }
+
+    /// Closes the list panel, the way a click on the menu bar icon does. Called before a window of the app
+    /// opens, so the window is not hidden under the list (the owner, 23 Nov 2026: "The triage window is
+    /// under the list").
+    @MainActor
+    static func closePanel() {
+        guard openPanel() != nil else { return }
+        statusButton()?.performClick(nil)
     }
 
     /// For checks: another program on this Mac can ask the running app to press its own menu bar icon
@@ -80,7 +185,13 @@ enum SelfCheck {
                         if let read = store.allMessagesNewestFirst.first(where: { $0.isRead }) {
                             store.openInWindow(read) { openWindow(id: $0) }
                         }
+                    case "windows":
+                        for window in NSApp.windows where window.isVisible {
+                            Logger(subsystem: "com.schabbauer.AMSMailMenu", category: "reading")
+                                .notice("window: \(String(describing: type(of: window)), privacy: .public) \(window.title, privacy: .public)")
+                        }
                     case "triage":
+                        SelfCheck.closePanel()
                         openWindow(id: "triage")
                         NSApp.activate(ignoringOtherApps: true)
                     case "settings":

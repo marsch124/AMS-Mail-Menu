@@ -233,6 +233,7 @@ final class MailStore: ObservableObject {
     func openInWindow(_ message: MailMessage, openWindow: (String) -> Void) {
         selectedMessage = message
         selectedContent = "Loading…"
+        SelfCheck.closePanel()
         openWindow("message")
         NSApp.activate(ignoringOtherApps: true)
         loadContent(of: message) { [weak self] text in

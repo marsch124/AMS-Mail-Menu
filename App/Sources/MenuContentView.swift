@@ -58,6 +58,7 @@ struct MenuContentView: View {
             Spacer()
             Text("Newest \(emailCount)").font(Look.f(10)).foregroundStyle(.secondary)
             Button {
+                SelfCheck.closePanel()
                 openWindow(id: "triage")
                 NSApp.activate(ignoringOtherApps: true)
             } label: {
