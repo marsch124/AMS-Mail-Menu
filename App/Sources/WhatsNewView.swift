@@ -1,0 +1,89 @@
+import SwiftUI
+
+/// The version of the running app, read from the bundle.
+enum AppInfo {
+    static var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1"
+    }
+    static var build: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+    }
+    /// For example "Version 0.1 (1)".
+    static var line: String { "Version \(version) (\(build))" }
+}
+
+struct Release: Identifiable {
+    let id = UUID()
+    let version: String
+    let date: String
+    let items: [String]
+}
+
+enum WhatsNew {
+    /// Newest first.
+    static let releases: [Release] = [
+        Release(version: "0.2 (2)", date: "23 Nov 2026", items: [
+            "New: the first version that runs on your Mac. 0.1 was written where no Mac was at hand and had never been started.",
+            "New: a fixed place for the menu bar icon, just left of the Deck Mate icon. Before, the Mac put the new icon at the far left of your full menu bar, where it could not be seen.",
+            "New: \"Open at login\" in Settings (off at first). While it is on, the app opens at every login.",
+            "New: the keeper. While \"Open at login\" is on, a second start order with the Mac opens the app again within about 10 seconds if it ever stops unexpectedly. If you quit it yourself, it stays closed.",
+            "New: only one copy of the app can sit in the menu bar. A second copy closes itself at once.",
+            "New: Settings now has three tabs: Settings, How it works, What's new.",
+            "New: \"How it works\", a guide to the whole app. It ends with \"Signs in this app\": every mark and colour and what it means.",
+            "New: \"What's new\", this list.",
+            "New: the version number shows at the bottom of the Settings tab.",
+            "Not there yet: an app icon. The icon library has no envelope yet.",
+        ]),
+        Release(version: "0.1 (1)", date: "23 Nov 2026", items: [
+            "New: AMS Mail Menu, a small app in the menu bar. It shows your newest emails from Apple Mail, grouped by sender.",
+            "New: the list. It shows the newest emails (20 at first, 5 to 100 in Settings) from the inboxes of all your accounts. Senders are ordered by their newest email, and inside a sender the newest email is on top. A sender with new mail is open, one without is closed, and you can open or close any by hand.",
+            "New: each email line shows the subject (bold while new) and the time. Settings can add the first line of the text and a small coloured dot for the account: blue for iCloud, orange for Gmail, grey for others.",
+            "New: a blue \"3 new\" tag on a sender, or grey \"4 read\" when nothing is new. \"Mark all read\" marks all of one sender's emails as read.",
+            "New: the menu bar icon. Outline envelope when nothing is new, blue envelope while new mail waits, warning triangle when something is wrong. Settings can show the number or a dot instead of the blue colour, and can show the time of the newest new email next to the icon.",
+            "New: actions on an email. Move the mouse over a line, or right-click it: mark as read, reply, archive, delete. Reply opens the reply window of Apple Mail.",
+            "New: Undo for 10 seconds after archive, delete or filing. The email goes back to where it was.",
+            "New: a short message in plain words at the bottom when an action does not work.",
+            "New: clicking an email opens it in a small window of this app (the default), in Apple Mail at exactly that email, or in Spark. Spark only comes to the front, because it cannot be told which email to show.",
+            "New: the message window. Subject, sender, account, date and text. Reply, Archive, Delete, Open in Apple Mail and Spark. Opening marks the email as read. \"Keep on top\" is on at first. Escape closes it.",
+            "New: Triage. One email at a time, newest first, one key per decision: D delete, A archive, F file in a Mail folder, P send to PARAGON, M mark as read, R reply, Space or the right arrow next, the left arrow back, Z undo, Escape close. \"Unread only\" and \"Start over\" at the top.",
+            "New: filing in a folder. A list of the folders of the email's account, the ones you used lately first. Type to find one. Enter takes the first shown.",
+            "New: send to PARAGON. You give the task words and tags, and choose Inbox, Today or a project or note. The task gets a link back to the email. Then the email is archived.",
+            "New: the list checks for mail by itself, every 30 seconds, 1, 2 or 5 minutes (1 minute at first), and after every action. The round arrow checks at once.",
+            "New: clear help when Mail is closed (\"Open Mail (hidden)\"), when the Mac blocked access (\"Open System Settings\"), or when access was not asked yet. The app never starts Mail on its own.",
+            "New: Settings, opened with the gear at the bottom of the list.",
+            "Good to know: the app reads Apple Mail with AppleScript. It uses no passwords, and nothing leaves your Mac.",
+        ]),
+    ]
+}
+
+/// The list of versions as a page for a settings screen.
+struct WhatsNewView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(WhatsNew.releases) { release in
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("\(release.version) · \(release.date)").font(.headline).foregroundStyle(Color.accentColor)
+                    ForEach(release.items, id: \.self) { item in
+                        HStack(alignment: .firstTextBaseline, spacing: 5) {
+                            Text("–").foregroundStyle(.secondary)
+                            Text(item).fixedSize(horizontal: false, vertical: true)
+                        }
+                        .font(.callout)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityIdentifier("newsPage")
+    }
+}
+
+/// The version number as one small line for the bottom of a settings screen.
+struct VersionLine: View {
+    var body: some View {
+        Text(AppInfo.line)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .accessibilityIdentifier("settingsVersion")
+    }
+}

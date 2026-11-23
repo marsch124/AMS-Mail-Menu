@@ -1,7 +1,22 @@
 import MailMenuCore
 import SwiftUI
 
+/// The Settings window: three tabs.
 struct SettingsView: View {
+    var body: some View {
+        TabView {
+            GeneralSettingsView()
+                .tabItem { Text("Settings") }
+            ScrollView { GuideView().padding(16) }
+                .tabItem { Text("How it works") }
+            ScrollView { WhatsNewView().padding(16) }
+                .tabItem { Text("What's new") }
+        }
+        .frame(width: 480, height: 560)
+    }
+}
+
+struct GeneralSettingsView: View {
     @EnvironmentObject private var store: MailStore
     @AppStorage(SettingsKey.emailCount) private var emailCount = SettingsDefault.emailCount
     @AppStorage(SettingsKey.showPreview) private var showPreview = SettingsDefault.showPreview
@@ -48,9 +63,12 @@ struct SettingsView: View {
                     Text("5 minutes").tag(300)
                 }
             }
+            OpenAtLoginSection()
+            Section {
+                VersionLine()
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 460)
         .onChange(of: emailCount) { store.refresh() }
         .onChange(of: showPreview) { store.refresh() }
         .onChange(of: refreshSeconds) { store.restartTimer() }

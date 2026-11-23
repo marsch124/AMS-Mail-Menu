@@ -5,6 +5,14 @@ import SwiftUI
 struct AMSMailMenuApp: App {
     @StateObject private var store = MailStore()
 
+    init() {
+        KeeperStartup.begin()
+        // A saved place in the menu bar (points from the right edge): just left of Deck Mate (272), right of
+        // Tidy Bar's line (302), so the icon always shows and never sits behind the notch.
+        let placeKey = "NSStatusItem Preferred Position Item-0"
+        if UserDefaults.standard.object(forKey: placeKey) == nil { UserDefaults.standard.set(290, forKey: placeKey) }
+    }
+
     var body: some Scene {
         MenuBarExtra {
             MenuContentView()

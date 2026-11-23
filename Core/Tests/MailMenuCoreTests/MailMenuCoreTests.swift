@@ -189,3 +189,31 @@ final class ParagonLinkTests: XCTestCase {
         XCTAssertEqual(ParagonTarget.note("Projects/Shed.md").label, "Shed")
     }
 }
+
+final class KeeperTests: XCTestCase {
+    func testTheCopyThatStartedFirstStays() {
+        let first = OneCopy.Copy(started: 100, pid: 50)
+        let second = OneCopy.Copy(started: 101, pid: 40)
+        let twin = OneCopy.Copy(started: 100, pid: 60)
+        XCTAssertTrue(OneCopy.earlier(than: first, among: [second]).isEmpty)
+        XCTAssertEqual(OneCopy.earlier(than: second, among: [first]), [first])
+        XCTAssertTrue(OneCopy.earlier(than: first, among: [twin]).isEmpty)
+        XCTAssertEqual(OneCopy.earlier(than: twin, among: [first]), [first])
+    }
+
+    func testTheKeepersStartOrder() {
+        let order = Keeper.plist(executable: "/Applications/X.app/Contents/MacOS/X", bundleID: "com.schabbauer.AMSMailMenu")
+        XCTAssertEqual(order["Label"] as? String, "com.schabbauer.AMSMailMenu.keeper")
+        XCTAssertEqual(order["ProgramArguments"] as? [String], ["/Applications/X.app/Contents/MacOS/X", "--keeper"])
+        XCTAssertEqual(order["RunAtLoad"] as? Bool, true)
+        XCTAssertEqual(order["KeepAlive"] as? [String: Bool], ["SuccessfulExit": false])
+    }
+
+    func testOnlyACopyOpenedByHandGivesWayToTheKeeper() {
+        XCTAssertTrue(Keeper.handsOver(wanted: true, openedByKeeper: false, plain: false, inApplications: true))
+        XCTAssertFalse(Keeper.handsOver(wanted: false, openedByKeeper: false, plain: false, inApplications: true))
+        XCTAssertFalse(Keeper.handsOver(wanted: true, openedByKeeper: true, plain: false, inApplications: true))
+        XCTAssertFalse(Keeper.handsOver(wanted: true, openedByKeeper: false, plain: true, inApplications: true))
+        XCTAssertFalse(Keeper.handsOver(wanted: true, openedByKeeper: false, plain: false, inApplications: false))
+    }
+}

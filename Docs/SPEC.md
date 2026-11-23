@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.1 (1), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.2 (2), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -45,12 +45,32 @@ D delete · A archive · F file in a Mail folder · P to PARAGON · M mark as re
 Mail not open (button "Open Mail (hidden)"), access turned off (button to System Settings → Automation), access not yet asked, anything else with Mail's own message.
 
 ## Not yet checked
-- The app has never been compiled or run.
+- Reading real mail on the Mac: the first build started, but no email has been read or acted on in a check yet.
+- A real restart of the Mac with the keeper.
 - Archive mailbox names for iCloud and Gmail (the list is a guess).
 - Nested folder paths in the File picker.
 - Whether the blue icon keeps its colour in the menu bar.
 - Whether PARAGON makes the `[Mail](message://…)` link clickable.
 - Speed of reading with "first line of text" on.
 
+## Place in the menu bar
+The icon gets a saved place at first start: 290 points from the right edge (`NSStatusItem Preferred Position Item-0`), just left of Deck Mate (272) and right of Tidy Bar's line (302). Without it the Mac puts a new icon at the far left of a full menu bar, where it is hidden. A place the owner drags it to is kept.
+
+## Settings window
+Three tabs, 480 x 560: Settings, How it works, What's new. The Settings tab ends with the section "Start" ("Open at login", off at first) and the version line ("Version 0.2 (2)").
+
+## How it works and What's new
+- How it works (`GuideView`): a guide to every part of the app, ending with "Signs in this app": every mark and colour with its meaning.
+- What's new (`WhatsNewView`): every version, newest first.
+
+## Open at login, the keeper, only one copy (`Keeper.swift`, rules in Core `KeeperRules.swift`)
+Same design as AMS Mic Check.
+- "Open at login" uses the Mac's login list (`SMAppService.mainApp`). The wish is remembered (`wantsOpenAtLogin`) and put right at every start.
+- While it is on, the app writes `~/Library/LaunchAgents/com.schabbauer.AMSMailMenu.keeper.plist` (run at load, keep alive unless the app ended cleanly). A copy opened by hand hands itself over to the keeper's copy (`--keeper`). `--plain` never hands over.
+- A polite stop (Quit, SIGTERM) is a clean end: the keeper does not open the app again. A sudden stop is not: the keeper opens it again.
+- Only in an Applications folder; a copy in a build folder never becomes the keeper's.
+- Only one copy: the copy that started first stays, a later one quits at once.
+- `Tools/install.sh` stops the app politely, tells the Mac to forget the old start order, installs, opens, and says whether the app runs under the keeper (only when "Open at login" is on).
+
 ## Not in this version (compared with the other AMS Mac apps)
-No app icon, no "Open at login", no keeper, no "How it works" guide.
+No app icon: the icon library has no envelope yet.
