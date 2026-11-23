@@ -38,7 +38,7 @@ public enum SettingsDefault {
     public static let refreshSeconds = 60
 }
 
-/// Colour family for the small account dot: iCloud blue, Gmail orange, others grey.
+/// Colour family for the small account dot: iCloud violet, Gmail green, others grey (blue and orange until 0.7).
 public enum AccountKind: Equatable {
     case iCloud, gmail, other
 

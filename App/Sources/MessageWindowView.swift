@@ -48,7 +48,7 @@ struct MessageWindowView: View {
                         .font(Look.f(13))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
-                        .background(Circle().fill(Color(red: 0.71, green: 0.33, blue: 0.16)))
+                        .background(Circle().fill(AccountKind.from(accountName: message.accountName).color))
                     VStack(alignment: .leading, spacing: 1) {
                         Text(senderLine(message)).font(Look.f(14)).textSelection(.enabled)
                         Text("\(message.accountName) · \(message.dateReceived.formatted(date: .abbreviated, time: .shortened))")

@@ -160,8 +160,11 @@ struct MenuContentView: View {
 extension AccountKind {
     var color: Color {
         switch self {
-        case .iCloud: return Color(red: 0.04, green: 0.36, blue: 0.77)   // #0A5BC4
-        case .gmail: return Color(red: 0.76, green: 0.25, blue: 0.05)    // #C2410C
+        // Never blue, never orange: blue is the app's own colour (what you can press, headings, new mail)
+        // and orange is the warning. Before 0.8 iCloud was blue and Gmail orange; a blue dot on every
+        // line also read as "unread", as in Apple Mail.
+        case .iCloud: return .accountViolet
+        case .gmail: return .accountGreen
         case .other: return Color.secondary
         }
     }

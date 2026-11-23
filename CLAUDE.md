@@ -66,4 +66,7 @@ Claude's reading (interpretation, not the owner's words):
   No more tries on the owner's mail without a new yes that names the email and the exact step.
 - 0.7 (7), 2026-11-23 15:45: the owner's width pick, option 4 of four: the list is 260 points wide
   (`Look.panelWidth`), "Mark read" instead of "Mark all read", no scroll bar. See SPEC "The narrow list".
+- 0.8 (8), 2026-11-23 15:53: one meaning per colour (SPEC "Colours"): blue = the app's own colour, iCloud
+  violet, Gmail green, orange = warning only, red = delete only. The four side branches of the first cloud
+  session were deleted on GitHub with the owner's yes; only `main` is left.
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

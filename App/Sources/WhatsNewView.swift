@@ -22,6 +22,14 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.8 (8)", date: "23 Nov 2026", items: [
+            "Changed: blue now means one thing, the app's own colour. It marks what you can press, the headings, and new mail (the envelope in the menu bar and the \"new\" tag). An account is never blue any more.",
+            "Changed: the dot of an iCloud account is violet, before blue. A blue dot on every line also looked like \"unread\", as in Apple Mail.",
+            "Changed: the dot of a Gmail account is green, before orange. Orange is now only the warning triangle.",
+            "Changed: the round badge with the sender's letters in the message window has the colour of the account: violet for iCloud, green for Gmail, grey for others. Before, it was always orange-brown.",
+            "Changed: the large tick when Triage is finished is blue, before green, so green means only Gmail.",
+            "Changed: Settings says \"iCloud violet, Gmail green\" at the account dot, and \"Signs in this app\" has a line for blue.",
+        ]),
         Release(version: "0.7 (7)", date: "23 Nov 2026", items: [
             "Changed: the list is narrower. You chose option 4 of four: 260 points wide, before 400.",
             "Changed: the button in a sender's bar says \"Mark read\", before \"Mark all read\". It still marks all of that sender's emails as read. With the longer words the narrow list showed only eight letters of a sender's name; now it shows about fifteen.",

@@ -105,7 +105,7 @@ struct TriageView: View {
             if store.lastRefresh == nil {
                 Text("Reading Mail…").font(Look.f(15)).foregroundStyle(.secondary)
             } else {
-                Image(systemName: "checkmark.circle").font(Look.f(32)).foregroundStyle(.green)
+                Image(systemName: "checkmark.circle").font(Look.f(32)).foregroundStyle(Color.mailBlue)
                 Text(queue.isEmpty ? "No emails to go through." : "All done.").font(Look.f(15))
             }
             Button("Close") { dismiss() }.keyboardShortcut(.defaultAction).buttonStyle(.borderedProminent)

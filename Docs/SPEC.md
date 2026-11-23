@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.7 (7), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.8 (8), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -71,6 +71,15 @@ Mail not open (button "Open Mail (hidden)"), access turned off (button to System
 ## Layout: no padding (0.4, the owner's word: "take away all padding")
 No empty space above or below anything. 4 points at the sides (3 inside the small tags), so letters do not touch an edge. One exception: 6 points around each window (list panel, message window, Triage), because the Mac rounds window corners and they cut into the words otherwise (the owner: "Terrible rounding"). Sender cards: corner 5. The list area is as tall as its emails up to 560 points (`fixedSize`), then it scrolls. Gaps between stacked things: 4 points at most. Rows are as tall as their words.
 
+## Colours: one meaning each (0.8)
+The owner's rule: a colour means ONE thing in the whole app. Since 0.8:
+- **Blue** (`Color.mailBlue`): the app's own colour: what you can press, headings, and new mail (the envelope in the menu bar, the "N new" tag). Never an account.
+- **Violet** (`Color.accountViolet`, day 125/77/209, night 179/143/255): an iCloud account: the dot on an email line, the dot in the heading row, the initials badge in the message window.
+- **Green** (`Color.accountGreen`, day 33/140/77, night 92/204/128): a Gmail account, the same three places. Nothing else is green: the "Triage is finished" tick is blue.
+- **Grey**: another account; a read email; small words.
+- **Orange**: the warning triangle only. **Red**: delete only.
+Until 0.7 iCloud was blue (it also read as "unread", as in Apple Mail), Gmail orange (the warning's colour), the badge always orange-brown and the finished tick green.
+
 ## Letters (0.6)
 Every size in the app goes through `Look.f(size, weight)` (`App/Sources/Look.swift`). The sizes written in the screens are those of 0.5; `Look.delta = -2` makes them 2 points smaller, never below 9. The owner chose this on 23 Nov 2026 as option 2 of six shown in one picture ("another smaller and not so intrusive font"): the Mac's own letters, regular weight. List: sender 12, subject 11, first line 10.5, time 10, small words 9. Message window and Triage: subject 14, email text 12. Settings, guide and What's new: 11, headings 12 in blue, not bold. Text without its own size takes `Look.f(13)` from the root of each window; controls are `.small`. `--picture … --look N` (1 = the sizes of 0.5, 2 = this, 3 thin, 4 Avenir Next, 5 rounded, 6 one point smaller) draws a candidate.
 
@@ -86,7 +95,7 @@ The running app presses its own menu bar icon when another program posts the not
 The icon gets a saved place at first start: 290 points from the right edge (`NSStatusItem Preferred Position Item-0`), just left of Deck Mate (272) and right of Tidy Bar's line (302). Without it the Mac puts a new icon at the far left of a full menu bar, where it is hidden. A place the owner drags it to is kept.
 
 ## Settings window (0.5)
-480 x 440. At the top the app's own row of three tabs (a segmented picker, not the Mac's tab bar: that one writes the chosen tab in the Mac's highlight colour and leaves an empty band): Settings, How it works, What's new. At the bottom the version line ("Version 0.7 (7)") on the left and Done (filled blue; Escape too) on the right. The Settings tab is plain rows without boxes: blue group headings, tick boxes, two menus, three radio buttons, ending with "Start" ("Open at login", off at first). Every change counts at once.
+480 x 440. At the top the app's own row of three tabs (a segmented picker, not the Mac's tab bar: that one writes the chosen tab in the Mac's highlight colour and leaves an empty band): Settings, How it works, What's new. At the bottom the version line ("Version 0.8 (8)") on the left and Done (filled blue; Escape too) on the right. The Settings tab is plain rows without boxes: blue group headings, tick boxes, two menus, three radio buttons, ending with "Start" ("Open at login", off at first). Every change counts at once.
 
 ## Triage and message window (0.5)
 - The key bar never cuts a word: each button has its fixed size, small controls, and the window cannot be narrower than the bar (761 points); it opens 800 x 600.

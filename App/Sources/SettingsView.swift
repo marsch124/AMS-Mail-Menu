@@ -57,7 +57,7 @@ struct GeneralSettingsView: View {
             Stepper("Show the newest \(emailCount) emails", value: $emailCount, in: 5...100, step: 5)
             Toggle("Show the first line of text", isOn: $showPreview)
             note("The first lines appear a moment after the list, one by one: Mail has to open each email for them.")
-            Toggle("Show the account as a coloured dot (iCloud blue, Gmail orange)", isOn: $showAccount)
+            Toggle("Show the account as a coloured dot (iCloud violet, Gmail green)", isOn: $showAccount)
             Divider()
 
             heading("Menu bar icon")
