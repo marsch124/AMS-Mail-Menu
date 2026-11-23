@@ -27,6 +27,8 @@ enum WhatsNew {
             "Changed: the same in the windows. In the message window and in Triage the subject is 14 points (before 19 and 18) and the text of the email 12 (before 14 and 13.5). Settings, How it works and What's new are 11 points (before 13 and 12). Buttons and tick boxes are the Mac's small size to match.",
             "Changed: the list is shorter for the same emails. Six emails from four senders took 263 points before and take 234 now.",
             "Changed: Triage can be 747 points narrow, before 761.",
+            "Fixed: Triage, or an email you open, came up underneath the list. The list now closes when one of them opens.",
+            "Changed: archiving a Gmail email now says plainly \"Archiving does not work for Gmail yet. Nothing was changed\". Before, it said \"Archived\" although the email stayed in the inbox. iCloud emails archive as before.",
             "Changed: no bold in the headings of How it works and What's new, in the titles of the small windows, in \"Undo\" and in the title of a problem. The blue colour marks a heading. Only the title \"Mail\" of the list is bold.",
         ]),
         Release(version: "0.5 (5)", date: "23 Nov 2026", items: [

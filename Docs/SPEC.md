@@ -100,8 +100,16 @@ Archive, delete, file, mark as read, reply, Undo and the folder list all go thro
 
 ## Tried on real mail, 23 Nov 2026 (with the owner's yes)
 - iCloud: one read email archived to "Archive" (3.3 s) and brought back with Undo (11.3 s, then on the main thread). Back in the inbox, checked by its Message-ID.
-- 🚨 Gmail, NOT working: `move m to mailbox "All Mail"` answers without error after 26.7 s, but the email stays in the inbox (still there 4 minutes later); Undo then answers "The email could not be found to move it back". Nothing was lost. Open: how Apple Mail really archives a Gmail email by script. Also open: `archive` returns only the last part of the mailbox name, so Undo could miss a mailbox that sits inside another.
+- 🚨 Gmail, NOT working, and why (looked at with `--gmail-look`, which changes nothing): the account is plain IMAP; every email sits in "INBOX" AND in "All Mail" at once. `move m to mailbox "All Mail"` answers without error (26.7 s) but changes nothing: the email stays in the inbox. Undo then answers "The email could not be found to move it back".
+- 🚨🚨 `set deleted status of m to true` (meant as "take it out of the inbox only") made **Apple Mail itself crash** (Mail 16.0, macOS 26.6.2, 23 Nov 2026 15:33:53, abort in `-[MCMessage(ScriptingSupport) setIsDeleted:]`). The email was untouched. Never send Mail that command. The try was removed from the app.
+- Since then `MailScript.archive` stops before the move when the archive mailbox is named "All Mail": "Archiving does not work for Gmail yet. Nothing was changed; the email is still in your inbox." (error 9005). Not tried on real mail. Open: a safe way to archive a Gmail email through Apple Mail; none is known. Also open: `archive` returns only the last part of the mailbox name, so Undo could miss a mailbox that sits inside another.
 - The check itself: the notice `show` with the word `archiveUndo` archives the newest READ email and undoes it; `report` only lists which read emails the inboxes hold. 🚨 `archiveUndo` changes the owner's mail: only with his yes for that very run.
+
+## The list closes for a window (0.6)
+Before Triage or the message window opens, the list panel closes (`SelfCheck.closePanel`: a click on the app's own menu bar button, only while the panel is open), so the window is not hidden under it. The owner, 23 Nov 2026: "The triage window is under the list."
+
+## Width of the list
+`Look.panelWidth` (400). The heading row never wraps: when it is too narrow the words "Newest 20" give way (`ViewThatFits`). `--picture … --width N` draws a candidate.
 
 ## Seeing the real windows (0.5)
 The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail. Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.

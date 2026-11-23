@@ -61,4 +61,7 @@ Claude's reading (interpretation, not the owner's words):
   NOT tried: delete, mark as read, reply, file, send to PARAGON on a real email.
 - 0.6 (6), 2026-11-23 15:25: the owner's font pick, option 2 of six: all sizes 2 points smaller through
   `Look.f` (`Look.delta = -2`), small controls, no bold except the list title "Mail". See SPEC "Letters".
+- 2026-11-23 15:33: 🚨 a try `set deleted status of m to true` on a Gmail email CRASHED Apple Mail. Never use
+  it. Gmail archive stays open (SPEC "Tried on real mail"); the app now says so instead of pretending.
+  No more tries on the owner's mail without a new yes that names the email and the exact step.
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

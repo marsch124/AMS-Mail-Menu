@@ -77,6 +77,10 @@ enum SelfCheck {
             """),
     ]
 
+    // 🚨 There was a `--gmail-archive-try` here. Its step `set deleted status of m to true` made Apple Mail
+    // itself crash (Mail 16.0, macOS 26.6.2, 23 Nov 2026 15:33, in -[MCMessage setIsDeleted:]). It is gone.
+    // Never send Mail that command again.
+
     static func gmailLookIfAsked() {
         let arguments = CommandLine.arguments
         guard let at = arguments.firstIndex(of: "--gmail-look"), at + 1 < arguments.count else { return }
@@ -224,14 +228,15 @@ enum SelfCheck {
                         isRead: read, preview: "This is the first line of the invented email number \(n).")
         }
         let store = MailStore(sample: [
-            mail(1, "Anna Example <anna@example.com>", "Dinner on Friday?", minutesAgo: 5, read: false, account: "iCloud"),
-            mail(2, "Anna Example <anna@example.com>", "Photos from the weekend", minutesAgo: 90, read: true, account: "iCloud"),
-            mail(3, "Example Shop <shop@example.com>", "Your order has shipped", minutesAgo: 30, read: false, account: "Gmail"),
-            mail(4, "Example Shop <shop@example.com>", "Thank you for your order", minutesAgo: 300, read: false, account: "Gmail"),
+            mail(1, "Anna Example via Example Groups <anna@example.com>", "Dinner on Friday at the new place by the harbour?", minutesAgo: 5, read: false, account: "iCloud"),
+            mail(2, "Anna Example via Example Groups <anna@example.com>", "Photos from the weekend are ready to download", minutesAgo: 90, read: true, account: "iCloud"),
+            mail(3, "Example Shop <shop@example.com>", "Your order 48213 has shipped and is on its way", minutesAgo: 30, read: false, account: "Gmail"),
+            mail(4, "Example Shop <shop@example.com>", "Thank you for your order, here is your receipt", minutesAgo: 300, read: false, account: "Gmail"),
             mail(5, "Example Bank <bank@example.com>", "Your monthly statement", minutesAgo: 2000, read: true, account: "iCloud"),
             mail(6, "Example News <news@example.com>", "This week in the news", minutesAgo: 4000, read: true, account: "Gmail"),
         ])
         if let l = arguments.firstIndex(of: "--look"), l + 1 < arguments.count { Look.choose(Int(arguments[l + 1]) ?? 1) }
+        if let w = arguments.firstIndex(of: "--width"), w + 1 < arguments.count, let width = Double(arguments[w + 1]) { Look.panelWidth = width }
         var which = "list"
         if let v = arguments.firstIndex(of: "--view"), v + 1 < arguments.count { which = arguments[v + 1] }
         let first = store.allMessagesNewestFirst[0]

@@ -44,30 +44,40 @@ struct MenuContentView: View {
         // The only empty space in the panel: its round corners would cut into the words otherwise.
         .padding(.horizontal, 6)
         .padding(.vertical, 6)
-        .frame(width: 400)
+        .frame(width: Look.panelWidth)
         .tint(.mailBlue)
         .font(Look.f(13))
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
+    /// The heading row. In a narrow list the words "Newest 20" give way, so nothing ever wraps.
     private var header: some View {
-        HStack(spacing: 10) {
-            Text("Mail").font(Look.f(15, .bold))
+        ViewThatFits(in: .horizontal) {
+            headerRow(showCount: true)
+            headerRow(showCount: false)
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private func headerRow(showCount: Bool) -> some View {
+        HStack(spacing: 8) {
+            Text("Mail").font(Look.f(15, .bold)).fixedSize()
             AccountKey(kind: .iCloud, name: "iCloud")
             AccountKey(kind: .gmail, name: "Gmail")
-            Spacer()
-            Text("Newest \(emailCount)").font(Look.f(10)).foregroundStyle(.secondary)
+            Spacer(minLength: 4)
+            if showCount {
+                Text("Newest \(emailCount)").font(Look.f(10)).foregroundStyle(.secondary).fixedSize()
+            }
             Button {
                 SelfCheck.closePanel()
                 openWindow(id: "triage")
                 NSApp.activate(ignoringOtherApps: true)
             } label: {
-                Label("Triage", systemImage: "tray.and.arrow.down")
+                Label("Triage", systemImage: "tray.and.arrow.down").fixedSize()
             }
             .buttonStyle(.borderless)
             .help("Go through the emails one by one: delete, archive, file, or send to PARAGON")
         }
-        .padding(.horizontal, 4)
     }
 
     private var footer: some View {
@@ -162,7 +172,7 @@ struct AccountKey: View {
     var body: some View {
         HStack(spacing: 4) {
             Circle().fill(kind.color).frame(width: 8, height: 8)
-            Text(name).font(Look.f(10)).foregroundStyle(.secondary)
+            Text(name).font(Look.f(10)).foregroundStyle(.secondary).fixedSize()
         }
     }
 }

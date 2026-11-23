@@ -165,6 +165,9 @@ public enum MailScript {
             \(findMessage(message))
             set destBox to my findBox(account "\(escape(message.accountName))", \(appleScriptList(archiveMailboxNames)))
             if destBox is missing value then error "No archive mailbox found in the account “\(escape(message.accountName))”." number 9002
+            -- Gmail keeps every email in "All Mail" already, so moving it there changes nothing and the email
+            -- stays in the inbox (seen 23 Nov 2026). Better to say so than to pretend.
+            if (name of destBox) is "All Mail" then error "Archiving does not work for Gmail yet. Nothing was changed; the email is still in your inbox." number 9005
             move m to destBox
             return name of destBox
         end tell
