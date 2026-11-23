@@ -50,4 +50,10 @@ Claude's reading (interpretation, not the owner's words):
   A box Mail refuses as a range is read one email at a time, "Apple Mail is busy" after 30 s, all padding
   removed (owner: "take away all padding. Absolute all padding everywhere"), self-check `--check` / `--probe`.
   Checked with the self-check on his real mail: 24 emails, 6 unread, 2 accounts, 10 sender groups, 0.4 s.
+- 0.5 (5), 2026-11-23 15:08: every window checked by Claude itself (owner: "I'm not here to check you"):
+  Settings rebuilt without boxes, own tab row, Done; Triage key bar never cut, waits for the first reading;
+  email text through `MessageLinks.tidyBody`; main buttons filled blue, Delete red; no bold in the windows.
+  How to look: SPEC "Seeing the real windows" and "Checking the real panel without a click". 23 tests.
+  NOT done on purpose: archive, delete, mark as read, reply, file, send to PARAGON on a real email (they change
+  the owner's mail; ask first).
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

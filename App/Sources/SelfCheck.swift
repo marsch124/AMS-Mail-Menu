@@ -63,6 +63,40 @@ enum SelfCheck {
         }
     }
 
+    /// The notice "com.schabbauer.AMSMailMenu.show" with the word message, triage or settings opens that
+    /// window of the running app (the message window with the newest email that is already read, so
+    /// nothing changes in Mail). Sits unseen behind the menu bar icon.
+    struct Hooks: View {
+        @EnvironmentObject private var store: MailStore
+        @Environment(\.openWindow) private var openWindow
+        @Environment(\.openSettings) private var openSettings
+
+        var body: some View {
+            Color.clear.frame(width: 0, height: 0)
+                .onReceive(DistributedNotificationCenter.default().publisher(
+                    for: Notification.Name("com.schabbauer.AMSMailMenu.show"))) { notice in
+                    switch notice.object as? String {
+                    case "message":
+                        if let read = store.allMessagesNewestFirst.first(where: { $0.isRead }) {
+                            store.openInWindow(read) { openWindow(id: $0) }
+                        }
+                    case "triage":
+                        openWindow(id: "triage")
+                        NSApp.activate(ignoringOtherApps: true)
+                    case "settings":
+                        openSettings()
+                        NSApp.activate(ignoringOtherApps: true)
+                    case "close":
+                        for window in NSApp.windows where window.isVisible && window.styleMask.contains(.titled) {
+                            window.close()
+                        }
+                    default:
+                        break
+                    }
+                }
+        }
+    }
+
     /// `--picture <file>`: draws the list with invented emails into a PNG, to check the layout without a click.
     @MainActor
     static func pictureIfAsked() {
@@ -82,17 +116,33 @@ enum SelfCheck {
             mail(5, "Example Bank <bank@example.com>", "Your monthly statement", minutesAgo: 2000, read: true, account: "iCloud"),
             mail(6, "Example News <news@example.com>", "This week in the news", minutesAgo: 4000, read: true, account: "Gmail"),
         ])
-        let host = NSHostingView(rootView: MenuContentView().environmentObject(store))
+        var which = "list"
+        if let v = arguments.firstIndex(of: "--view"), v + 1 < arguments.count { which = arguments[v + 1] }
+        let first = store.allMessagesNewestFirst[0]
+        // Each screen as its window shows it: the same edge and colour as in the app. nil = as tall as its content.
+        let screens: [String: (AnyView, CGSize?)] = [
+            "list": (AnyView(MenuContentView()), nil),
+            "message": (AnyView(MessageWindowView().padding(6)), CGSize(width: 480, height: 560)),
+            "triage": (AnyView(TriageView().padding(6)), nil),
+            "file": (AnyView(FilePicker(message: first) { _ in }), nil),
+            "paragon": (AnyView(ParagonSheet(message: first) { _ in }), nil),
+            "settings": (AnyView(SettingsView()), nil),
+            "guide": (AnyView(GuideView().padding(.horizontal, 4).frame(width: 480)), nil),
+            "news": (AnyView(WhatsNewView().padding(.horizontal, 4).frame(width: 480)), nil),
+        ]
+        guard let (screen, fixed) = screens[which] else { exit(2) }
+        let host = NSHostingView(rootView: screen.tint(.mailBlue).environmentObject(store)
+            .background(Color(nsColor: .windowBackgroundColor)))
         if arguments.contains("--dark") { host.appearance = NSAppearance(named: .darkAqua) }
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.borderless],
                               backing: .buffered, defer: false)
         window.contentView = host
         RunLoop.main.run(until: Date().addingTimeInterval(0.4))
-        let size = host.fittingSize
+        let size = fixed ?? host.fittingSize
         window.setContentSize(size)
         host.frame = NSRect(origin: .zero, size: size)
         host.layoutSubtreeIfNeeded()
-        RunLoop.main.run(until: Date().addingTimeInterval(0.4))
+        RunLoop.main.run(until: Date().addingTimeInterval(0.6))
         if let image = host.bitmapImageRepForCachingDisplay(in: host.bounds) {
             host.cacheDisplay(in: host.bounds, to: image)
             try? image.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: arguments[at + 1]))

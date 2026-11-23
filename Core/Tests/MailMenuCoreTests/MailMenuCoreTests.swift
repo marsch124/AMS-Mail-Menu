@@ -82,6 +82,12 @@ final class LinkTests: XCTestCase {
         // A line of signs that show nothing is not a first line.
         XCTAssertEqual(MessageLinks.firstLine(of: "\u{FFFC}\u{200C}\u{00A0} \u{200C}\nReal words"), "Real words")
         XCTAssertEqual(MessageLinks.firstLine(of: "\u{200B}\u{FEFF}"), "")
+    }
+
+    func testAnEmailsTextHasNoRowsOfEmptyLines() {
+        XCTAssertEqual(MessageLinks.tidyBody("\n\n\nHello\n\n\n\u{00A0}\nSecond part\nnext line\n\n"), "Hello\n\nSecond part\nnext line")
+        XCTAssertEqual(MessageLinks.tidyBody("One\nTwo"), "One\nTwo")
+        XCTAssertEqual(MessageLinks.tidyBody("\n \n"), "")
         XCTAssertEqual(MessageLinks.firstLine(of: String(repeating: "x", count: 200), maxLength: 10).count, 10)
     }
 }

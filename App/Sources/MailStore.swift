@@ -36,9 +36,16 @@ final class MailStore: ObservableObject {
 
     /// For the test picture: a list of invented emails, no reading from Mail, no timer.
     init(sample: [MailMessage]) {
+        isSample = true
         groups = SenderGrouping.group(sample, limit: sample.count)
         lastRefresh = Date()
+        selectedMessage = sample.first
+        selectedContent = Self.sampleText
     }
+
+    /// True for the test pictures: nothing is asked of Mail.
+    private var isSample = false
+    static let sampleText = "Hello Martin,\n\nthis is an invented email for the test picture. It has a few lines, so the window shows how text looks.\n\nShall we have dinner on Friday? I can book the table for seven.\n\nBest wishes\nAnna"
 
     init() {
         defaults.register(defaults: [
@@ -170,9 +177,8 @@ final class MailStore: ObservableObject {
         selectedContent = "Loading…"
         openWindow("message")
         NSApp.activate(ignoringOtherApps: true)
-        switch MailReader.run(MailScript.fetchContent(of: message)) {
-        case .success(let d): selectedContent = d.stringValue ?? ""
-        case .failure(let p): selectedContent = "\(p.title)\n\n\(p.explanation)"
+        loadContent(of: message) { [weak self] text in
+            if self?.selectedMessage?.id == message.id { self?.selectedContent = text }
         }
         if !message.isRead {
             markRead([message])
@@ -180,11 +186,14 @@ final class MailStore: ObservableObject {
         }
     }
 
-    /// The full text of one email, read from Mail.
-    func content(of message: MailMessage) -> String {
-        switch MailReader.run(MailScript.fetchContent(of: message)) {
-        case .success(let d): return d.stringValue ?? ""
-        case .failure(let p): return "\(p.title)\n\n\(p.explanation)"
+    /// The full text of one email, read from Mail by the helper; the window stays free meanwhile.
+    func loadContent(of message: MailMessage, then: @escaping @MainActor (String) -> Void) {
+        if isSample { then(Self.sampleText); return }
+        MailReader.runInBackground(MailScript.fetchContent(of: message)) { result in
+            switch result {
+            case .success(let d): then(MessageLinks.tidyBody(d.stringValue ?? ""))
+            case .failure(let p): then("\(p.title)\n\n\(p.explanation)")
+            }
         }
     }
 
@@ -239,6 +248,7 @@ final class MailStore: ObservableObject {
     private var mailboxCache: [String: [String]] = [:]
 
     func mailboxes(for account: String) -> [String] {
+        if isSample { return ["Archive", "Bills", "Family", "Family/Holidays", "Receipts", "Work"] }
         if let cached = mailboxCache[account] { return cached }
         switch MailReader.run(MailScript.listMailboxes(account: account)) {
         case .success(let d):

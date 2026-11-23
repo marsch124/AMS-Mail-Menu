@@ -22,6 +22,19 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.5 (5)", date: "23 Nov 2026", items: [
+            "Checked: the message window, Triage, its two small windows and Settings, each drawn by day and by night and then photographed on the Mac with real mail. What was wrong is fixed below.",
+            "Fixed: in Triage the buttons at the bottom were cut off (\"Del…\", \"Arc…\", \"Re…\" twice). All nine now show their whole word, and the window cannot be made narrower than the row of buttons. It opens 800 points wide, before 620.",
+            "Fixed: Triage opened before the first reading was done said \"No emails to go through\" and stayed that way. Now it says \"Reading Mail…\" and starts by itself when the emails are there.",
+            "Changed: Settings has no boxes and no empty space any more. Before, the Settings tab was 795 points tall in a 560 point window and had to be scrolled. Now everything fits in 440 points without scrolling. Switches are tick boxes.",
+            "Changed: the three tabs in Settings are the app's own row. Before, the Mac's tab bar wrote the chosen tab in pale yellow on white and left an empty band above.",
+            "New: Done at the bottom right of Settings, in full colour. Escape closes Settings too. The version number sits at the bottom left, on every tab.",
+            "Changed: no bold in the message window and in Triage either: subject, sender and the letters on the key buttons.",
+            "Changed: the main buttons are in full blue: Reply, Send to PARAGON, Close, Done. Delete in the message window is red.",
+            "Changed: the text of an email has no empty lines at its start and never more than one empty line in a row. Many emails come with three or more.",
+            "Changed: opening an email, and each email in Triage, no longer holds the window while Mail fetches the text. You see \"Loading…\" for a moment; a heavy email can take a few seconds.",
+            "Changed: the small windows for \"File in a folder\" and \"To PARAGON\" have a thin edge all round, and the folder list has tight rows instead of the Mac's roomy list.",
+        ]),
         Release(version: "0.4 (4)", date: "23 Nov 2026", items: [
             "Fixed: the list took over a minute to show. The cause was the first line of text under each subject: for it, Mail opens every email in full. Before, the list waited for all of them, at every check. Now the list shows in under a second, the first lines follow one by one, and each is read only once.",
             "Fixed: the list froze while Apple Mail answered. Right after Mail starts it can take more than a minute to answer, and all that time nothing in the list could be clicked. Now a small helper copy of the app does the reading, and the list stays usable meanwhile. A reading takes 1 to 3 seconds; while Mail itself is busy fetching mail it can take longer, and the list keeps showing what it had.",

@@ -33,6 +33,8 @@ struct TriageView: View {
         .frame(minWidth: 560, minHeight: 520)
         .onAppear(perform: start)
         .onChange(of: index) { loadBody() }
+        // Opened before the first reading was done: start as soon as the emails are there.
+        .onChange(of: store.lastRefresh) { if queue.isEmpty { start() } }
         .sheet(isPresented: $showFile) {
             if let message = current {
                 FilePicker(message: message) { path in
@@ -75,7 +77,7 @@ struct TriageView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 8) {
                 Circle().fill(AccountKind.from(accountName: message.accountName).color).frame(width: 8, height: 8)
-                Text(message.sender.displayName).font(.system(size: 14, weight: .semibold))
+                Text(message.sender.displayName).font(.system(size: 14))
                 if !message.sender.address.isEmpty, !message.sender.name.isEmpty {
                     Text(message.sender.address).font(.caption).foregroundStyle(.secondary)
                 }
@@ -84,7 +86,7 @@ struct TriageView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             Text(message.subject.isEmpty ? "(no subject)" : message.subject)
-                .font(.system(size: 18, weight: .bold))
+                .font(.system(size: 18))
             if done.contains(message.id) {
                 Label("Already handled", systemImage: "checkmark.circle").foregroundStyle(.secondary)
             }
@@ -100,9 +102,13 @@ struct TriageView: View {
 
     private var finished: some View {
         VStack(spacing: 4) {
-            Image(systemName: "checkmark.circle").font(.system(size: 40)).foregroundStyle(.green)
-            Text(queue.isEmpty ? "No emails to go through." : "All done.").font(.title3)
-            Button("Close") { dismiss() }.keyboardShortcut(.defaultAction)
+            if store.lastRefresh == nil {
+                Text("Reading Mail…").font(.title3).foregroundStyle(.secondary)
+            } else {
+                Image(systemName: "checkmark.circle").font(.system(size: 40)).foregroundStyle(.green)
+                Text(queue.isEmpty ? "No emails to go through." : "All done.").font(.title3)
+            }
+            Button("Close") { dismiss() }.keyboardShortcut(.defaultAction).buttonStyle(.borderedProminent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -125,6 +131,9 @@ struct TriageView: View {
             Button("") { dismiss() }.keyboardShortcut(.cancelAction).hidden().frame(width: 0)
         }
         .disabled(showFile || showParagon)
+        .controlSize(.small)
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(maxWidth: .infinity)
         .padding(.horizontal, 4)
     }
 
@@ -141,7 +150,9 @@ struct TriageView: View {
     private func loadBody() {
         guard let message = current else { body_ = ""; return }
         body_ = "Loading…"
-        body_ = store.content(of: message)
+        store.loadContent(of: message) { text in
+            if current?.id == message.id { body_ = text }
+        }
     }
 
     private func act(_ action: () -> Void) {
@@ -171,10 +182,10 @@ struct KeyButton: View {
         Button(action: action) {
             HStack(spacing: 5) {
                 Text(label ?? String(key.character).uppercased())
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .font(.system(size: 11, design: .monospaced))
                     .padding(.horizontal, 3)
                     .background(RoundedRectangle(cornerRadius: 3).strokeBorder(Color.secondary.opacity(0.6)))
-                Text(title)
+                Text(title).fixedSize()
             }
             .foregroundStyle(tint ?? .primary)
         }
@@ -205,9 +216,16 @@ struct FilePicker: View {
             TextField("Type to find a folder", text: $search)
                 .textFieldStyle(.roundedBorder)
                 .onSubmit { if let first = shown.first { finish(first) } }
-            List(shown, id: \.self) { path in
-                Button(path) { finish(path) }
-                    .buttonStyle(.plain)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(shown, id: \.self) { path in
+                        Button { finish(path) } label: {
+                            Text(path).frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        Divider()
+                    }
+                }
             }
             .frame(minHeight: 240)
             if folders.isEmpty {
@@ -219,7 +237,7 @@ struct FilePicker: View {
                 Button("Cancel") { finish(nil) }.keyboardShortcut(.cancelAction)
             }
         }
-        .padding(.horizontal, 4)
+        .padding(8)     // a sheet has round corners too
         .frame(width: 380, height: 420)
         .onAppear { folders = store.mailboxes(for: message.accountName) }
     }
@@ -275,10 +293,11 @@ struct ParagonSheet: View {
                     finish(store.sendToParagon(message, words: words, tags: tags, target: target))
                 }
                 .keyboardShortcut(.defaultAction)
+                .buttonStyle(.borderedProminent)
                 .disabled(words.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
-        .padding(.horizontal, 4)
+        .padding(8)
         .frame(width: 440)
         .onAppear {
             words = ParagonLink.suggestedWords(for: message)

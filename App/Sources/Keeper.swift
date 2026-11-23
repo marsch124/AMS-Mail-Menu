@@ -182,7 +182,8 @@ struct OpenAtLoginSection: View {
     @State private var openAtLogin = KeeperJob.wanted
 
     var body: some View {
-        Section("Start") {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Start").foregroundStyle(Color.mailBlue)
             Toggle("Open at login", isOn: $openAtLogin)
                 .onChange(of: openAtLogin) { _, wanted in
                     UserDefaults.standard.set(wanted, forKey: LoginItem.wantedKey)

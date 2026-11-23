@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.4 (4), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.5 (5), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -82,8 +82,18 @@ The running app presses its own menu bar icon when another program posts the not
 ## Place in the menu bar
 The icon gets a saved place at first start: 290 points from the right edge (`NSStatusItem Preferred Position Item-0`), just left of Deck Mate (272) and right of Tidy Bar's line (302). Without it the Mac puts a new icon at the far left of a full menu bar, where it is hidden. A place the owner drags it to is kept.
 
-## Settings window
-Three tabs, 480 x 560: Settings, How it works, What's new. The Settings tab ends with the section "Start" ("Open at login", off at first) and the version line ("Version 0.4 (4)").
+## Settings window (0.5)
+480 x 440. At the top the app's own row of three tabs (a segmented picker, not the Mac's tab bar: that one writes the chosen tab in the Mac's highlight colour and leaves an empty band): Settings, How it works, What's new. At the bottom the version line ("Version 0.5 (5)") on the left and Done (filled blue; Escape too) on the right. The Settings tab is plain rows without boxes: blue group headings, tick boxes, two menus, three radio buttons, ending with "Start" ("Open at login", off at first). Every change counts at once.
+
+## Triage and message window (0.5)
+- The key bar never cuts a word: each button has its fixed size, small controls, and the window cannot be narrower than the bar (761 points); it opens 800 x 600.
+- Opened before the first reading is done: "Reading Mail…"; it starts when `lastRefresh` arrives.
+- An email's text is read by the helper (`MailStore.loadContent`), shown through `MessageLinks.tidyBody` (no empty lines at start or end, never two in a row; tested).
+- Main buttons filled blue (`borderedProminent`): Reply, Send to PARAGON, Close, Done. Delete in the message window red.
+- Sheets ("File in a folder", "To PARAGON"): 8 points all round; the folder list is plain rows with hairlines.
+
+## Seeing the real windows (0.5)
+The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail. Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.
 
 ## How it works and What's new
 - How it works (`GuideView`): a guide to every part of the app, ending with "Signs in this app": every mark and colour with its meaning.

@@ -31,6 +31,7 @@ struct AMSMailMenuApp: App {
             MenuBarLabel(unread: store.unreadCount,
                          newestUnread: store.newestUnreadDate,
                          hasProblem: store.problem != nil)
+                .background(SelfCheck.Hooks().environmentObject(store))
         }
         .menuBarExtraStyle(.window)
 
@@ -49,7 +50,7 @@ struct AMSMailMenuApp: App {
                 .tint(.mailBlue)
                 .environmentObject(store)
         }
-        .defaultSize(width: 620, height: 600)
+        .defaultSize(width: 800, height: 600)
 
         Settings {
             SettingsView()

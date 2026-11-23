@@ -41,16 +41,16 @@ struct MessageWindowView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(message.subject.isEmpty ? "(no subject)" : message.subject)
-                    .font(.system(size: 19, weight: .bold))
+                    .font(.system(size: 19))
                     .textSelection(.enabled)
                 HStack(spacing: 10) {
                     Text(initials(message.sender.displayName))
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: 13))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
                         .background(Circle().fill(Color(red: 0.71, green: 0.33, blue: 0.16)))
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(senderLine(message)).font(.system(size: 13.5, weight: .semibold)).textSelection(.enabled)
+                        Text(senderLine(message)).font(.system(size: 13.5)).textSelection(.enabled)
                         Text("\(message.accountName) · \(message.dateReceived.formatted(date: .abbreviated, time: .shortened))")
                             .font(.caption).foregroundStyle(.secondary)
                     }
@@ -82,6 +82,7 @@ struct MessageWindowView: View {
                     store.delete(message)
                     dismiss()
                 }
+                .tint(.red)     // red always means delete
                 Spacer()
                 Button("Open in Apple Mail") { store.openInAppleMail(message) }
                 Button("Spark") { MailStore.bringSparkForward() }

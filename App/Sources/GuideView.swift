@@ -25,7 +25,7 @@ enum Guide {
 
         GuideSection(title: "Triage", body: "Triage goes through your emails one at a time, newest first. Open it with the \"Triage\" button at the top right of the list.\n\nYou see one email. You decide with one key. No modifier key is needed. The buttons at the bottom show the same keys.\n\nD: delete.\n\nA: archive.\n\nF: file in a Mail folder. A small window lists the folders of that account, the ones you used lately first. Type to find a folder. Enter takes the first one shown.\n\nP: send to PARAGON. A small window asks for the task words, the tags, and where the task goes: Inbox, Today, or a project or note. The task gets a link back to the email. Then the email is archived.\n\nM: mark as read, and go on.\n\nR: reply.\n\nSpace or the right arrow: next email, without doing anything. The left arrow goes back.\n\nZ: undo the last delete, archive or filing.\n\nEscape: close Triage.\n\nAt the top you see where you are, for example \"3 of 20\". \"Unread only\" shows only new emails. \"Start over\" begins again from the newest. When all emails are done, you see \"All done\" and a Close button."),
 
-        GuideSection(title: "Settings", body: "Open Settings with the gear at the bottom of the list. It has three tabs: Settings, How it works, and What's new. The Settings tab has these parts:\n\nList: how many emails to show (5 to 100, in steps of 5), the first line of text, and the account dot.\n\nMenu bar icon: what the icon does while new mail waits, and the time next to it.\n\nClicking an email opens it in: small window, Apple Mail or Spark.\n\nChecking for new mail: every 30 seconds, 1, 2 or 5 minutes.\n\nStart: \"Open at login\".\n\nThe version number shows at the bottom of the Settings tab."),
+        GuideSection(title: "Settings", body: "Open Settings with the gear at the bottom of the list. It has three tabs at the top: Settings, How it works, and What's new. Every change counts at once. Done at the bottom right, or Escape, closes the window. The Settings tab has these parts:\n\nList: how many emails to show (5 to 100, in steps of 5), the first line of text, and the account dot.\n\nMenu bar icon: what the icon does while new mail waits, and the time next to it.\n\nClicking an email opens it in: small window, Apple Mail or Spark.\n\nChecking for new mail: every 30 seconds, 1, 2 or 5 minutes.\n\nStart: \"Open at login\".\n\nThe version number shows at the bottom left of the window."),
 
         GuideSection(title: "Open at login", body: "While \"Open at login\" is on, the app opens by itself every time you log in to your Mac.\n\nIt also keeps a second start order with the Mac, called the keeper. The keeper opens the app again within about 10 seconds if it ever stops unexpectedly. If you quit the app yourself with the power button, it stays closed until you open it or until the next login.\n\nIf you open the app by hand while \"Open at login\" is on, it hands itself over to the keeper. It closes and comes back about a second later. The icon may blink once.\n\nIn System Settings, General, Login Items & Extensions, AMS Mail Menu shows in two places. Leave both on."),
 
@@ -67,7 +67,8 @@ enum Guide {
         ("Tick in a circle, \"Already handled\"", "You already dealt with this email in this round of Triage."),
         ("Large green tick in a circle", "Triage is finished; no emails left."),
         ("Round badge with letters in the message window", "The first letters of the sender's name."),
-        ("Blue button \"Reply\"", "The main button of the message window."),
+        ("Button filled with blue", "The main button of a window: Reply, Send to PARAGON, Close, Done."),
+        ("Blue heading in Settings", "The name of a group of settings."),
     ]
 }
 
