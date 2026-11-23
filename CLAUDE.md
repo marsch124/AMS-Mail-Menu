@@ -34,5 +34,6 @@ Claude's reading (interpretation, not the owner's words):
 - Rebuilt in that shape on 2026-11-23 from branch `claude/ams-mail-menu-step1` (old layout, kept).
 - `Core`: 19 tests pass on Linux only with a stand-in for `NSAppleEventDescriptor`/`NSAppleScript`
   (not in the repo). On a Mac `swift test` needs no stand-in.
-- `App` has never been compiled. No `.xcodeproj` is committed; `Tools/install.sh` generates it.
+- First build on the Mac, 2026-11-23 14:15: 19 of 19 tests pass, the app compiled with no errors, `Tools/install.sh`
+  installed 0.1 (1) in `~/Applications` and started it. The `.xcodeproj` is committed, as in the model apps.
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

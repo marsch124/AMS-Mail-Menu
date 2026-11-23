@@ -1,0 +1,371 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B4C43A9E0C910EB1419D3DA /* MailReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C115EF19F5361D9302C3D428 /* MailReader.swift */; };
+		7EABF361708E333A53EDDA2A /* MenuContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346D86B3BB8C046E694938FA /* MenuContentView.swift */; };
+		802181EBBF9DECC82BA8D1AE /* TriageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DE656B3E4844EE3C1A260F /* TriageView.swift */; };
+		9AD615B98B829BF9BBAEA8EF /* AMSMailMenuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4602BA781785FDF1C054E6 /* AMSMailMenuApp.swift */; };
+		A155B140DD2152C7FE40F051 /* MessageWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6B487B741E500293267B7A /* MessageWindowView.swift */; };
+		C57E80279062E89D8C346594 /* MailStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5416F2544108AEF25A03A9 /* MailStore.swift */; };
+		CC5021A891E27CCBC61C6C20 /* MailMenuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 68EAA688C3140C14C6486BB3 /* MailMenuCore */; };
+		F8D5BB667BAA3E4D1D4727E7 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE35801FF528FAE74BCF9971 /* SettingsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		10E91D225FC75EB7504EC0A6 /* AMSMailMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AMSMailMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A6B487B741E500293267B7A /* MessageWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageWindowView.swift; sourceTree = "<group>"; };
+		32DE656B3E4844EE3C1A260F /* TriageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriageView.swift; sourceTree = "<group>"; };
+		346D86B3BB8C046E694938FA /* MenuContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuContentView.swift; sourceTree = "<group>"; };
+		C115EF19F5361D9302C3D428 /* MailReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailReader.swift; sourceTree = "<group>"; };
+		DE35801FF528FAE74BCF9971 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		E4608D50AE399FF53638E22F /* Core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Core; path = Core; sourceTree = SOURCE_ROOT; };
+		EA4602BA781785FDF1C054E6 /* AMSMailMenuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSMailMenuApp.swift; sourceTree = "<group>"; };
+		FB5416F2544108AEF25A03A9 /* MailStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailStore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		78B11864CCA3D6DB02ED40B4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC5021A891E27CCBC61C6C20 /* MailMenuCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1A0E006CFFBB71A85C640BBE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				10E91D225FC75EB7504EC0A6 /* AMSMailMenu.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		69BE464FBF1DC2D9BAECB359 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				EA4602BA781785FDF1C054E6 /* AMSMailMenuApp.swift */,
+				C115EF19F5361D9302C3D428 /* MailReader.swift */,
+				FB5416F2544108AEF25A03A9 /* MailStore.swift */,
+				346D86B3BB8C046E694938FA /* MenuContentView.swift */,
+				2A6B487B741E500293267B7A /* MessageWindowView.swift */,
+				DE35801FF528FAE74BCF9971 /* SettingsView.swift */,
+				32DE656B3E4844EE3C1A260F /* TriageView.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		6E3BC7F6A4D64A413ECC3D1C /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				E4608D50AE399FF53638E22F /* Core */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		A0123A0B656F906710881716 = {
+			isa = PBXGroup;
+			children = (
+				DD0647E97908D37C6D4B551C /* App */,
+				6E3BC7F6A4D64A413ECC3D1C /* Packages */,
+				1A0E006CFFBB71A85C640BBE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DD0647E97908D37C6D4B551C /* App */ = {
+			isa = PBXGroup;
+			children = (
+				69BE464FBF1DC2D9BAECB359 /* Sources */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		57985B91D6C0209465E52B0C /* AMSMailMenu */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6C4F206EAAE6B8DA5BF92B89 /* Build configuration list for PBXNativeTarget "AMSMailMenu" */;
+			buildPhases = (
+				380F89FEBDE91F2717416611 /* Sources */,
+				78B11864CCA3D6DB02ED40B4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AMSMailMenu;
+			packageProductDependencies = (
+				68EAA688C3140C14C6486BB3 /* MailMenuCore */,
+			);
+			productName = AMSMailMenu;
+			productReference = 10E91D225FC75EB7504EC0A6 /* AMSMailMenu.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		36A71BCC50CAB87D1B224373 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					57985B91D6C0209465E52B0C = {
+						DevelopmentTeam = D24ENP83QQ;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = D365397FA730C46AEF6FCC88 /* Build configuration list for PBXProject "AMSMailMenu" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = A0123A0B656F906710881716;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				ED032E77B98126E8C13DD932 /* XCLocalSwiftPackageReference "Core" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1A0E006CFFBB71A85C640BBE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				57985B91D6C0209465E52B0C /* AMSMailMenu */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		380F89FEBDE91F2717416611 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9AD615B98B829BF9BBAEA8EF /* AMSMailMenuApp.swift in Sources */,
+				0B4C43A9E0C910EB1419D3DA /* MailReader.swift in Sources */,
+				C57E80279062E89D8C346594 /* MailStore.swift in Sources */,
+				7EABF361708E333A53EDDA2A /* MenuContentView.swift in Sources */,
+				A155B140DD2152C7FE40F051 /* MessageWindowView.swift in Sources */,
+				F8D5BB667BAA3E4D1D4727E7 /* SettingsView.swift in Sources */,
+				802181EBBF9DECC82BA8D1AE /* TriageView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0AF924AE6A239937923F4831 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		2586225D36855A49A36EB3C9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D24ENP83QQ;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = App/Config/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.schabbauer.AMSMailMenu;
+				PRODUCT_NAME = "AMS Mail Menu";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B4EF5BBA0CE7A79F71C7B0E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		C2ECCD14BA7187FA084594D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D24ENP83QQ;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = App/Config/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.schabbauer.AMSMailMenu;
+				PRODUCT_NAME = "AMS Mail Menu";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6C4F206EAAE6B8DA5BF92B89 /* Build configuration list for PBXNativeTarget "AMSMailMenu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2586225D36855A49A36EB3C9 /* Debug */,
+				C2ECCD14BA7187FA084594D9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D365397FA730C46AEF6FCC88 /* Build configuration list for PBXProject "AMSMailMenu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0AF924AE6A239937923F4831 /* Debug */,
+				B4EF5BBA0CE7A79F71C7B0E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		ED032E77B98126E8C13DD932 /* XCLocalSwiftPackageReference "Core" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Core;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		68EAA688C3140C14C6486BB3 /* MailMenuCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MailMenuCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 36A71BCC50CAB87D1B224373 /* Project object */;
+}
