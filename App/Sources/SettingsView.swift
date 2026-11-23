@@ -31,6 +31,9 @@ struct GeneralSettingsView: View {
             Section("List") {
                 Stepper("Show the newest \(emailCount) emails", value: $emailCount, in: 5...100, step: 5)
                 Toggle("Show the first line of text", isOn: $showPreview)
+                Text("The first lines appear a moment after the list, one by one: Mail has to open each email for them.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Toggle("Show the account (coloured dot: iCloud blue, Gmail orange)", isOn: $showAccount)
             }
             Section("Menu bar icon") {

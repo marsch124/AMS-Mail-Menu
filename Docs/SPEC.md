@@ -54,12 +54,18 @@ Mail not open (button "Open Mail (hidden)"), access turned off (button to System
 - Speed of reading with "first line of text" on.
 
 ## Reading Mail (0.4)
-- Every script runs on one background queue, one after another, never on the main thread (`MailReader`). The regular reading (`MailStore.refresh`) does not wait: the list stays usable, the bottom left says "Reading Mail…", and a reading asked for meanwhile runs once when the first ends. One action (archive, delete, mark as read, open) still waits for its own answer.
+- Asking Mail is only quick from a program's main thread (measured 23 Nov 2026: about 1 s there, 30 to 40 s from a background thread, because the answers arrive on the main thread). So:
+  - The regular reading and the first lines run in a **helper copy of the app** (`Worker`, started with `--worker` by `MailReader.runInBackground`): it gets the script on its input, runs it on its own main thread, hands back Mail's answer packed (`AEFlattenDesc`, in a small JSON envelope) and ends. The app's window stays free; the bottom left says "Reading Mail…"; a reading asked for meanwhile runs once when the first ends. Measured: 1.2 to 1.6 s per reading, 3.3 s in the running app.
+  - One action (archive, delete, mark as read, open) runs on the app's main thread and waits for its own answer (`MailReader.run`).
+  - `Launcher.main` is where the program starts: the helper does its job there, before any window work.
+- Mail itself is sometimes slow (while it fetches new mail a reading took 25 to 45 s). The list then keeps showing what it had.
+- A diary in the Mac's log (subsystem `com.schabbauer.AMSMailMenu`, category `reading`): "reading starts", "read N emails, U unread, in X s". Counts and times only.
 - Each inbox: first whole columns at once (`… of messages 1 thru k`); if Mail refuses that ("Invalid index": fewer emails than asked, still loading, or changed meanwhile), one email at a time as far as Mail gives them. Seen 23 Nov 2026: inboxes of 18 and 6 emails, one reading 0.4 s; right after Mail started, 75 s.
+- The first line of text is not part of the reading: `content` makes Mail open the whole email (seconds each; 24 emails took over a minute, at every check). After the list is shown, `MailStore.readNextPreview` reads one first line at a time in the background, newest first, and keeps it (`previewCache`, until the email leaves the list). Settings says so under the switch.
 - Every question to Mail gives up after 30 seconds: "Apple Mail is busy" (`MailAccessProblem.mailBusy`, AppleScript -1712); the next regular reading tries again.
 
 ## Self-check (0.4, `SelfCheck.swift`)
-`open -n "AMS Mail Menu.app" --args --check <file>` reads the inboxes once and writes into the file: how many emails, how many unread, how many per account, how many sender groups, how long it took. Never the words of an email. `--probe <file>` times 13 fixed small questions to Mail. Both run as the app itself (its own permission for Mail), before the one-copy rule, and quit.
+`open -n "AMS Mail Menu.app" --args --check <file>` reads the inboxes once and writes into the file: how many emails, how many unread, how many per account, how many sender groups, how long it took. Never the words of an email. `--probe <file>` times 13 fixed small questions to Mail. `--check <file> --helper` reads through the helper copy. Both run as the app itself (its own permission for Mail), before the one-copy rule, and quit.
 
 ## Layout: no padding (0.4, the owner's word: "take away all padding")
 No empty space above or below anything. 4 points at the sides (3 inside the small tags), so letters do not touch an edge or a rounded corner. Gaps between stacked things: 4 points at most. Rows are as tall as their words.

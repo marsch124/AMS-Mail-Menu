@@ -1,7 +1,15 @@
 import MailMenuCore
 import SwiftUI
 
+/// Where the program starts. The helper copy (`--worker`) does its one job and ends before any window work.
 @main
+enum Launcher {
+    static func main() {
+        Worker.runIfAsked()
+        AMSMailMenuApp.main()
+    }
+}
+
 struct AMSMailMenuApp: App {
     @StateObject private var store = MailStore()
 

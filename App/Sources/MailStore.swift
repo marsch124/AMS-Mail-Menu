@@ -2,6 +2,7 @@ import MailMenuCore
 import AppKit
 import Combine
 import Foundation
+import os
 
 /// Holds the emails shown in the menu and refreshes them from Apple Mail.
 @MainActor
@@ -27,6 +28,8 @@ final class MailStore: ObservableObject {
         let fromBoxes: [String]
     }
 
+    /// A diary in the Mac's log: counts and times only, never the words of an email.
+    private let diary = Logger(subsystem: "com.schabbauer.AMSMailMenu", category: "reading")
     private var timer: Timer?
     private var undoTimer: Timer?
     private let defaults = UserDefaults.standard
@@ -69,16 +72,28 @@ final class MailStore: ObservableObject {
         let count = max(1, defaults.integer(forKey: SettingsKey.emailCount))
         let preview = defaults.bool(forKey: SettingsKey.showPreview)
         isLoading = true
+        let began = Date()
+        diary.notice("reading starts")
         // Each inbox is asked for `count` emails; the newest `count` across all inboxes are kept.
-        MailReader.runInBackground(MailScript.fetchInboxes(perMailbox: count, includePreview: preview)) { [weak self] result in
+        // The first lines of text are NOT read here: Mail opens every email in full for them, which takes
+        // seconds per email. The list comes first; the first lines follow one by one (`readNextPreview`).
+        MailReader.runInBackground(MailScript.fetchInboxes(perMailbox: count, includePreview: false)) { [weak self] result in
             guard let self else { return }
             self.isLoading = false
+            let seconds = Date().timeIntervalSince(began)
             switch result {
             case .success(let descriptor):
-                self.groups = SenderGrouping.group(MailScript.parseInboxes(descriptor), limit: count)
+                self.listed = MailScript.parseInboxes(descriptor)
+                self.diary.notice("read \(self.listed.count) emails, \(self.listed.filter { !$0.isRead }.count) unread, in \(seconds, format: .fixed(precision: 1)) s")
+                self.listLimit = count
+                let here = Set(self.listed.map(\.id))
+                self.previewCache = self.previewCache.filter { here.contains($0.key) }
+                self.regroup()
                 self.problem = nil
                 self.lastRefresh = Date()
+                if preview { self.readNextPreview() }
             case .failure(let p):
+                self.diary.notice("reading failed after \(seconds, format: .fixed(precision: 1)) s: \(p.title, privacy: .public)")
                 self.problem = p
                 if p == .mailNotRunning { self.groups = [] }
             }
@@ -86,6 +101,42 @@ final class MailStore: ObservableObject {
                 self.refreshWanted = false
                 self.refresh()
             }
+        }
+    }
+
+    // MARK: - First lines of text
+
+    /// The emails as last read from Mail, before grouping.
+    private var listed: [MailMessage] = []
+    private var listLimit = 20
+    /// First lines already read, by email. Each is read once.
+    private var previewCache: [String: String] = [:]
+    private var previewRunning = false
+
+    private func regroup() {
+        var messages = listed
+        for i in messages.indices { messages[i].preview = previewCache[messages[i].id] }
+        groups = SenderGrouping.group(messages, limit: listLimit)
+    }
+
+    /// Reads the first line of the newest email that has none yet, in the background, then the next.
+    private func readNextPreview() {
+        guard !previewRunning, defaults.bool(forKey: SettingsKey.showPreview) else { return }
+        guard let next = allMessagesNewestFirst.first(where: { previewCache[$0.id] == nil }) else { return }
+        previewRunning = true
+        MailReader.runInBackground(MailScript.fetchContent(of: next)) { [weak self] result in
+            guard let self else { return }
+            self.previewRunning = false
+            switch result {
+            case .success(let d):
+                self.previewCache[next.id] = MessageLinks.firstLine(of: String((d.stringValue ?? "").prefix(2000)))
+            case .failure(.other):
+                self.previewCache[next.id] = ""     // this one email cannot be read; do not try it for ever
+            case .failure:
+                return                               // Mail is closed, busy or not allowed: the next reading starts again
+            }
+            self.regroup()
+            self.readNextPreview()
         }
     }
 

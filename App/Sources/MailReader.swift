@@ -10,25 +10,48 @@ enum MailReader {
         !NSRunningApplication.runningApplications(withBundleIdentifier: mailBundleID).isEmpty
     }
 
-    /// Every script runs here, one after another, never on the main thread: a slow answer from Mail
-    /// must not freeze the list. (NSAppleScript must not run twice at the same time.)
-    private static let queue = DispatchQueue(label: "com.schabbauer.AMSMailMenu.mail", qos: .userInitiated)
+    // Asking Mail is only quick from a program's main thread: the answers arrive there. From any other
+    // thread each answer waits until the main thread happens to look (measured 23 Nov 2026: 0.8 s on the
+    // main thread, 30 to 40 s from a background queue). So there are two ways to run a script:
+    //  - `run`: on the main thread, waiting. For one quick action (archive, delete, mark as read).
+    //  - `runInBackground`: in a helper copy of this app (`--worker`), which runs the script on ITS main
+    //    thread at full speed while this app's window stays free. For the regular reading and the first lines.
 
-    /// Runs a script and waits for the answer. For one quick action (archive, delete, mark as read).
+    /// Runs a script on the main thread and waits for the answer.
     static func run(_ source: String) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
-        queue.sync { execute(source) }
+        execute(source)
     }
 
-    /// Runs a script in the background and hands the answer back on the main thread.
+    /// Runs a script in a helper copy of the app and hands the answer back on the main thread.
     static func runInBackground(_ source: String,
                                 then: @escaping @MainActor (Result<NSAppleEventDescriptor, MailAccessProblem>) -> Void) {
-        queue.async {
-            let result = execute(source)
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = runInWorker(source)
             DispatchQueue.main.async { MainActor.assumeIsolated { then(result) } }
         }
     }
 
-    private static func execute(_ source: String) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
+    /// Starts the helper copy, gives it the script, waits for its answer. Never call on the main thread
+    /// of the app with its window open (the self-check does, on purpose).
+    static func runInWorker(_ source: String) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
+        guard isMailRunning else { return .failure(.mailNotRunning) }
+        guard let program = Bundle.main.executableURL else { return .failure(.other("Internal error: the app could not find itself.")) }
+        let worker = Process()
+        worker.executableURL = program
+        worker.arguments = [Worker.argument]
+        let input = Pipe(), output = Pipe()
+        worker.standardInput = input
+        worker.standardOutput = output
+        worker.standardError = FileHandle.nullDevice
+        do { try worker.run() } catch { return .failure(.other("Internal error: the helper could not be started.")) }
+        input.fileHandleForWriting.write(Data(source.utf8))
+        try? input.fileHandleForWriting.close()
+        let answer = output.fileHandleForReading.readDataToEndOfFile()
+        worker.waitUntilExit()
+        return Worker.decode(answer)
+    }
+
+    fileprivate static func execute(_ source: String) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
         guard isMailRunning else { return .failure(.mailNotRunning) }
         guard let script = NSAppleScript(source: source) else {
             return .failure(.other("Internal error: script could not be created."))
@@ -38,7 +61,7 @@ enum MailReader {
         if let errorInfo {
             let number = (errorInfo[NSAppleScript.errorNumber] as? Int) ?? 0
             let message = (errorInfo[NSAppleScript.errorMessage] as? String) ?? ""
-            return .failure(MailAccessProblem.from(errorNumber: number, message: message))
+            return .failure(.from(errorNumber: number, message: message))
         }
         return .success(result)
     }
@@ -57,5 +80,72 @@ enum MailReader {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation") {
             NSWorkspace.shared.open(url)
         }
+    }
+}
+
+/// The helper copy of the app: started with `--worker`, it reads one script from its input, runs it on its
+/// main thread, writes the answer to its output and ends. It never shows anything.
+enum Worker {
+    static let argument = "--worker"
+
+    private struct Answer: Codable {
+        var ok: Bool
+        var reply: Data?        // Mail's answer, packed
+        var number: Int?
+        var message: String?
+    }
+
+    static func runIfAsked() {
+        guard CommandLine.arguments.contains(argument) else { return }
+        let source = String(data: FileHandle.standardInput.readDataToEndOfFile(), encoding: .utf8) ?? ""
+        var answer: Answer
+        guard MailReader.isMailRunning, let script = NSAppleScript(source: source) else {
+            answer = Answer(ok: false, number: -600, message: "")
+            FileHandle.standardOutput.write((try? JSONEncoder().encode(answer)) ?? Data())
+            exit(0)
+        }
+        var errorInfo: NSDictionary?
+        let result = script.executeAndReturnError(&errorInfo)
+        if let errorInfo {
+            answer = Answer(ok: false, number: (errorInfo[NSAppleScript.errorNumber] as? Int) ?? 0,
+                            message: (errorInfo[NSAppleScript.errorMessage] as? String) ?? "")
+        } else if let packed = pack(result) {
+            answer = Answer(ok: true, reply: packed)
+        } else {
+            answer = Answer(ok: false, number: 0, message: "Internal error: Mail's answer could not be passed on.")
+        }
+        FileHandle.standardOutput.write((try? JSONEncoder().encode(answer)) ?? Data())
+        exit(0)
+    }
+
+    static func decode(_ data: Data) -> Result<NSAppleEventDescriptor, MailAccessProblem> {
+        guard let answer = try? JSONDecoder().decode(Answer.self, from: data) else {
+            return .failure(.other("Internal error: the helper gave no answer."))
+        }
+        if answer.ok, let reply = answer.reply, let descriptor = unpack(reply) { return .success(descriptor) }
+        if answer.ok { return .failure(.other("Internal error: Mail's answer could not be read back.")) }
+        return .failure(.from(errorNumber: answer.number ?? 0, message: answer.message ?? ""))
+    }
+
+    /// Mail's answer as plain bytes (Apple's own packing for such answers).
+    private static func pack(_ descriptor: NSAppleEventDescriptor) -> Data? {
+        guard let desc = descriptor.aeDesc else { return nil }
+        let size = AESizeOfFlattenedDesc(desc)
+        guard size > 0 else { return nil }
+        var data = Data(count: size)
+        var actual = 0
+        let status = data.withUnsafeMutableBytes { buffer in
+            AEFlattenDesc(desc, buffer.baseAddress!.assumingMemoryBound(to: CChar.self), size, &actual)
+        }
+        return status == noErr ? data.prefix(actual) : nil
+    }
+
+    private static func unpack(_ data: Data) -> NSAppleEventDescriptor? {
+        var desc = AEDesc()
+        let status = data.withUnsafeBytes { buffer in
+            AEUnflattenDescFromBytes(buffer.baseAddress!, data.count, &desc)
+        }
+        guard status == noErr else { return nil }
+        return NSAppleEventDescriptor(aeDescNoCopy: &desc)
     }
 }

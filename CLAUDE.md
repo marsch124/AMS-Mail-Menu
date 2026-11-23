@@ -44,8 +44,10 @@ Claude's reading (interpretation, not the owner's words):
   Triage, send to PARAGON, the Settings window, the keeper with the switch on.
 - 0.3 (3), 2026-11-23: app icon (`App/Resources/AppIcon.icns`, `Tools/make_icon.py`); the envelope was added to
   AMS-Icons as hand-drawn icon "envelope" ("Mail", Everyday).
-- 0.4 (4), 2026-11-23 14:28: reading Mail moved off the main thread (the list froze for minutes when Mail had just
-  started), a box Mail refuses as a range is read one email at a time, "Apple Mail is busy" after 30 s, all padding
+- 0.4 (4), 2026-11-23 14:40: the regular reading runs in a helper copy of the app (`--worker`, see SPEC "Reading
+  Mail"): NSAppleScript is only quick on a main thread (1 s; 30-40 s from a background queue — tried, measured,
+  dropped). First lines of text are read after the list, one by one, once each (`content` is slow).
+  A box Mail refuses as a range is read one email at a time, "Apple Mail is busy" after 30 s, all padding
   removed (owner: "take away all padding. Absolute all padding everywhere"), self-check `--check` / `--probe`.
   Checked with the self-check on his real mail: 24 emails, 6 unread, 2 accounts, 10 sender groups, 0.4 s.
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

@@ -49,7 +49,9 @@ enum SelfCheck {
         let file = URL(fileURLWithPath: arguments[at + 1])
         var lines: [String] = []
         let start = Date()
-        switch MailReader.run(MailScript.fetchInboxes(perMailbox: 20, includePreview: false)) {
+        let source = MailScript.fetchInboxes(perMailbox: 20, includePreview: false)
+        let answer = arguments.contains("--helper") ? MailReader.runInWorker(source) : MailReader.run(source)
+        switch answer {
         case .success(let descriptor):
             let messages = MailScript.parseInboxes(descriptor)
             var perAccount: [String: Int] = [:]

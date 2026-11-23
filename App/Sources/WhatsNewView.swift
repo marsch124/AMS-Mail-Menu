@@ -23,7 +23,8 @@ enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
         Release(version: "0.4 (4)", date: "23 Nov 2026", items: [
-            "Fixed: the list froze while Apple Mail answered. Right after Mail starts it can take more than a minute to answer, and all that time nothing in the list could be clicked. Now the app reads Mail in the background and the list stays usable.",
+            "Fixed: the list took over a minute to show. The cause was the first line of text under each subject: for it, Mail opens every email in full. Before, the list waited for all of them, at every check. Now the list shows in under a second, the first lines follow one by one, and each is read only once.",
+            "Fixed: the list froze while Apple Mail answered. Right after Mail starts it can take more than a minute to answer, and all that time nothing in the list could be clicked. Now a small helper copy of the app does the reading, and the list stays usable meanwhile. A reading takes 1 to 3 seconds; while Mail itself is busy fetching mail it can take longer, and the list keeps showing what it had.",
             "New: \"Reading Mail…\" at the bottom left while the app reads. When it is done you see \"Checked\" and the time again.",
             "Fixed: \"Mail could not be read … Invalid index\". It showed when an inbox held fewer emails than the list asks for, or while Mail was still loading. Now the app takes the emails that are there.",
             "New: \"Apple Mail is busy\". If Mail does not answer within 30 seconds, the list says so in plain words and tries again by itself.",
