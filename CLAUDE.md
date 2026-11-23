@@ -27,7 +27,7 @@ Claude's reading (interpretation, not the owner's words):
 - Commits go to `main` with messages like `0.6.2 (11): what changed`; version and build number are
   raised together in `project.yml`, `Info.plist`, README and SPEC.
 - The model apps also have an app icon, a keeper (LaunchAgent that reopens the app) and a guide.
-  AMS Mail Menu has the keeper, Open at login, the guide and What's new since 0.2; the app icon is still missing.
+  AMS Mail Menu has the keeper, Open at login, the guide and What's new since 0.2, and the app icon since 0.3.
 
 ## This project
 
@@ -42,5 +42,6 @@ Claude's reading (interpretation, not the owner's words):
   `NSStatusItem Preferred Position Item-0` = 290 at first start (just left of Deck Mate). Seen on screen at x 952.
 - NOT checked yet: reading real mail (Mail was closed, the icon showed the warning triangle; the Mac's question
   "may control Mail" is the owner's to answer), the list, Triage, the Settings window, the keeper with the switch on.
-- App icon: the AMS icon library has no envelope. It needs a new icon in AMS-Icons first (shared; ask the owner).
+- 0.3 (3), 2026-11-23: app icon (`App/Resources/AppIcon.icns`, `Tools/make_icon.py`); the envelope was added to
+  AMS-Icons as hand-drawn icon "envelope" ("Mail", Everyday).
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

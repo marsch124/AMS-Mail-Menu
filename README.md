@@ -1,6 +1,6 @@
 # AMS Mail Menu
 
-A small Mac menu bar app, version 0.2 (build 2). It shows your newest emails from Apple Mail, grouped by sender.
+A small Mac menu bar app, version 0.3 (build 3). It shows your newest emails from Apple Mail, grouped by sender.
 
 **Not yet built on a Mac.** The rules in `Core` pass their tests; the app itself has not been compiled yet (see "State" below).
 
@@ -27,4 +27,4 @@ The installed app is at `~/Applications/AMS Mail Menu.app`.
 
 ## State (23 Nov 2026)
 - Built, installed and started on the Mac on 23 Nov 2026. The 22 tests in `Core` pass there.
-- Not there yet: an app icon (the icon library has no envelope yet).
+- App icon: `App/Resources/AppIcon.icns`, made by `Tools/make_icon.py` from the envelope of the AMS Icon Library.

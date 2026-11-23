@@ -9,7 +9,7 @@ struct GuideSection: Identifiable {
 /// "How it works": a plain-words guide to the whole app. A blank line in a body starts a new paragraph.
 enum Guide {
     static let howItWorks: [GuideSection] = [
-        GuideSection(title: "What this app is for", body: "AMS Mail Menu shows your newest emails from Apple Mail without opening a mail app. You can read them, and deal with them in a few clicks or keys. It lives in the menu bar at the top of the screen and has no Dock icon.\n\nIt reads Apple Mail on your Mac. It uses no passwords, and nothing leaves your Mac."),
+        GuideSection(title: "What this app is for", body: "AMS Mail Menu shows your newest emails from Apple Mail without opening a mail app. You can read them, and deal with them in a few clicks or keys. It lives in the menu bar at the top of the screen and has no Dock icon. Its app icon, a white envelope on blue, shows in the Applications folder.\n\nIt reads Apple Mail on your Mac. It uses no passwords, and nothing leaves your Mac."),
 
         GuideSection(title: "The first time", body: "The Mac asks once if AMS Mail Menu may control Mail. Say yes. Without it the app cannot read your emails.\n\nThe app never starts Mail by itself. If Mail is closed, the list says so and offers \"Open Mail (hidden)\". If you said no by mistake, the list offers \"Open System Settings\", where you switch Mail on under Automation."),
 

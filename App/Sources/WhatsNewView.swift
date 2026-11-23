@@ -22,6 +22,10 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.3 (3)", date: "23 Nov 2026", items: [
+            "New: the app has its own icon. A white hand-drawn envelope on calm blue, the same blue as the envelope in the menu bar while new mail waits. Before, it showed the Mac's plain stand-in icon. You see it in the Applications folder, in Login Items and next to the Mac's questions.",
+            "New in the icon library: the envelope, called \"Mail\", under Everyday. It is drawn in the same style as the other icons, so any of your apps can use it.",
+        ]),
         Release(version: "0.2 (2)", date: "23 Nov 2026", items: [
             "New: the first version that runs on your Mac. 0.1 was written where no Mac was at hand and had never been started.",
             "New: a fixed place for the menu bar icon, just left of the Deck Mate icon. Before, the Mac put the new icon at the far left of your full menu bar, where it could not be seen.",

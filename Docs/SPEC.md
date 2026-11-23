@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.2 (2), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.3 (3), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -57,7 +57,7 @@ Mail not open (button "Open Mail (hidden)"), access turned off (button to System
 The icon gets a saved place at first start: 290 points from the right edge (`NSStatusItem Preferred Position Item-0`), just left of Deck Mate (272) and right of Tidy Bar's line (302). Without it the Mac puts a new icon at the far left of a full menu bar, where it is hidden. A place the owner drags it to is kept.
 
 ## Settings window
-Three tabs, 480 x 560: Settings, How it works, What's new. The Settings tab ends with the section "Start" ("Open at login", off at first) and the version line ("Version 0.2 (2)").
+Three tabs, 480 x 560: Settings, How it works, What's new. The Settings tab ends with the section "Start" ("Open at login", off at first) and the version line ("Version 0.3 (3)").
 
 ## How it works and What's new
 - How it works (`GuideView`): a guide to every part of the app, ending with "Signs in this app": every mark and colour with its meaning.
@@ -72,5 +72,5 @@ Same design as AMS Mic Check.
 - Only one copy: the copy that started first stays, a later one quits at once.
 - `Tools/install.sh` stops the app politely, tells the Mac to forget the old start order, installs, opens, and says whether the app runs under the keeper (only when "Open at login" is on).
 
-## Not in this version (compared with the other AMS Mac apps)
-No app icon: the icon library has no envelope yet.
+## App icon
+`App/Resources/AppIcon.icns`: a rounded tile (824 of 1024 points, corner 176, as AMS Mic Check) in the app's blue (10, 92, 196 — the blue of the menu bar envelope), with the white hand-drawn envelope "envelope" ("Mail", Everyday) of the AMS Icon Library. Flat, no glow. `Tools/make_icon.py` makes it again from the library's tile `png/app-icon/envelope-1024.png`.
