@@ -44,6 +44,25 @@ enum SelfCheck {
         exit(0)
     }
 
+    /// For checks: another program on this Mac can ask the running app to press its own menu bar icon
+    /// (the notice "com.schabbauer.AMSMailMenu.openPanel"), so the real panel can be photographed.
+    static func listenForOpenPanel() {
+        DistributedNotificationCenter.default().addObserver(
+            forName: Notification.Name("com.schabbauer.AMSMailMenu.openPanel"), object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated {
+                func button(in view: NSView?) -> NSStatusBarButton? {
+                    guard let view else { return nil }
+                    if let found = view as? NSStatusBarButton { return found }
+                    for sub in view.subviews { if let found = button(in: sub) { return found } }
+                    return nil
+                }
+                for window in NSApp.windows {
+                    if let found = button(in: window.contentView) { found.performClick(nil); return }
+                }
+            }
+        }
+    }
+
     /// `--picture <file>`: draws the list with invented emails into a PNG, to check the layout without a click.
     @MainActor
     static func pictureIfAsked() {
@@ -64,6 +83,7 @@ enum SelfCheck {
             mail(6, "Example News <news@example.com>", "This week in the news", minutesAgo: 4000, read: true, account: "Gmail"),
         ])
         let host = NSHostingView(rootView: MenuContentView().environmentObject(store))
+        if arguments.contains("--dark") { host.appearance = NSAppearance(named: .darkAqua) }
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.borderless],
                               backing: .buffered, defer: false)
         window.contentView = host

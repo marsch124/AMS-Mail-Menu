@@ -45,6 +45,7 @@ struct MenuContentView: View {
         .padding(.horizontal, 6)
         .padding(.vertical, 6)
         .frame(width: 400)
+        .tint(.mailBlue)
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
@@ -180,7 +181,7 @@ struct SenderCard: View {
                             .foregroundStyle(.secondary)
                             .frame(width: 12)
                         Text(group.sender.displayName)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.system(size: 14))
                             .lineLimit(1)
                         Spacer()
                     }
@@ -192,14 +193,14 @@ struct SenderCard: View {
                 if group.unreadCount > 0 {
                     if isOpen {
                         Button("Mark all read") { store.markRead(group.messages) }
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.system(size: 12))
                             .buttonStyle(.borderless)
                     }
                     Text("\(group.unreadCount) new")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 11))
                         .padding(.horizontal, 3)
-                        .background(RoundedRectangle(cornerRadius: 4).fill(Color.accentColor.opacity(0.15)))
-                        .foregroundStyle(Color.accentColor)
+                        .background(RoundedRectangle(cornerRadius: 4).fill(Color.mailBlue.opacity(0.15)))
+                        .foregroundStyle(Color.mailBlue)
                 } else {
                     Text("\(group.messages.count) read")
                         .font(.caption)
@@ -239,7 +240,9 @@ struct MessageRow: View {
                         .help(message.accountName)
                 }
                 Text(message.subject.isEmpty ? "(no subject)" : message.subject)
-                    .font(.system(size: 13, weight: message.isRead ? .regular : .semibold))
+                    // No bold (the owner: "Not bold - it looks terrible"). New mail: full-strength letters; read: grey.
+                    .font(.system(size: 13))
+                    .foregroundStyle(message.isRead ? Color.secondary : Color.primary)
                     .lineLimit(1)
                 Spacer()
                 if hovering {
@@ -256,7 +259,7 @@ struct MessageRow: View {
             }
         }
         .padding(.horizontal, 4)
-        .background(hovering ? Color.accentColor.opacity(0.10) : Color.clear)
+        .background(hovering ? Color.mailBlue.opacity(0.10) : Color.clear)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
         .onTapGesture { store.open(message) { openWindow(id: $0) } }
@@ -297,7 +300,7 @@ struct MessageRow: View {
 struct RowButton: View {
     let symbol: String
     let label: String
-    var tint: Color = .accentColor
+    var tint: Color = .mailBlue
     let action: () -> Void
 
     var body: some View {

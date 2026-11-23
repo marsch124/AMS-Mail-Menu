@@ -15,7 +15,7 @@ enum Guide {
 
         GuideSection(title: "The menu bar icon", body: "The icon is an envelope. It sits just left of the Deck Mate icon, among your own app icons. If you cannot see it, your menu bar is full: hold the Command key and drag another icon away to make room.\n\nOutline envelope: no new mail.\n\nBlue envelope: new mail waits. In Settings you can choose instead the envelope with the number of new emails, or the envelope with a dot.\n\nWarning triangle: something is wrong, for example Mail is closed. Click the icon to read what.\n\nNext to the icon you can see the time of the newest new email. You can switch this off in Settings."),
 
-        GuideSection(title: "The list", body: "Click the icon and a list drops down. It shows your newest emails from the inboxes of all your accounts in Apple Mail. The number is set in Settings.\n\nThe emails are grouped by sender. The sender with the newest email is on top. Inside a sender, the newest email is on top.\n\nA sender with new mail is open. A sender without new mail is closed. Click the sender's name to open or close it. What you open or close by hand stays as you left it.\n\nEach line shows the subject and the time. New emails have a bold subject. Read emails have a normal one. Today you see the time of day, before that the day and the month.\n\nIn Settings you can add the first line of the text under each subject, and a small coloured dot for the account.\n\n\"Mark all read\" in a sender's bar marks all of that sender's emails as read.\n\nThe list checks for new mail by itself, every minute unless you chose another time in Settings. It also checks after every action. The round arrow at the bottom checks at once. \"Checked\" at the bottom left tells you when it last did. While the app reads, it says \"Reading Mail…\" there instead; you can go on using the list meanwhile. Right after Mail starts, the first reading can take a minute."),
+        GuideSection(title: "The list", body: "Click the icon and a list drops down. It shows your newest emails from the inboxes of all your accounts in Apple Mail. The number is set in Settings.\n\nThe emails are grouped by sender. The sender with the newest email is on top. Inside a sender, the newest email is on top.\n\nA sender with new mail is open. A sender without new mail is closed. Click the sender's name to open or close it. What you open or close by hand stays as you left it.\n\nEach line shows the subject and the time. New emails have a subject in full-strength letters. Read emails have a grey one. Nothing in the list is bold. Today you see the time of day, before that the day and the month.\n\nIn Settings you can add the first line of the text under each subject, and a small coloured dot for the account.\n\n\"Mark all read\" in a sender's bar marks all of that sender's emails as read.\n\nThe list checks for new mail by itself, every minute unless you chose another time in Settings. It also checks after every action. The round arrow at the bottom checks at once. \"Checked\" at the bottom left tells you when it last did. While the app reads, it says \"Reading Mail…\" there instead; you can go on using the list meanwhile. Right after Mail starts, the first reading can take a minute."),
 
         GuideSection(title: "Dealing with one email", body: "Move the mouse over an email line. Four small buttons appear in place of the time: mark as read (only for new mail), reply, archive and delete (red).\n\nRight-click an email for the same actions, and also to open it in the small window, in Apple Mail or in Spark.\n\nArchive moves the email to the archive of its account. Delete moves it to the bin.\n\nAfter archive, delete or filing, a dark bar with \"Undo\" shows for 10 seconds at the bottom. Click Undo and the email goes back.\n\nIf an action does not work, a short message in plain words shows at the bottom with an orange warning triangle. The small cross closes it."),
 
@@ -42,8 +42,8 @@ enum Guide {
         ("Envelope with a dot", "New mail waits (a choice in Settings)."),
         ("Warning triangle in the menu bar", "Something is wrong, for example Mail is closed. Click the icon to read what."),
         ("Time next to the icon", "When the newest new email arrived."),
-        ("Bold subject", "A new email, not yet read."),
-        ("Normal subject", "An email you have read."),
+        ("Subject in full-strength letters", "A new email, not yet read."),
+        ("Subject in grey letters", "An email you have read."),
         ("Blue dot", "The email is in an iCloud account."),
         ("Orange dot", "The email is in a Gmail account."),
         ("Grey dot", "The email is in another account."),
@@ -77,7 +77,7 @@ struct GuideView: View {
         VStack(alignment: .leading, spacing: 4) {
             ForEach(Guide.howItWorks) { section in
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(section.title).font(.headline).foregroundStyle(Color.accentColor)
+                    Text(section.title).font(.headline).foregroundStyle(Color.mailBlue)
                     ForEach(Array(section.body.components(separatedBy: "\n\n").enumerated()), id: \.offset) { _, paragraph in
                         Text(paragraph).font(.callout).fixedSize(horizontal: false, vertical: true)
                     }

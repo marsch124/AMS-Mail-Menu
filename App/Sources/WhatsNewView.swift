@@ -31,6 +31,9 @@ enum WhatsNew {
             "Changed: the padding is gone, in every window. Before, there were 8 to 18 points of empty space around the heading, the rows, the cards and the buttons. Now there is none above and below, and 4 points at the sides so letters do not touch an edge. Gaps between rows are 4 points at most, before up to 12.",
             "Changed: one thin edge of 6 points stays around each window, because the Mac rounds the window's corners and they cut into the words without it. The cards of the senders have smaller round corners, 5 points instead of 10.",
             "Fixed: the list is as tall as its emails, up to a limit, and then scrolls. For a moment today it showed no emails at all between the heading and the bottom bar.",
+            "Changed: nothing in the list is bold any more. Before, the subjects of new emails, the sender names, \"Mark all read\" and the \"new\" tags were bold. Now a new email has its subject in full-strength letters and a read one in grey.",
+            "Changed: the app uses its own blue for the tags, \"Mark all read\", Triage and the buttons at the bottom. Before, it took the Mac's highlight colour, which on your Mac gave pale yellow tags that were hard to read. By night the blue is lighter.",
+            "Fixed: an empty second line under some subjects. Many emails begin with signs that show nothing; the first line is now the first one with something to read.",
             "Changed: before the first reading is done the list says \"Reading Mail…\", not \"No emails in your inboxes\".",
             "New: the app can check itself. Started with a special word, it reads the inboxes once and writes down how many emails it found and how long it took. It is used for testing; you do not need it.",
         ]),
@@ -78,7 +81,7 @@ struct WhatsNewView: View {
         VStack(alignment: .leading, spacing: 4) {
             ForEach(WhatsNew.releases) { release in
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("\(release.version) · \(release.date)").font(.headline).foregroundStyle(Color.accentColor)
+                    Text("\(release.version) · \(release.date)").font(.headline).foregroundStyle(Color.mailBlue)
                     ForEach(release.items, id: \.self) { item in
                         HStack(alignment: .firstTextBaseline, spacing: 5) {
                             Text("–").foregroundStyle(.secondary)

@@ -70,6 +70,14 @@ Mail not open (button "Open Mail (hidden)"), access turned off (button to System
 ## Layout: no padding (0.4, the owner's word: "take away all padding")
 No empty space above or below anything. 4 points at the sides (3 inside the small tags), so letters do not touch an edge. One exception: 6 points around each window (list panel, message window, Triage), because the Mac rounds window corners and they cut into the words otherwise (the owner: "Terrible rounding"). Sender cards: corner 5. The list area is as tall as its emails up to 560 points (`fixedSize`), then it scrolls. Gaps between stacked things: 4 points at most. Rows are as tall as their words.
 
+## Letters and colour in the list (0.4)
+- Nothing in the list is bold (the owner, 23 Nov 2026: "Not bold - it looks terrible"). A new email: subject in the primary text colour; a read one: secondary (grey). Only the panel title "Mail" is bold.
+- The app's own colour `Color.mailBlue` (day 10, 92, 196; night 107, 173, 255) for tags, "Mark all read", Triage, the bottom buttons, headings in the guide. Never the Mac's highlight colour (his is yellow: unreadable tags).
+- First line of text: the first line with something to read; lines made only of signs that show nothing (zero-width signs, no-break spaces, a picture's place U+FFFC) are skipped (`MessageLinks.firstLine`, tested).
+
+## Checking the real panel without a click (0.4)
+The running app presses its own menu bar icon when another program posts the notice `com.schabbauer.AMSMailMenu.openPanel` (`SelfCheck.listenForOpenPanel`). Then `screencapture -R 700,0,612,700` shows the real panel with the real emails. `--picture <file> [--dark]` draws the panel with invented emails, by day or by night.
+
 ## Place in the menu bar
 The icon gets a saved place at first start: 290 points from the right edge (`NSStatusItem Preferred Position Item-0`), just left of Deck Mate (272) and right of Tidy Bar's line (302). Without it the Mac puts a new icon at the far left of a full menu bar, where it is hidden. A place the owner drags it to is kept.
 

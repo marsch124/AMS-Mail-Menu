@@ -20,6 +20,7 @@ struct AMSMailMenuApp: App {
         // Tidy Bar's line (302), so the icon always shows and never sits behind the notch.
         let placeKey = "NSStatusItem Preferred Position Item-0"
         if UserDefaults.standard.object(forKey: placeKey) == nil { UserDefaults.standard.set(290, forKey: placeKey) }
+        SelfCheck.listenForOpenPanel()
     }
 
     var body: some Scene {
@@ -36,6 +37,7 @@ struct AMSMailMenuApp: App {
         Window("Email", id: "message") {
             MessageWindowView()
                 .padding(6)     // the window's round corners would cut into the words otherwise
+                .tint(.mailBlue)
                 .environmentObject(store)
         }
         .defaultSize(width: 480, height: 560)
@@ -44,12 +46,14 @@ struct AMSMailMenuApp: App {
         Window("Triage", id: "triage") {
             TriageView()
                 .padding(6)
+                .tint(.mailBlue)
                 .environmentObject(store)
         }
         .defaultSize(width: 620, height: 600)
 
         Settings {
             SettingsView()
+                .tint(.mailBlue)
                 .environmentObject(store)
         }
     }

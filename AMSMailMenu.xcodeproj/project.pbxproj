@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0B4C43A9E0C910EB1419D3DA /* MailReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C115EF19F5361D9302C3D428 /* MailReader.swift */; };
+		238DA5B8EEEAE03590C59B8D /* Colours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2CE7A61E0ACF1EF0436B31 /* Colours.swift */; };
 		418F8874D18D87E11ED94C85 /* WhatsNewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD7F04532FBA6422F048427 /* WhatsNewView.swift */; };
 		7EABF361708E333A53EDDA2A /* MenuContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346D86B3BB8C046E694938FA /* MenuContentView.swift */; };
 		802181EBBF9DECC82BA8D1AE /* TriageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32DE656B3E4844EE3C1A260F /* TriageView.swift */; };
@@ -26,6 +27,7 @@
 		10E91D225FC75EB7504EC0A6 /* AMSMailMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AMSMailMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F3A219B3B72A3ACB16AA9F6 /* SelfCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCheck.swift; sourceTree = "<group>"; };
 		2A6B487B741E500293267B7A /* MessageWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageWindowView.swift; sourceTree = "<group>"; };
+		2E2CE7A61E0ACF1EF0436B31 /* Colours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colours.swift; sourceTree = "<group>"; };
 		32DE656B3E4844EE3C1A260F /* TriageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriageView.swift; sourceTree = "<group>"; };
 		346D86B3BB8C046E694938FA /* MenuContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuContentView.swift; sourceTree = "<group>"; };
 		6BD161F92E6337686E18EB08 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				EA4602BA781785FDF1C054E6 /* AMSMailMenuApp.swift */,
+				2E2CE7A61E0ACF1EF0436B31 /* Colours.swift */,
 				A8F4076A23395A49D6EA2546 /* GuideView.swift */,
 				E10BCD77B7245AC436529F07 /* Keeper.swift */,
 				C115EF19F5361D9302C3D428 /* MailReader.swift */,
@@ -188,6 +191,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9AD615B98B829BF9BBAEA8EF /* AMSMailMenuApp.swift in Sources */,
+				238DA5B8EEEAE03590C59B8D /* Colours.swift in Sources */,
 				F20CFC452235898200AAF19C /* GuideView.swift in Sources */,
 				DE831933192AA86F494845E9 /* Keeper.swift in Sources */,
 				0B4C43A9E0C910EB1419D3DA /* MailReader.swift in Sources */,

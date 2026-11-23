@@ -79,6 +79,9 @@ final class LinkTests: XCTestCase {
 
     func testFirstLine() {
         XCTAssertEqual(MessageLinks.firstLine(of: "\n\n  Hello there  \nSecond"), "Hello there")
+        // A line of signs that show nothing is not a first line.
+        XCTAssertEqual(MessageLinks.firstLine(of: "\u{FFFC}\u{200C}\u{00A0} \u{200C}\nReal words"), "Real words")
+        XCTAssertEqual(MessageLinks.firstLine(of: "\u{200B}\u{FEFF}"), "")
         XCTAssertEqual(MessageLinks.firstLine(of: String(repeating: "x", count: 200), maxLength: 10).count, 10)
     }
 }
