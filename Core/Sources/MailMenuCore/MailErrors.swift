@@ -1,0 +1,42 @@
+import Foundation
+
+/// Problems talking to Apple Mail, with plain-language explanations.
+public enum MailAccessProblem: Error, Equatable {
+    case mailNotRunning
+    case permissionDenied
+    case permissionNotYetAsked
+    case other(String)
+
+    /// AppleScript error numbers that mean "not allowed".
+    /// -1743: the user refused Automation access. -1744: permission would need to be asked first.
+    public static func from(errorNumber: Int, message: String) -> MailAccessProblem {
+        switch errorNumber {
+        case -1743: return .permissionDenied
+        case -1744: return .permissionNotYetAsked
+        case -600, -609: return .mailNotRunning
+        default: return .other(message.isEmpty ? "Error \(errorNumber)" : message)
+        }
+    }
+
+    public var title: String {
+        switch self {
+        case .mailNotRunning: return "Apple Mail is not open"
+        case .permissionDenied: return "Access to Mail is turned off"
+        case .permissionNotYetAsked: return "Access to Mail is needed"
+        case .other: return "Mail could not be read"
+        }
+    }
+
+    public var explanation: String {
+        switch self {
+        case .mailNotRunning:
+            return "This app reads your emails from Apple Mail. Please open Mail (it may stay hidden)."
+        case .permissionDenied:
+            return "To fix it: System Settings → Privacy & Security → Automation → AMS Mail Menu → switch on “Mail”."
+        case .permissionNotYetAsked:
+            return "Click “Refresh”. macOS will ask whether AMS Mail Menu may control Mail. Please click “Allow”."
+        case .other(let text):
+            return text
+        }
+    }
+}

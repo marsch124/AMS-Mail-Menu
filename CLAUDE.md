@@ -12,16 +12,27 @@ Context: said after a cloud session could not build the app (no Mac there) and
 proposed that the owner start a separate session on the Mac. The owner answered "NO".
 
 Claude's reading (interpretation, not the owner's words):
-- Set this project up anew, the same way as those four apps (repositories
-  marsch124/AMS-Deck-Mate, AMS-Mic-Check, AMS-Shortcut-Overview, AMS-Tidy-Bar):
-  look at their project layout, GitHub workflows and delivery first, then copy that pattern.
-- Reuse the existing Swift code from branch `claude/ams-mail-menu-step1`
-  (`AMSMailMenu/`, `MailMenuCore/`, `MailMenuCoreTests/`) instead of rewriting it.
+- Keep this project in the same shape as those four apps and work the same way.
 - Do not hand the owner technical steps to carry out.
 
-## State of the existing code (checked 2026-11-23, commit 482f075)
+## How the four model apps are set up (read 2026-11-23)
 
-- `MailMenuCore/` compiles with Swift 6.0 on Linux; its 19 unit tests pass there, but with a
-  stand-in for the Mac-only AppleScript types, so the two AppleScript tests are not truly verified.
-- `AMSMailMenu/` (SwiftUI/AppKit) has never been compiled.
-- The hand-written `AMSMailMenu.xcodeproj` has never been opened by Xcode.
+- Folders: `App/Sources`, `App/Config/Info.plist`, `App/Resources`; `Core/` is a Swift package
+  (rules + tests, `@testable import`); `Docs/SPEC.md`; `Tools/install.sh`; `project.yml` (XcodeGen).
+- `project.yml`: bundle id `com.schabbauer.<Name>`, macOS 15.0, Swift 5, signing "Apple Development"
+  with the team already used there, hardened runtime off, scheme named like the app, run config Release.
+- Build and install happen ON THE MAC: `Tools/install.sh` runs `swift test` in `Core`,
+  `xcodegen generate`, `xcodebuild` (Release, `-derivedDataPath build`), copies the app to
+  `~/Applications` and starts it. GitHub Actions only runs `swift test --package-path Core` on `macos-15`.
+- Commits go to `main` with messages like `0.6.2 (11): what changed`; version and build number are
+  raised together in `project.yml`, `Info.plist`, README and SPEC.
+- The model apps also have an app icon, a keeper (LaunchAgent that reopens the app) and a guide.
+  AMS Mail Menu has none of these yet.
+
+## This project
+
+- Rebuilt in that shape on 2026-11-23 from branch `claude/ams-mail-menu-step1` (old layout, kept).
+- `Core`: 19 tests pass on Linux only with a stand-in for `NSAppleEventDescriptor`/`NSAppleScript`
+  (not in the repo). On a Mac `swift test` needs no stand-in.
+- `App` has never been compiled. No `.xcodeproj` is committed; `Tools/install.sh` generates it.
+- A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.
