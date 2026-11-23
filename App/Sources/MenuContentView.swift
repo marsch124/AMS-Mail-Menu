@@ -256,6 +256,8 @@ struct MessageRow: View {
                     .font(.system(size: 12.5))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+                    // Starts under the subject, not under the account dot (dot 8 + gap 7).
+                    .padding(.leading, showAccount ? 15 : 0)
             }
         }
         .padding(.horizontal, 4)
