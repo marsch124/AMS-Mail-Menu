@@ -29,6 +29,9 @@ enum WhatsNew {
             "Fixed: \"Mail could not be read … Invalid index\". It showed when an inbox held fewer emails than the list asks for, or while Mail was still loading. Now the app takes the emails that are there.",
             "New: \"Apple Mail is busy\". If Mail does not answer within 30 seconds, the list says so in plain words and tries again by itself.",
             "Changed: the padding is gone, in every window. Before, there were 8 to 18 points of empty space around the heading, the rows, the cards and the buttons. Now there is none above and below, and 4 points at the sides so letters do not touch an edge. Gaps between rows are 4 points at most, before up to 12.",
+            "Changed: one thin edge of 6 points stays around each window, because the Mac rounds the window's corners and they cut into the words without it. The cards of the senders have smaller round corners, 5 points instead of 10.",
+            "Fixed: the list is as tall as its emails, up to a limit, and then scrolls. For a moment today it showed no emails at all between the heading and the bottom bar.",
+            "Changed: before the first reading is done the list says \"Reading Mail…\", not \"No emails in your inboxes\".",
             "New: the app can check itself. Started with a special word, it reads the inboxes once and writes down how many emails it found and how long it took. It is used for testing; you do not need it.",
         ]),
         Release(version: "0.3 (3)", date: "23 Nov 2026", items: [

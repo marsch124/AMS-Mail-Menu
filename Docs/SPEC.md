@@ -65,10 +65,10 @@ Mail not open (button "Open Mail (hidden)"), access turned off (button to System
 - Every question to Mail gives up after 30 seconds: "Apple Mail is busy" (`MailAccessProblem.mailBusy`, AppleScript -1712); the next regular reading tries again.
 
 ## Self-check (0.4, `SelfCheck.swift`)
-`open -n "AMS Mail Menu.app" --args --check <file>` reads the inboxes once and writes into the file: how many emails, how many unread, how many per account, how many sender groups, how long it took. Never the words of an email. `--probe <file>` times 13 fixed small questions to Mail. `--check <file> --helper` reads through the helper copy. Both run as the app itself (its own permission for Mail), before the one-copy rule, and quit.
+`open -n "AMS Mail Menu.app" --args --check <file>` reads the inboxes once and writes into the file: how many emails, how many unread, how many per account, how many sender groups, how long it took. Never the words of an email. `--picture <file>` draws the list panel with six invented emails into a PNG (and its size into `<file>.txt`): the way to look at the layout without a click. `--probe <file>` times 13 fixed small questions to Mail. `--check <file> --helper` reads through the helper copy. Both run as the app itself (its own permission for Mail), before the one-copy rule, and quit.
 
 ## Layout: no padding (0.4, the owner's word: "take away all padding")
-No empty space above or below anything. 4 points at the sides (3 inside the small tags), so letters do not touch an edge or a rounded corner. Gaps between stacked things: 4 points at most. Rows are as tall as their words.
+No empty space above or below anything. 4 points at the sides (3 inside the small tags), so letters do not touch an edge. One exception: 6 points around each window (list panel, message window, Triage), because the Mac rounds window corners and they cut into the words otherwise (the owner: "Terrible rounding"). Sender cards: corner 5. The list area is as tall as its emails up to 560 points (`fixedSize`), then it scrolls. Gaps between stacked things: 4 points at most. Rows are as tall as their words.
 
 ## Place in the menu bar
 The icon gets a saved place at first start: 290 points from the right edge (`NSStatusItem Preferred Position Item-0`), just left of Deck Mate (272) and right of Tidy Bar's line (302). Without it the Mac puts a new icon at the far left of a full menu bar, where it is hidden. A place the owner drags it to is kept.

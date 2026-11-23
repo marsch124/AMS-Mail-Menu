@@ -19,12 +19,12 @@ struct MenuContentView: View {
             if let problem = store.problem {
                 ProblemView(problem: problem)
             } else if store.groups.isEmpty {
-                Text("No emails in your inboxes.")
+                Text(store.lastRefresh == nil ? "Reading Mail…" : "No emails in your inboxes.")
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 4)
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 4) {
                         ForEach(store.groups) { group in
                             SenderCard(group: group,
                                        isOpen: isOpen(group),
@@ -35,10 +35,15 @@ struct MenuContentView: View {
                     }
                     .padding(.horizontal, 4)
                 }
+                // As tall as its emails, up to 560; without this the list area collapses to nothing.
                 .frame(maxHeight: 560)
+                .fixedSize(horizontal: false, vertical: true)
             }
             footer
         }
+        // The only empty space in the panel: its round corners would cut into the words otherwise.
+        .padding(.horizontal, 6)
+        .padding(.vertical, 6)
         .frame(width: 400)
         .background(Color(nsColor: .windowBackgroundColor))
     }
@@ -87,7 +92,7 @@ struct MenuContentView: View {
                 .font(.system(size: 13))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 4)
-                .background(RoundedRectangle(cornerRadius: 10).fill(Color(white: 0.11)))
+                .background(RoundedRectangle(cornerRadius: 5).fill(Color(white: 0.11)))
                 .padding(.horizontal, 4)
             }
             footerBar
@@ -210,8 +215,8 @@ struct SenderCard: View {
                 }
             }
         }
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color(nsColor: .controlBackgroundColor)))
-        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Color.primary.opacity(0.08)))
+        .background(RoundedRectangle(cornerRadius: 5).fill(Color(nsColor: .controlBackgroundColor)))
+        .overlay(RoundedRectangle(cornerRadius: 5).strokeBorder(Color.primary.opacity(0.08)))
     }
 }
 

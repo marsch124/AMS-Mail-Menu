@@ -34,6 +34,12 @@ final class MailStore: ObservableObject {
     private var undoTimer: Timer?
     private let defaults = UserDefaults.standard
 
+    /// For the test picture: a list of invented emails, no reading from Mail, no timer.
+    init(sample: [MailMessage]) {
+        groups = SenderGrouping.group(sample, limit: sample.count)
+        lastRefresh = Date()
+    }
+
     init() {
         defaults.register(defaults: [
             SettingsKey.emailCount: SettingsDefault.emailCount,

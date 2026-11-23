@@ -1,4 +1,6 @@
+import AppKit
 import Foundation
+import SwiftUI
 import MailMenuCore
 
 /// A check without the menu: `open -n "AMS Mail Menu.app" --args --check <file>` reads the inboxes once,
@@ -42,7 +44,45 @@ enum SelfCheck {
         exit(0)
     }
 
+    /// `--picture <file>`: draws the list with invented emails into a PNG, to check the layout without a click.
+    @MainActor
+    static func pictureIfAsked() {
+        let arguments = CommandLine.arguments
+        guard let at = arguments.firstIndex(of: "--picture"), at + 1 < arguments.count else { return }
+        _ = NSApplication.shared
+        func mail(_ n: Int, _ from: String, _ subject: String, minutesAgo: Double, read: Bool, account: String) -> MailMessage {
+            MailMessage(mailID: n, messageID: "sample-\(n)@example.com", accountName: account, mailboxName: "INBOX",
+                        sender: Sender.parse(from), subject: subject, dateReceived: Date().addingTimeInterval(-60 * minutesAgo),
+                        isRead: read, preview: "This is the first line of the invented email number \(n).")
+        }
+        let store = MailStore(sample: [
+            mail(1, "Anna Example <anna@example.com>", "Dinner on Friday?", minutesAgo: 5, read: false, account: "iCloud"),
+            mail(2, "Anna Example <anna@example.com>", "Photos from the weekend", minutesAgo: 90, read: true, account: "iCloud"),
+            mail(3, "Example Shop <shop@example.com>", "Your order has shipped", minutesAgo: 30, read: false, account: "Gmail"),
+            mail(4, "Example Shop <shop@example.com>", "Thank you for your order", minutesAgo: 300, read: false, account: "Gmail"),
+            mail(5, "Example Bank <bank@example.com>", "Your monthly statement", minutesAgo: 2000, read: true, account: "iCloud"),
+            mail(6, "Example News <news@example.com>", "This week in the news", minutesAgo: 4000, read: true, account: "Gmail"),
+        ])
+        let host = NSHostingView(rootView: MenuContentView().environmentObject(store))
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.borderless],
+                              backing: .buffered, defer: false)
+        window.contentView = host
+        RunLoop.main.run(until: Date().addingTimeInterval(0.4))
+        let size = host.fittingSize
+        window.setContentSize(size)
+        host.frame = NSRect(origin: .zero, size: size)
+        host.layoutSubtreeIfNeeded()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.4))
+        if let image = host.bitmapImageRepForCachingDisplay(in: host.bounds) {
+            host.cacheDisplay(in: host.bounds, to: image)
+            try? image.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: arguments[at + 1]))
+        }
+        try? "size \(Int(size.width)) x \(Int(size.height))".write(toFile: arguments[at + 1] + ".txt", atomically: true, encoding: .utf8)
+        exit(0)
+    }
+
     static func runIfAsked() {
+        MainActor.assumeIsolated { pictureIfAsked() }
         probeIfAsked()
         let arguments = CommandLine.arguments
         guard let at = arguments.firstIndex(of: "--check"), at + 1 < arguments.count else { return }

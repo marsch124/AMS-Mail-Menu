@@ -35,6 +35,7 @@ struct AMSMailMenuApp: App {
 
         Window("Email", id: "message") {
             MessageWindowView()
+                .padding(6)     // the window's round corners would cut into the words otherwise
                 .environmentObject(store)
         }
         .defaultSize(width: 480, height: 560)
@@ -42,6 +43,7 @@ struct AMSMailMenuApp: App {
 
         Window("Triage", id: "triage") {
             TriageView()
+                .padding(6)
                 .environmentObject(store)
         }
         .defaultSize(width: 620, height: 600)

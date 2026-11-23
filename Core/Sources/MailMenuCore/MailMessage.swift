@@ -17,6 +17,19 @@ public struct MailMessage: Identifiable, Equatable, Hashable {
     public var isRead: Bool
     /// First line of the text, only filled when that setting is on.
     public var preview: String?
+
+    public init(mailID: Int, messageID: String, accountName: String, mailboxName: String, sender: Sender,
+                subject: String, dateReceived: Date, isRead: Bool, preview: String? = nil) {
+        self.mailID = mailID
+        self.messageID = messageID
+        self.accountName = accountName
+        self.mailboxName = mailboxName
+        self.sender = sender
+        self.subject = subject
+        self.dateReceived = dateReceived
+        self.isRead = isRead
+        self.preview = preview
+    }
 }
 
 /// A sender as shown by Mail, e.g. `Anna Example <anna@example.com>`.
