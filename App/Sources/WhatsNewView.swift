@@ -22,6 +22,12 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.7 (7)", date: "23 Nov 2026", items: [
+            "Changed: the list is narrower. You chose option 4 of four: 260 points wide, before 400.",
+            "Changed: the button in a sender's bar says \"Mark read\", before \"Mark all read\". It still marks all of that sender's emails as read. With the longer words the narrow list showed only eight letters of a sender's name; now it shows about fifteen.",
+            "Changed: the list has no scroll bar any more. On your Mac it took 15 of the 260 points. Scroll with two fingers or the mouse wheel.",
+            "Changed: in the narrow list the words \"Newest 20\" at the top give way, so the heading row never breaks into two lines. The number is still in Settings.",
+        ]),
         Release(version: "0.6 (6)", date: "23 Nov 2026", items: [
             "Changed: smaller, quieter letters in the whole app. You chose option 2 of six. In the list the sender is 12 points (before 14), the subject 11 (before 13), the first line of text 10.5 (before 12.5), the time 10 (before 12). The letters are still the Mac's own, in normal weight.",
             "Changed: the same in the windows. In the message window and in Triage the subject is 14 points (before 19 and 18) and the text of the email 12 (before 14 and 13.5). Settings, How it works and What's new are 11 points (before 13 and 12). Buttons and tick boxes are the Mac's small size to match.",

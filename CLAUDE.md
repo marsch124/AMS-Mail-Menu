@@ -64,4 +64,6 @@ Claude's reading (interpretation, not the owner's words):
 - 2026-11-23 15:33: 🚨 a try `set deleted status of m to true` on a Gmail email CRASHED Apple Mail. Never use
   it. Gmail archive stays open (SPEC "Tried on real mail"); the app now says so instead of pretending.
   No more tries on the owner's mail without a new yes that names the email and the exact step.
+- 0.7 (7), 2026-11-23 15:45: the owner's width pick, option 4 of four: the list is 260 points wide
+  (`Look.panelWidth`), "Mark read" instead of "Mark all read", no scroll bar. See SPEC "The narrow list".
 - A cloud (Linux) session cannot build or start the app. That needs a session on the Mac.

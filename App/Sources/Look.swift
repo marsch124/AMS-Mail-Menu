@@ -5,8 +5,9 @@ import SwiftUI
 /// option 2 of six on 23 Nov 2026 ("another smaller and not so intrusive font"): 2 points smaller, the Mac's
 /// own letters, regular weight. `choose` switches to another candidate for the test pictures (`--look N`).
 enum Look {
-    /// How wide the list panel is.
-    static var panelWidth: CGFloat = 400
+    /// How wide the list panel is. The owner chose 260 points on 23 Nov 2026, option 4 of four
+    /// ("It is too broad. I think we should do it more narrow."); before it was 400.
+    static var panelWidth: CGFloat = 260
     static var delta: CGFloat = -2
     static var design: Font.Design = .default
     static var weight: Font.Weight = .regular

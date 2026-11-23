@@ -35,6 +35,8 @@ struct MenuContentView: View {
                     }
                     .padding(.horizontal, 4)
                 }
+                // No scroll bar: on a Mac set to always show them it took 15 of the 260 points.
+                .scrollIndicators(.never)
                 // As tall as its emails, up to 560; without this the list area collapses to nothing.
                 .frame(maxHeight: 560)
                 .fixedSize(horizontal: false, vertical: true)
@@ -207,7 +209,10 @@ struct SenderCard: View {
 
                 if group.unreadCount > 0 {
                     if isOpen {
-                        Button("Mark all read") { store.markRead(group.messages) }
+                        // "Mark read", not "Mark all read": in the 260-point list the longer words left
+                        // the sender's name only eight letters ("Martin S…").
+                        Button("Mark read") { store.markRead(group.messages) }
+                            .help("Mark all emails of this sender as read")
                             .font(Look.f(12))
                             .buttonStyle(.borderless)
                     }
