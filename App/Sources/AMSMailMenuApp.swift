@@ -75,28 +75,31 @@ struct MenuBarLabel: View {
     @AppStorage(SettingsKey.menuBarStyle) private var style = SettingsDefault.menuBarStyle
     @AppStorage(SettingsKey.menuBarShowTime) private var showTime = SettingsDefault.menuBarShowTime
 
+    /// Read so the label is drawn again when the Mac switches between day and night.
+    @Environment(\.colorScheme) private var scheme
+
     var body: some View {
-        HStack(spacing: 3) {
-            if hasProblem {
-                Image(systemName: "exclamationmark.triangle")
-            } else if unread == 0 {
-                Image(systemName: "envelope")
-            } else {
-                switch MenuBarStyle(rawValue: style) ?? .blueFill {
-                case .blueFill:
-                    // Menu bar images are normally drawn in black/white; this one keeps its colour.
-                    Image(nsImage: Self.blueEnvelope)
-                case .count:
-                    Image(systemName: "envelope.fill")
-                    Text("\(unread)")
-                case .dot:
-                    Image(systemName: "envelope.badge")
-                }
-            }
-            if showTime, !hasProblem, unread > 0, let date = newestUnread {
-                Text(date.formatted(date: .omitted, time: .shortened))
-            }
+        // A menu bar label shows only its first picture, so everything is drawn into one (MenuBarArt.label).
+        Image(nsImage: MenuBarArt.label(parts, dark: scheme == .dark))
+    }
+
+    private var parts: [MenuBarArt.Part] {
+        // The orange envelope with "!" (the owner's pick 2, 26 Nov 2026; before: a black triangle).
+        if hasProblem { return [.picture(MenuBarArt.warningMark)] }
+        if unread == 0 { return [.picture(MenuBarArt.symbol("envelope", "No new mail"))] }
+        var parts: [MenuBarArt.Part]
+        switch MenuBarStyle(rawValue: style) ?? .blueFill {
+        case .blueFill:
+            // Menu bar images are normally drawn in black/white; this one keeps its colour.
+            parts = [.picture(Self.blueEnvelope)]
+        case .count:
+            parts = [.picture(MenuBarArt.symbol("envelope.fill", "New mail")), .word("\(unread)")]
+        case .dot:
+            parts = [.picture(MenuBarArt.symbol("envelope.badge", "New mail"))]
         }
+        // Two small thin lines, "08:" over "09" (the owner's pick A; before: "8:09" in 13 pt).
+        if showTime, let date = newestUnread { parts.append(.time(date)) }
+        return parts
     }
 
     static let blueEnvelope: NSImage = {

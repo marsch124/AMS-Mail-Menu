@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0B4C43A9E0C910EB1419D3DA /* MailReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C115EF19F5361D9302C3D428 /* MailReader.swift */; };
+		14E17A184659FD3E1E3DC592 /* MenuBarArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB95FE4D44653B0764F11D29 /* MenuBarArt.swift */; };
 		238DA5B8EEEAE03590C59B8D /* Colours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2CE7A61E0ACF1EF0436B31 /* Colours.swift */; };
 		3EF093AC9D6AC0608FCB4A57 /* Look.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2745C5BB0C6956CD11C48FEC /* Look.swift */; };
 		418F8874D18D87E11ED94C85 /* WhatsNewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD7F04532FBA6422F048427 /* WhatsNewView.swift */; };
@@ -42,6 +43,7 @@
 		E10BCD77B7245AC436529F07 /* Keeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keeper.swift; sourceTree = "<group>"; };
 		E4608D50AE399FF53638E22F /* Core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Core; path = Core; sourceTree = SOURCE_ROOT; };
 		EA4602BA781785FDF1C054E6 /* AMSMailMenuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMSMailMenuApp.swift; sourceTree = "<group>"; };
+		EB95FE4D44653B0764F11D29 /* MenuBarArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarArt.swift; sourceTree = "<group>"; };
 		FB5416F2544108AEF25A03A9 /* MailStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,6 +86,7 @@
 				2745C5BB0C6956CD11C48FEC /* Look.swift */,
 				C115EF19F5361D9302C3D428 /* MailReader.swift */,
 				FB5416F2544108AEF25A03A9 /* MailStore.swift */,
+				EB95FE4D44653B0764F11D29 /* MenuBarArt.swift */,
 				346D86B3BB8C046E694938FA /* MenuContentView.swift */,
 				2A6B487B741E500293267B7A /* MessageWindowView.swift */,
 				1F3A219B3B72A3ACB16AA9F6 /* SelfCheck.swift */,
@@ -204,6 +207,7 @@
 				3EF093AC9D6AC0608FCB4A57 /* Look.swift in Sources */,
 				0B4C43A9E0C910EB1419D3DA /* MailReader.swift in Sources */,
 				C57E80279062E89D8C346594 /* MailStore.swift in Sources */,
+				14E17A184659FD3E1E3DC592 /* MenuBarArt.swift in Sources */,
 				7EABF361708E333A53EDDA2A /* MenuContentView.swift in Sources */,
 				A155B140DD2152C7FE40F051 /* MessageWindowView.swift in Sources */,
 				F90EB42D8DEE9D0E4D7460FF /* SelfCheck.swift in Sources */,
@@ -286,7 +290,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = D24ENP83QQ;
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = App/Config/Info.plist;
@@ -294,7 +298,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
+				MARKETING_VERSION = 0.9.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.schabbauer.AMSMailMenu;
 				PRODUCT_NAME = "AMS Mail Menu";
 				SDKROOT = macosx;
@@ -365,7 +369,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = D24ENP83QQ;
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = App/Config/Info.plist;
@@ -373,7 +377,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
+				MARKETING_VERSION = 0.9.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.schabbauer.AMSMailMenu;
 				PRODUCT_NAME = "AMS Mail Menu";
 				SDKROOT = macosx;

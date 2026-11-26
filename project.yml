@@ -18,8 +18,8 @@ targets:
       path: App/Config/Info.plist
       properties:
         CFBundleDisplayName: AMS Mail Menu
-        CFBundleShortVersionString: "0.9.2"
-        CFBundleVersion: "11"
+        CFBundleShortVersionString: "0.9.3"
+        CFBundleVersion: "12"
         CFBundleIconFile: AppIcon
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.productivity
@@ -29,8 +29,8 @@ targets:
         PRODUCT_NAME: AMS Mail Menu
         PRODUCT_BUNDLE_IDENTIFIER: com.schabbauer.AMSMailMenu
         SWIFT_VERSION: "5.0"
-        MARKETING_VERSION: "0.9.2"
-        CURRENT_PROJECT_VERSION: "11"
+        MARKETING_VERSION: "0.9.3"
+        CURRENT_PROJECT_VERSION: "12"
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: Apple Development
         DEVELOPMENT_TEAM: D24ENP83QQ

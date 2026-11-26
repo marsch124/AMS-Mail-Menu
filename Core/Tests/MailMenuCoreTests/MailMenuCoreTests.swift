@@ -318,3 +318,14 @@ final class KeeperTests: XCTestCase {
         XCTAssertFalse(Keeper.handsOver(wanted: true, openedByKeeper: false, plain: false, inApplications: false))
     }
 }
+
+final class MenuBarTimeTests: XCTestCase {
+    func testHourWithColonOverMinutesAlwaysTwoDigits() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Stockholm")!
+        let morning = calendar.date(from: DateComponents(year: 2026, month: 11, day: 26, hour: 8, minute: 9))!
+        XCTAssertTrue(MenuBarTime.lines(morning, calendar: calendar) == ("08:", "09"))
+        let evening = calendar.date(from: DateComponents(year: 2026, month: 11, day: 26, hour: 21, minute: 45))!
+        XCTAssertTrue(MenuBarTime.lines(evening, calendar: calendar) == ("21:", "45"))
+    }
+}

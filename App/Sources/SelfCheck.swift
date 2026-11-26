@@ -260,6 +260,8 @@ enum SelfCheck {
                         }
                     case "report":
                         store.reportReadEmails()
+                    case "warningLook":
+                        store.showWarningForCheck()
                     case "archiveUndo":
                         store.checkArchiveAndUndo()
                     case "archiveUndoTest":

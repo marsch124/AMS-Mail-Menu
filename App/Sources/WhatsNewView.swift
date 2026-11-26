@@ -22,6 +22,15 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9.3 (12)", date: "26 Nov 2026", items: [
+            "Changed: the warning mark in the menu bar. Before (0.2 to 0.9.2), when something was wrong (for example Mail is closed), the icon was Apple's warning triangle, drawn in the menu bar's own black or white. Now it is the envelope with a small filled badge at its top right, with a white \"!\" in it, and the whole mark is orange. You chose option 2 of 3 (red badge, orange badge, red filled envelope).",
+            "Why orange: in this app orange means only \"warning\". The list already shows an orange warning triangle at the bottom when an action fails. Red stays only for delete. So the menu bar warning and the warning in the list now look alike.",
+            "Changed: the time of the newest new email next to the icon is much smaller and thinner. Before, it was one line, for example \"8:09\", in the menu bar's normal letters, 13 points. Now it is two small thin lines, one above the other: the hour with the colon on top and the minutes below (\"08:\" over \"09\"). The letters are 7.5 points, light weight, so the time takes less width and looks calm. You chose option A of 2 (with the colon) and asked for the numbers to be even smaller.",
+            "Changed: the time always has two digits for the hour and two for the minutes. Before, 8:09 was written \"8:09\"; now it is \"08:\" over \"09\".",
+            "Changed: the time takes the menu bar's own colour, as before: dark on a light menu bar, white on a dark one, by day and by night.",
+            "Changed: \"How it works\", part \"The menu bar icon\", and the line for the warning in \"Signs in this app\" now say \"orange envelope with a !\", and describe the two-line time. The line for the orange warning triangle at the bottom of the list says that orange means the warning in both places.",
+            "Nothing else changed: the switch in Settings \"Show the time of the newest new email next to the icon\" is where it was and works as before; the blue envelope, the outline envelope and the number and dot choices look the same.",
+        ]),
         Release(version: "0.9.2 (11)", date: "23 Nov 2026", items: [
             "Fixed: the gear did not always get you into Settings. Before (0.2 to 0.9.1), if the Settings window was already open behind other windows, pressing the gear showed nothing. And a new Settings window could open behind the window you were working in. Now Settings always comes to the front, in front of every other window.",
             "Fixed: the list stayed open over Settings. Before, it stayed on the screen after you pressed the gear. Now the list closes first, then Settings opens.",

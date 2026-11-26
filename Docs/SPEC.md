@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.9.2 (11), 23 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.9.3 (12), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -21,9 +21,10 @@ See the newest emails without opening a mail app, and deal with them in a few cl
 - Refresh every 30 s / 1 / 2 / 5 minutes (default 1 minute, never under 15 s), and after every action.
 
 ## Menu bar icon
-- No unread mail: outline envelope. A problem: warning triangle.
+- No unread mail: outline envelope.
+- A problem (for example Mail is closed): the envelope with a small filled badge at its top right with a white "!"; the whole mark is orange (`systemOrange`, not a template image). Before 0.9.3: Apple's warning triangle in the menu bar's own black/white. The owner's pick, 26 Nov 2026: option 2 of 3 (red badge / orange badge / red filled envelope). Orange because in this app orange means only "warning" (the list's warning triangle at the bottom is orange too); red means only delete.
 - Unread mail, by Settings: blue filled envelope (default), filled envelope with the count, or envelope with a dot.
-- Optional: the time of the newest unread email next to the icon (default on).
+- Optional: the time of the newest unread email next to the icon (default on; Settings switch "Show the time of the newest new email next to the icon", unchanged). Since 0.9.3 it is two stacked lines: the hour with the colon on top, the minutes below ("08:" over "09"), always two digits each, 7.5 pt, light weight, in the menu bar's own colour (template colour: dark by day, white by night). Before: one line such as "8:09" in the menu bar's normal letters, 13 pt. The owner, 26 Nov 2026: "Make the time stamp much smaller and thinner"; pick A of 2 (with the colon); "make the numbers even smaller".
 
 ## Opening an email
 Settings choose one: a small window in this app (default), Apple Mail at that email (`message://%3C…%3E` link from the Message-ID), or Spark (only brings Spark to the front; Spark cannot be told which email to show).
@@ -77,7 +78,7 @@ The owner's rule: a colour means ONE thing in the whole app. Since 0.8:
 - **Violet** (`Color.accountViolet`, day 125/77/209, night 179/143/255): an iCloud account: the dot on an email line, the dot in the heading row, the initials badge in the message window.
 - **Green** (`Color.accountGreen`, day 33/140/77, night 92/204/128): a Gmail account, the same three places. Nothing else is green: the "Triage is finished" tick is blue.
 - **Grey**: another account; a read email; small words.
-- **Orange**: the warning triangle only. **Red**: delete only.
+- **Orange**: the warning only: the warning triangle at the bottom of the list and, since 0.9.3, the orange envelope with "!" in the menu bar. **Red**: delete only.
 Until 0.7 iCloud was blue (it also read as "unread", as in Apple Mail), Gmail orange (the warning's colour), the badge always orange-brown and the finished tick green.
 
 ## Letters (0.6)
@@ -161,7 +162,7 @@ Before (0.9): at the top right of the list, Triage was opened by a tray-with-an-
 260 points wide. A sender's bar: arrow, name (cut with "…" when too long), "Mark read" (tooltip "Mark all emails of this sender as read"; "Mark all read" before, which left the name eight letters), the "N new" tag. No scroll bar (`scrollIndicators(.never)`): a Mac set to always show scroll bars gave it 15 of the 260 points. The heading row drops "Newest N" when it does not fit.
 
 ## Seeing the real windows (0.5)
-The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings`, `pressGear` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail; `pressGear` makes the running app press its own gear button in the open list (found by its identifier `settingsGear`), so the real button can be tried without a mouse; `settings` goes the same way as the gear (`SelfCheck.showSettings`). Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.
+The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings`, `pressGear` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail; `pressGear` makes the running app press its own gear button in the open list (found by its identifier `settingsGear`), so the real button can be tried without a mouse; `settings` goes the same way as the gear (`SelfCheck.showSettings`). `warningLook` (0.9.3) shows the menu bar warning mark for 8 seconds without touching Mail or the list, then reads Mail again — photograph the menu bar with `screencapture -x -R <x>,0,70,30`. The menu bar label is ONE picture (`MenuBarArt.label`): a SwiftUI menu bar label shows only its first picture, so a second picture for the time was dropped (seen 26 Nov 2026); envelope, number and time are drawn side by side into one image — a template when nothing in it has its own colour, otherwise the plain parts are painted black by day and white at night. Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.
 
 ## How it works and What's new
 - How it works (`GuideView`): a guide to every part of the app, ending with "Signs in this app": every mark and colour with its meaning.

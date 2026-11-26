@@ -82,6 +82,13 @@ final class MailStore: ObservableObject {
     private var refreshWanted = false
 
     /// Reads the inboxes in the background; the list stays usable while Mail answers.
+    /// For looking at the warning mark in the real menu bar (check word `warningLook`): shows the
+    /// "Mail is closed" warning for 8 seconds without touching Mail or the list, then reads Mail again.
+    func showWarningForCheck() {
+        problem = .mailNotRunning
+        DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in self?.refresh() }
+    }
+
     func refresh() {
         guard !isLoading else { refreshWanted = true; return }
         let count = max(1, defaults.integer(forKey: SettingsKey.emailCount))
