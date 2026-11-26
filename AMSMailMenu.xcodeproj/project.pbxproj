@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0B4C43A9E0C910EB1419D3DA /* MailReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C115EF19F5361D9302C3D428 /* MailReader.swift */; };
 		14E17A184659FD3E1E3DC592 /* MenuBarArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB95FE4D44653B0764F11D29 /* MenuBarArt.swift */; };
+		1E36C2FAA4F537C913EB0F02 /* IconMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9944ABB91AE83ACACE74FE6F /* IconMenu.swift */; };
 		238DA5B8EEEAE03590C59B8D /* Colours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2CE7A61E0ACF1EF0436B31 /* Colours.swift */; };
 		3EF093AC9D6AC0608FCB4A57 /* Look.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2745C5BB0C6956CD11C48FEC /* Look.swift */; };
 		418F8874D18D87E11ED94C85 /* WhatsNewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD7F04532FBA6422F048427 /* WhatsNewView.swift */; };
@@ -35,6 +36,7 @@
 		32DE656B3E4844EE3C1A260F /* TriageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriageView.swift; sourceTree = "<group>"; };
 		346D86B3BB8C046E694938FA /* MenuContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuContentView.swift; sourceTree = "<group>"; };
 		6BD161F92E6337686E18EB08 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		9944ABB91AE83ACACE74FE6F /* IconMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconMenu.swift; sourceTree = "<group>"; };
 		A8F4076A23395A49D6EA2546 /* GuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideView.swift; sourceTree = "<group>"; };
 		BFD7F04532FBA6422F048427 /* WhatsNewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewView.swift; sourceTree = "<group>"; };
 		C115EF19F5361D9302C3D428 /* MailReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailReader.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 				2E2CE7A61E0ACF1EF0436B31 /* Colours.swift */,
 				D7912C7877E45B0B435D6B42 /* GmailConnection.swift */,
 				A8F4076A23395A49D6EA2546 /* GuideView.swift */,
+				9944ABB91AE83ACACE74FE6F /* IconMenu.swift */,
 				E10BCD77B7245AC436529F07 /* Keeper.swift */,
 				2745C5BB0C6956CD11C48FEC /* Look.swift */,
 				C115EF19F5361D9302C3D428 /* MailReader.swift */,
@@ -203,6 +206,7 @@
 				238DA5B8EEEAE03590C59B8D /* Colours.swift in Sources */,
 				F8EDE780FC1A4A9AA8771E8C /* GmailConnection.swift in Sources */,
 				F20CFC452235898200AAF19C /* GuideView.swift in Sources */,
+				1E36C2FAA4F537C913EB0F02 /* IconMenu.swift in Sources */,
 				DE831933192AA86F494845E9 /* Keeper.swift in Sources */,
 				3EF093AC9D6AC0608FCB4A57 /* Look.swift in Sources */,
 				0B4C43A9E0C910EB1419D3DA /* MailReader.swift in Sources */,
@@ -290,7 +294,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = D24ENP83QQ;
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = App/Config/Info.plist;
@@ -298,7 +302,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.5;
+				MARKETING_VERSION = 0.9.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.schabbauer.AMSMailMenu;
 				PRODUCT_NAME = "AMS Mail Menu";
 				SDKROOT = macosx;
@@ -369,7 +373,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = D24ENP83QQ;
 				ENABLE_HARDENED_RUNTIME = NO;
 				INFOPLIST_FILE = App/Config/Info.plist;
@@ -377,7 +381,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.5;
+				MARKETING_VERSION = 0.9.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.schabbauer.AMSMailMenu;
 				PRODUCT_NAME = "AMS Mail Menu";
 				SDKROOT = macosx;

@@ -91,6 +91,12 @@ enum MailReader {
         NSWorkspace.shared.openApplication(at: url, configuration: config)
     }
 
+    /// Opens Mail and brings it to the front (two-finger menu, "Open Apple Mail").
+    static func openMailInFront() {
+        guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: mailBundleID) else { return }
+        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
+    }
+
     /// Opens System Settings at Privacy & Security → Automation.
     static func openAutomationSettings() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation") {

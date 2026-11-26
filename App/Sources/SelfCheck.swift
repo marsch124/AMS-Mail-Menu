@@ -186,6 +186,21 @@ enum SelfCheck {
 
     /// For checks: clicks the real gear in the open list, with a mouse press and release sent to the list.
     @MainActor
+    /// A two-finger click on the app's own menu bar icon, queued like a real one (check word `rightClick`),
+    /// so the watcher in `IconMenu` is tried, not only the menu. `IconMenu` closes the menu after 3 seconds.
+    static func rightClickIcon() -> Bool {
+        guard let button = statusButton(), let window = button.window else { return false }
+        let spot = button.convert(NSPoint(x: button.bounds.midX, y: button.bounds.midY), to: nil)
+        guard let event = NSEvent.mouseEvent(
+            with: .rightMouseDown, location: spot, modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
+            windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 1)
+        else { return false }
+        IconMenu.shared.closeNextAfter = 3
+        NSApp.postEvent(event, atStart: false)
+        return true
+    }
+
+    @MainActor
     static func pressGear() -> Bool {
         guard let panel = openPanel(), let content = panel.contentView, gearFrame.width > 0 else { return false }
         let spot = NSPoint(x: gearFrame.midX, y: content.bounds.height - gearFrame.midY)
@@ -229,6 +244,16 @@ enum SelfCheck {
 
         var body: some View {
             Color.clear.frame(width: 0, height: 0)
+                // The two-finger menu on the icon (0.9.6): what its entries do.
+                .onAppear {
+                    IconMenu.shared.install(
+                        checkNow: { store.refresh() },
+                        openTriage: {
+                            openWindow(id: "triage")
+                            NSApp.activate(ignoringOtherApps: true)
+                        },
+                        openSettings: { SelfCheck.showSettings { openSettings() } })
+                }
                 .onReceive(DistributedNotificationCenter.default().publisher(
                     for: Notification.Name("com.schabbauer.AMSMailMenu.show"))) { notice in
                     switch notice.object as? String {
@@ -262,6 +287,13 @@ enum SelfCheck {
                         store.reportReadEmails()
                     case "warningLook":
                         store.showWarningForCheck()
+                    case "rightClick":
+                        let posted = SelfCheck.rightClickIcon()
+                        Logger(subsystem: "com.schabbauer.AMSMailMenu", category: "reading")
+                            .notice("two-finger click posted: \(posted, privacy: .public)")
+                    case "iconMenu":
+                        // The two-finger menu under the icon, closed again by itself after 3 seconds.
+                        DispatchQueue.main.async { IconMenu.shared.show(closingAfter: 3) }
                     case "archiveUndo":
                         store.checkArchiveAndUndo()
                     case "archiveUndoTest":

@@ -22,6 +22,13 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9.6 (15)", date: "26 Nov 2026", items: [
+            "New: resting the pointer on the menu bar icon now also shows a hint when all is well. Before (0.9.4 and 0.9.5), the hint showed only when something was wrong. Now it also tells you how many new emails wait: \"22 new emails, newest at 08:47\", or \"1 new email, newest at 08:47\", or \"No new emails\". When something is wrong, the words of the problem show instead, as before. You said yes to this (\"Yes, do 1 too - show new count on hover\").",
+            "New: a two-finger click on the menu bar envelope (or a click with the Control key held) now opens a small menu. Before, a two-finger click did nothing. Now the menu has: \"Check for new mail now\" (reads Mail again at once), \"Open Apple Mail\" (brings Mail to the front), \"Triage\" (opens the Triage window), \"Settings…\", a line, and \"Quit AMS Mail Menu\". You chose this one, \"Short menu\", out of four.",
+            "A normal click on the envelope still opens the list, as before.",
+            "Changed: \"How it works\", parts \"The menu bar icon\" and \"Quit\", and the line for the time next to the icon in \"Signs in this app\" now describe this. There are no new marks.",
+            "Nothing else changed: the envelopes, the time next to the icon and the list look and work as before.",
+        ]),
         Release(version: "0.9.5 (14)", date: "26 Nov 2026", items: [
             "New: a click on the orange envelope now opens Apple Mail for you, hidden in the background. Before (0.9.3 and 0.9.4), when Mail was closed, a click opened the list with the problem and a button \"Open Mail (hidden)\" that you had to press yourself. Now the click opens the list and opens Mail by itself at the same time. Mail stays hidden: it does not come to the front and does not take over your screen. You said yes to this (\"Yes, do 2 - open Mail on click\").",
             "While Mail starts, the list says \"Opening Mail…\" where the button used to be. The app reads Mail again after 4 seconds, and once more after 10 seconds if Mail was slow. Then your emails appear and the icon turns back to the envelope.",

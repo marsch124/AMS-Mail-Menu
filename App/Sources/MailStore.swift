@@ -7,23 +7,26 @@ import os
 /// Holds the emails shown in the menu and refreshes them from Apple Mail.
 @MainActor
 final class MailStore: ObservableObject {
-    @Published private(set) var groups: [SenderGroup] = []
+    @Published private(set) var groups: [SenderGroup] = [] {
+        didSet { updateHover() }
+    }
     @Published private(set) var problem: MailAccessProblem? {
-        didSet { if problem != oldValue { showProblemOnHover() } }
+        didSet { if problem != oldValue { updateHover() } }
     }
 
-    /// Resting the pointer on the menu bar icon shows what is wrong (the owner's yes, 26 Nov 2026);
-    /// no hint while all is well. Read back from the real button for the diary.
-    private func showProblemOnHover() {
-        let text = problem?.hoverText
+    /// Resting the pointer on the menu bar icon shows what is wrong (0.9.4) or, when all is well, how many
+    /// new emails there are and when the newest came (0.9.6; both the owner's yes, 26 Nov 2026).
+    /// Read back from the real button for the diary, only when the words change.
+    private var lastHover: String?
+    private func updateHover() {
+        let text = problem?.hoverText ?? MenuBarHint.text(unread: unreadCount, newest: newestUnreadDate)
+        guard text != lastHover else { return }
+        lastHover = text
         Task { @MainActor in
-            let button = SelfCheck.statusButton()
-            button?.toolTip = text
-            let shown = button?.toolTip
-            self.diary.notice("hover text: \(shown ?? "none", privacy: .public)")
-            // Still there a moment later, after the menu bar has drawn the new icon?
-            try? await Task.sleep(for: .seconds(3))
-            self.diary.notice("hover text 3 s later: \(SelfCheck.statusButton()?.toolTip ?? "none", privacy: .public)")
+            // Before the icon is in the menu bar there is no button yet: try again at the next change.
+            guard let button = SelfCheck.statusButton() else { self.lastHover = nil; return }
+            button.toolTip = text
+            self.diary.notice("hover text: \(button.toolTip ?? "none", privacy: .public)")
         }
     }
     @Published private(set) var lastRefresh: Date?

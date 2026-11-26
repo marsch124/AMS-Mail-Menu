@@ -347,3 +347,19 @@ final class OpenMailOnClickTests: XCTestCase {
         XCTAssertFalse(MailAccessProblem.other("x").opensMailOnClick)
     }
 }
+
+final class MenuBarHintTests: XCTestCase {
+    func testHoverWhenAllIsWell() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Stockholm")!
+        let d = calendar.date(from: DateComponents(year: 2026, month: 11, day: 26, hour: 8, minute: 47))!
+        XCTAssertEqual(MenuBarHint.text(unread: 22, newest: d, calendar: calendar), "22 new emails, newest at 08:47")
+        XCTAssertEqual(MenuBarHint.text(unread: 1, newest: d, calendar: calendar), "1 new email, newest at 08:47")
+        XCTAssertEqual(MenuBarHint.text(unread: 0, newest: nil, calendar: calendar), "No new emails")
+    }
+
+    func testIconMenuEntriesInOrder() {
+        XCTAssertEqual(IconMenuEntry.layout.map { $0?.title ?? "—" },
+                       ["Check for new mail now", "Open Apple Mail", "Triage", "Settings…", "—", "Quit AMS Mail Menu"])
+    }
+}
