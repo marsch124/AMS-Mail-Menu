@@ -1,23 +1,23 @@
 # AMS Mail Menu — specification
 
-Version 0.9.6 (15), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.9.7 (16), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
-Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
+Status: written from the code, and built and run on the Mac since 23 Nov 2026; see "Not yet checked" for what is still open.
 
 ## Purpose
 See the newest emails without opening a mail app, and deal with them in a few clicks or keys.
 
 ## Overview
 - Lives in the menu bar. No Dock icon.
-- Reads Apple Mail through AppleScript (`NSAppleScript`, on the main thread). Never starts Mail by itself.
-- Needs the Automation permission for Mail (macOS asks on first use). No passwords. Nothing leaves the Mac.
+- Reads Apple Mail through AppleScript (`NSAppleScript`, on the main thread). Starts Mail only when the owner clicks the orange envelope while Mail is closed (since 0.9.5, hidden; see "Open Mail on click"); otherwise never.
+- Needs the Automation permission for Mail (macOS asks on first use). No passwords and nothing leaves the Mac, unless the Gmail connection is set up (see "Gmail archive"): then the app password sits in the Keychain, and the app talks to Gmail only on Connect, Archive and Undo of a Gmail email.
 - Not sandboxed. Signed "Apple Development", same team as the other AMS Mac apps.
 
 ## The list
 - The newest N emails (Settings, default 20, 5–100) across the Inboxes of all accounts. Each inbox is asked for N; the newest N overall are kept.
 - Grouped by sender (lower-cased address, or the name if there is no address). Groups are ordered by their newest email; emails inside a group newest first (`SenderGrouping`).
 - A sender is folded open when it has unread mail, unless folded by hand.
-- Each line: account dot (iCloud blue, Gmail orange, others grey; decided from the account's name), subject, time; optional first line of text (first 400 characters read, first non-empty line, at most 120 characters).
+- Each line: account dot (iCloud violet, Gmail green, others grey; decided from the account's name), subject, time; optional first line of text (first 400 characters read, first non-empty line, at most 120 characters).
 - Refresh every 30 s / 1 / 2 / 5 minutes (default 1 minute, never under 15 s), and after every action.
 
 ## Menu bar icon
@@ -97,7 +97,7 @@ Every size in the app goes through `Look.f(size, weight)` (`App/Sources/Look.swi
 
 ## Letters and colour in the list (0.4)
 - Nothing in the list is bold (the owner, 23 Nov 2026: "Not bold - it looks terrible"). A new email: subject in the primary text colour; a read one: secondary (grey). Only the panel title "Mail" is bold.
-- The app's own colour `Color.mailBlue` (day 10, 92, 196; night 107, 173, 255) for tags, "Mark all read", Triage, the bottom buttons, headings in the guide. Never the Mac's highlight colour (his is yellow: unreadable tags).
+- The app's own colour `Color.mailBlue` (day 10, 92, 196; night 107, 173, 255) for tags, "Mark read", Triage, the bottom buttons, headings in the guide. Never the Mac's highlight colour (his is yellow: unreadable tags).
 - First line of text: the first line with something to read; lines made only of signs that show nothing (zero-width signs, no-break spaces, a picture's place U+FFFC) are skipped (`MessageLinks.firstLine`, tested).
 
 ## Checking the real panel without a click (0.4)
@@ -107,7 +107,7 @@ The running app presses its own menu bar icon when another program posts the not
 The icon gets a saved place at first start: 290 points from the right edge (`NSStatusItem Preferred Position Item-0`), just left of Deck Mate (272) and right of Tidy Bar's line (302). Without it the Mac puts a new icon at the far left of a full menu bar, where it is hidden. A place the owner drags it to is kept.
 
 ## Settings window (0.5)
-480 x 440. At the top the app's own row of three tabs (a segmented picker, not the Mac's tab bar: that one writes the chosen tab in the Mac's highlight colour and leaves an empty band): Settings, How it works, What's new. At the bottom the version line ("Version 0.8 (8)") on the left and Done (filled blue; Escape too) on the right. The Settings tab is plain rows without boxes: blue group headings, tick boxes, two menus, three radio buttons, ending with "Start" ("Open at login", off at first). Every change counts at once.
+480 x 440. At the top the app's own row of four tabs (a segmented picker, not the Mac's tab bar: that one writes the chosen tab in the Mac's highlight colour and leaves an empty band): Settings, Gmail, How it works, What's new. At the bottom the version line ("Version 0.8 (8)") on the left and Done (filled blue; Escape too) on the right. The Settings tab is plain rows without boxes: blue group headings, tick boxes, two menus, three radio buttons, ending with "Start" ("Open at login", off at first). Every change counts at once.
 
 ### Opening (0.9.2)
 Before (0.2 to 0.9.1): the gear at the bottom of the list opened the Settings window without bringing the app to the front. A Settings window already open behind other programs' windows (open since the afternoon) showed nothing when the gear was pressed, a new one could open behind the window in use, and the list stayed open over it. Now (0.9.2): the gear closes the list, opens Settings and puts the Settings window in front of every other window, also when it was already open behind something. Nothing else changed: same place, same look. The owner: "I cannot access Settings". Code: `SelfCheck.showSettings` (the gear and the notice word `settings` both go this way).
@@ -139,7 +139,7 @@ History, 23 Nov 2026:
 - 🚨 Never send Mail `set deleted status` (it crashed Apple Mail on 23 Nov 2026).
 - 🚨 The check words that change mail (`archiveUndo`) need the owner's yes for that very run. New check word `archiveUndoTest`: archives and undoes ONLY the email whose subject is exactly "Mail Menu test", never a real email.
 
-Settings, part "Gmail" (keys `gmailAddress` and `gmailMailAccount` in the app's settings):
+Settings, tab "Gmail" (keys `gmailAddress` and `gmailMailAccount` in the app's settings):
 - "Gmail address"; "App password" (a secure field, the letters hidden); "Account in Mail" (which account in Apple Mail is the Gmail one, for example "Gmail"; proposed: the account whose name contains "gmail" or "google"); main blue button "Connect"; after connecting the line "Connected to Gmail" and a button "Disconnect".
 - If Google refuses, one plain sentence says why: wrong address or app password; no internet.
 - The app password is made at myaccount.google.com/apppasswords (Google account > Security > 2-Step Verification must be on > App passwords), named "AMS Mail Menu", the 16 letters pasted into "App password". It is not the normal Google password.
@@ -174,6 +174,9 @@ Before (0.9): at the top right of the list, Triage was opened by a tray-with-an-
 
 ## Seeing the real windows (0.5)
 The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings`, `pressGear` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail; `pressGear` makes the running app press its own gear button in the open list (found by its identifier `settingsGear`), so the real button can be tried without a mouse; `settings` goes the same way as the gear (`SelfCheck.showSettings`). `warningLook` (0.9.3) shows the menu bar warning mark for 8 seconds without touching Mail or the list, then reads Mail again — photograph the menu bar with `screencapture -x -R <x>,0,70,30`. The menu bar label is ONE picture (`MenuBarArt.label`): a SwiftUI menu bar label shows only its first picture, so a second picture for the time was dropped (seen 26 Nov 2026); envelope, number and time are drawn side by side into one image — a template when nothing in it has its own colour, otherwise the plain parts are painted black by day and white at night. Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.
+
+## 0.9.7 (16), 26 Nov 2026: wrong texts fixed
+Texts only; no behaviour changed. How it works: "no passwords, nothing leaves your Mac" made true for the Gmail connection; "three tabs" now four (Settings, Gmail, How it works, What's new); "part Gmail" now "tab Gmail". README: tabs, "Mark read", what talks to Google, version, "not yet built" line removed. This specification: account colours (violet and green, not blue and orange), Mail started on a click since 0.9.5, Gmail connection and password wording, four tabs, "Mark read", status line.
 
 ## How it works and What's new
 - How it works (`GuideView`): a guide to every part of the app, ending with "Signs in this app": every mark and colour with its meaning.
