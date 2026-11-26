@@ -5,10 +5,10 @@ import XCTest
 
 final class SenderTests: XCTestCase {
     func testNameAndAddress() {
-        let s = Sender.parse("Anna Example <anna@example.com>")
-        XCTAssertEqual(s.name, "Anna Example")
-        XCTAssertEqual(s.address, "anna@example.com")
-        XCTAssertEqual(s.displayName, "Anna Example")
+        let s = Sender.parse("Eva Example <eva@example.com>")
+        XCTAssertEqual(s.name, "Eva Example")
+        XCTAssertEqual(s.address, "eva@example.com")
+        XCTAssertEqual(s.displayName, "Eva Example")
     }
 
     func testQuotedName() {
@@ -26,8 +26,8 @@ final class SenderTests: XCTestCase {
     }
 
     func testGroupKeyIgnoresCase() {
-        XCTAssertEqual(Sender.parse("A <Anna@Example.com>").groupKey,
-                       Sender.parse("Anna <anna@example.com>").groupKey)
+        XCTAssertEqual(Sender.parse("A <Eva@Example.com>").groupKey,
+                       Sender.parse("Eva <eva@example.com>").groupKey)
     }
 }
 
@@ -41,13 +41,13 @@ final class GroupingTests: XCTestCase {
 
     func testNewestSenderFirstAndNewestMessageFirst() {
         let messages = [
-            msg(1, "Anna <anna@example.com>", minutesAgo: 50),
+            msg(1, "Eva <eva@example.com>", minutesAgo: 50),
             msg(2, "Ben <ben@example.com>", minutesAgo: 10),
-            msg(3, "Anna <anna@example.com>", minutesAgo: 5),
+            msg(3, "Eva <eva@example.com>", minutesAgo: 5),
             msg(4, "Cara <cara@example.com>", minutesAgo: 30),
         ]
         let groups = SenderGrouping.group(messages, limit: 10)
-        XCTAssertEqual(groups.map(\.key), ["anna@example.com", "ben@example.com", "cara@example.com"])
+        XCTAssertEqual(groups.map(\.key), ["eva@example.com", "ben@example.com", "cara@example.com"])
         XCTAssertEqual(groups[0].messages.map(\.mailID), [3, 1])
     }
 
@@ -221,7 +221,7 @@ final class ScriptTests: XCTestCase {
             NSAppleEventDescriptor(string: "INBOX"),
             list([NSAppleEventDescriptor(int32: 11), NSAppleEventDescriptor(int32: 12)]),
             list([NSAppleEventDescriptor(string: "one@example.com"), NSAppleEventDescriptor(string: "two@example.com")]),
-            list([NSAppleEventDescriptor(string: "Anna <anna@example.com>"), NSAppleEventDescriptor(string: "ben@example.com")]),
+            list([NSAppleEventDescriptor(string: "Eva <eva@example.com>"), NSAppleEventDescriptor(string: "ben@example.com")]),
             list([NSAppleEventDescriptor(string: "Hello"), NSAppleEventDescriptor(string: "Invoice")]),
             list([NSAppleEventDescriptor(date: date), NSAppleEventDescriptor(date: date.addingTimeInterval(-60))]),
             list([NSAppleEventDescriptor(boolean: true), NSAppleEventDescriptor(boolean: false)]),
@@ -230,7 +230,7 @@ final class ScriptTests: XCTestCase {
         let messages = MailScript.parseInboxes(list([box]))
         XCTAssertEqual(messages.count, 2)
         XCTAssertEqual(messages[0].mailID, 11)
-        XCTAssertEqual(messages[0].sender.name, "Anna")
+        XCTAssertEqual(messages[0].sender.name, "Eva")
         XCTAssertEqual(messages[0].subject, "Hello")
         XCTAssertEqual(messages[0].dateReceived.timeIntervalSince1970, date.timeIntervalSince1970, accuracy: 1)
         XCTAssertTrue(messages[0].isRead)
@@ -271,7 +271,7 @@ final class ParagonLinkTests: XCTestCase {
 
     func testCaptureURLRoundTrip() throws {
         let mail = MessageLinks.appleMailURL(messageID: "abc.1@example.com")
-        let url = try XCTUnwrap(ParagonLink.captureURL(words: "Dinner on Saturday? – Anna & Ben",
+        let url = try XCTUnwrap(ParagonLink.captureURL(words: "Dinner on Saturday? – Eva & Ben",
                                                        tags: "family #plans",
                                                        target: .note("Projects/Summer cabin.md"),
                                                        mailLink: mail))
@@ -280,7 +280,7 @@ final class ParagonLinkTests: XCTestCase {
         // Read it back the way PARAGON does (URLComponents.queryItems).
         let items = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
         let text = items.first { $0.name == "text" }?.value
-        XCTAssertEqual(text, "Dinner on Saturday? – Anna & Ben #family #plans [Mail](message://%3Cabc.1@example.com%3E)")
+        XCTAssertEqual(text, "Dinner on Saturday? – Eva & Ben #family #plans [Mail](message://%3Cabc.1@example.com%3E)")
         XCTAssertEqual(items.first { $0.name == "target" }?.value, "Projects/Summer cabin.md")
     }
 

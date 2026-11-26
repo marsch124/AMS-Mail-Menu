@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.9.7 (16), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.9.8 (17), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code, and built and run on the Mac since 23 Nov 2026; see "Not yet checked" for what is still open.
 
@@ -174,6 +174,9 @@ Before (0.9): at the top right of the list, Triage was opened by a tray-with-an-
 
 ## Seeing the real windows (0.5)
 The notice `com.schabbauer.AMSMailMenu.show` with the word `message`, `triage`, `settings`, `pressGear` or `close` makes the running app open (or close) that window (`SelfCheck.Hooks`, behind the menu bar icon); `message` opens the newest email that is already read, so nothing changes in Mail; `pressGear` makes the running app press its own gear button in the open list (found by its identifier `settingsGear`), so the real button can be tried without a mouse; `settings` goes the same way as the gear (`SelfCheck.showSettings`). `warningLook` (0.9.3) shows the menu bar warning mark for 8 seconds without touching Mail or the list, then reads Mail again — photograph the menu bar with `screencapture -x -R <x>,0,70,30`. The menu bar label is ONE picture (`MenuBarArt.label`): a SwiftUI menu bar label shows only its first picture, so a second picture for the time was dropped (seen 26 Nov 2026); envelope, number and time are drawn side by side into one image — a template when nothing in it has its own colour, otherwise the plain parts are painted black by day and white at night. Then `screencapture -l <window number>`. `--picture <file> --view list|message|triage|file|paragon|settings|guide|news [--dark]` draws any screen with invented emails.
+
+## 0.9.8 (17), 26 Nov 2026: invented names
+Words only; no behaviour changed. The invented sample data (test picture email "Hello Sam", senders "Eva Example <eva@example.com>"), the tests and the code comments no longer use real first names.
 
 ## 0.9.7 (16), 26 Nov 2026: wrong texts fixed
 Texts only; no behaviour changed. How it works: "no passwords, nothing leaves your Mac" made true for the Gmail connection; "three tabs" now four (Settings, Gmail, How it works, What's new); "part Gmail" now "tab Gmail". README: tabs, "Mark read", what talks to Google, version, "not yet built" line removed. This specification: account colours (violet and green, not blue and orange), Mail started on a click since 0.9.5, Gmail connection and password wording, four tabs, "Mark read", status line.

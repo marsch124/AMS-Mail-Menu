@@ -32,7 +32,7 @@ public struct MailMessage: Identifiable, Equatable, Hashable {
     }
 }
 
-/// A sender as shown by Mail, e.g. `Anna Example <anna@example.com>`.
+/// A sender as shown by Mail, e.g. `Eva Example <eva@example.com>`.
 public struct Sender: Equatable, Hashable {
     public let name: String
     public let address: String

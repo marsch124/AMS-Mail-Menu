@@ -1,7 +1,7 @@
 import MailMenuCore
 import SwiftUI
 
-/// The small window inside the app that shows one email (Martin's drawing 5).
+/// The small window inside the app that shows one email (his drawing 5).
 /// Opening marks the email as read; Escape closes; "Keep on top" keeps it above other windows.
 struct MessageWindowView: View {
     @EnvironmentObject private var store: MailStore

@@ -66,7 +66,7 @@ struct AMSMailMenuApp: App {
     }
 }
 
-/// The icon in the menu bar (Martin's drawing 8: blue fill while new mail waits;
+/// The icon in the menu bar (his drawing 8: blue fill while new mail waits;
 /// count or dot can be chosen in Settings; optional time of the newest new email).
 struct MenuBarLabel: View {
     let unread: Int

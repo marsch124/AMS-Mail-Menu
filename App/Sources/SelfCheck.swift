@@ -322,8 +322,8 @@ enum SelfCheck {
                         isRead: read, preview: "This is the first line of the invented email number \(n).")
         }
         let store = MailStore(sample: [
-            mail(1, "Anna Example via Example Groups <anna@example.com>", "Dinner on Friday at the new place by the harbour?", minutesAgo: 5, read: false, account: "iCloud"),
-            mail(2, "Anna Example via Example Groups <anna@example.com>", "Photos from the weekend are ready to download", minutesAgo: 90, read: true, account: "iCloud"),
+            mail(1, "Eva Example via Example Groups <eva@example.com>", "Dinner on Friday at the new place by the harbour?", minutesAgo: 5, read: false, account: "iCloud"),
+            mail(2, "Eva Example via Example Groups <eva@example.com>", "Photos from the weekend are ready to download", minutesAgo: 90, read: true, account: "iCloud"),
             mail(3, "Example Shop <shop@example.com>", "Your order 48213 has shipped and is on its way", minutesAgo: 30, read: false, account: "Gmail"),
             mail(4, "Example Shop <shop@example.com>", "Thank you for your order, here is your receipt", minutesAgo: 300, read: false, account: "Gmail"),
             mail(5, "Example Bank <bank@example.com>", "Your monthly statement", minutesAgo: 2000, read: true, account: "iCloud"),

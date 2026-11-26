@@ -1,7 +1,7 @@
 import MailMenuCore
 import SwiftUI
 
-/// The panel that drops down from the menu bar icon (layout: Martin's drawing 3).
+/// The panel that drops down from the menu bar icon (layout: his drawing 3).
 struct MenuContentView: View {
     @EnvironmentObject private var store: MailStore
     @Environment(\.openWindow) private var openWindow
@@ -241,7 +241,7 @@ struct SenderCard: View {
                 if group.unreadCount > 0 {
                     if isOpen {
                         // "Mark read", not "Mark all read": in the 260-point list the longer words left
-                        // the sender's name only eight letters ("Martin S…").
+                        // the sender's name only eight letters ("Sam S…").
                         Button("Mark read") { store.markRead(group.messages) }
                             .help("Mark all emails of this sender as read")
                             .font(Look.f(12))

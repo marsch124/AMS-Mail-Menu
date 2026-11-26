@@ -1,6 +1,6 @@
 # AMS Mail Menu
 
-A small Mac menu bar app, version 0.9.7 (build 16). It shows your newest emails from Apple Mail, grouped by sender.
+A small Mac menu bar app, version 0.9.8 (build 17). It shows your newest emails from Apple Mail, grouped by sender.
 
 - The newest emails (number set in Settings) from the Inboxes of all accounts in Apple Mail, grouped by sender, newest sender first.
 - Each line: subject and time; Settings can add the first line of text and a coloured dot for the account.

@@ -67,7 +67,7 @@ final class MailStore: ObservableObject {
 
     /// True for the test pictures: nothing is asked of Mail.
     private var isSample = false
-    static let sampleText = "Hello Martin,\n\nthis is an invented email for the test picture. It has a few lines, so the window shows how text looks.\n\nShall we have dinner on Friday? I can book the table for seven.\n\nBest wishes\nAnna"
+    static let sampleText = "Hello Sam,\n\nthis is an invented email for the test picture. It has a few lines, so the window shows how text looks.\n\nShall we have dinner on Friday? I can book the table for seven.\n\nBest wishes\nAnna"
 
     init() {
         defaults.register(defaults: [

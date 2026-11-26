@@ -22,6 +22,11 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9.8 (17)", date: "26 Nov 2026", items: [
+            "Only words changed: the sample names and examples no longer use real names. The app works as before.",
+            "Changed: the invented email used for the test picture. Before, it began \"Hello Martin\". Now it begins \"Hello Sam\".",
+            "Changed: the invented senders in the test pictures. Before, they were \"Anna Example\" with the address anna@example.com. Now they are \"Eva Example\" with eva@example.com."
+        ]),
         Release(version: "0.9.7 (16)", date: "26 Nov 2026", items: [
             "Fixed: wrong words in \"How it works\", the README and the written specification. Only words changed; the app works exactly as before.",
             "\"How it works\", part \"What this app is for\": it said \"It uses no passwords, and nothing leaves your Mac.\" That is only true without Gmail. Now it says: without the Gmail connection nothing leaves your Mac; with it, the app password is kept in your Mac's Keychain, and the app talks to Gmail only when you press Connect, and to archive a Gmail email or take that back with Undo.",
