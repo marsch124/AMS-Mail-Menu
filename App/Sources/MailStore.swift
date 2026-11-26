@@ -99,6 +99,30 @@ final class MailStore: ObservableObject {
     private var refreshWanted = false
 
     /// Reads the inboxes in the background; the list stays usable while Mail answers.
+    /// True while Mail is being opened after a click on the icon: the list says "Opening Mail…".
+    @Published private(set) var openingMail = false
+
+    /// A click on the menu bar icon while Mail is closed opens Mail, hidden (the owner's yes, 26 Nov 2026).
+    /// A Mail that is already running is never touched (opening it "hidden" would hide its windows):
+    /// then the app only reads again. Reads again after 4 and 10 seconds, as Mail needs a moment to start.
+    func openMailBecauseListOpened() {
+        guard let problem, problem.opensMailOnClick, !openingMail else { return }
+        if MailReader.isMailRunning {
+            diary.notice("click on the icon while Mail is closed: Mail is already open, reading again")
+            refresh()
+            return
+        }
+        diary.notice("click on the icon while Mail is closed: opening Mail (hidden)")
+        openingMail = true
+        MailReader.launchMailHidden()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in self?.refresh() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) { [weak self] in
+            guard let self else { return }
+            self.openingMail = false
+            if self.problem != nil { self.refresh() }
+        }
+    }
+
     /// For looking at the warning mark in the real menu bar (check word `warningLook`): shows the
     /// "Mail is closed" warning for 8 seconds without touching Mail or the list, then reads Mail again.
     func showWarningForCheck() {

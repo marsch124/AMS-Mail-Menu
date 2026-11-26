@@ -333,7 +333,17 @@ final class MenuBarTimeTests: XCTestCase {
 final class HoverTextTests: XCTestCase {
     func testHoverTextIsTitleAndExplanation() {
         XCTAssertEqual(MailAccessProblem.mailNotRunning.hoverText,
-                       "Apple Mail is not open\nThis app reads your emails from Apple Mail. Please open Mail (it may stay hidden).")
+                       "Apple Mail is not open\nThis app reads your emails from Apple Mail. A click on the menu bar envelope opens Mail for you, hidden.")
         XCTAssertEqual(MailAccessProblem.other("Odd answer").hoverText, "Mail could not be read\nOdd answer")
+    }
+}
+
+final class OpenMailOnClickTests: XCTestCase {
+    func testOnlyClosedMailIsOpenedOnClick() {
+        XCTAssertTrue(MailAccessProblem.mailNotRunning.opensMailOnClick)
+        XCTAssertFalse(MailAccessProblem.permissionDenied.opensMailOnClick)
+        XCTAssertFalse(MailAccessProblem.permissionNotYetAsked.opensMailOnClick)
+        XCTAssertFalse(MailAccessProblem.mailBusy.opensMailOnClick)
+        XCTAssertFalse(MailAccessProblem.other("x").opensMailOnClick)
     }
 }

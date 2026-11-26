@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.9.4 (13), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.9.5 (14), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -23,7 +23,7 @@ See the newest emails without opening a mail app, and deal with them in a few cl
 ## Menu bar icon
 - No unread mail: outline envelope.
 - A problem (for example Mail is closed): the envelope with a small filled badge at its top right with a white "!"; the whole mark is orange (`systemOrange`, not a template image). Before 0.9.3: Apple's warning triangle in the menu bar's own black/white. The owner's pick, 26 Nov 2026: option 2 of 3 (red badge / orange badge / red filled envelope). Orange because in this app orange means only "warning" (the list's warning triangle at the bottom is orange too); red means only delete.
-- Hover hint on the warning (0.9.4, 26 Nov 2026; the owner said yes to "show the problem on hover"): resting the pointer on the orange envelope shows the Mac's normal hint with the problem's title, a line break, then its explanation (`MailAccessProblem.hoverText` in Core, tested by `testHoverTextIsTitleAndExplanation`); e.g. "Apple Mail is not open" over "This app reads your emails from Apple Mail. Please open Mail (it may stay hidden)." The words are the ones the list shows. It is set on the app's own menu bar button (`NSStatusBarButton.toolTip`) whenever the problem changes (`MailStore.problem` didSet → `SelfCheck.statusButton()`) and removed when the problem is gone, so no problem = no hint. The diary writes "hover text: …" each time. Seen with the check word `warningLook`. Before 0.9.4: no hint; the problem could only be read in the list after a click (a click still opens the list).
+- Hover hint on the warning (0.9.4, 26 Nov 2026; the owner said yes to "show the problem on hover"): resting the pointer on the orange envelope shows the Mac's normal hint with the problem's title, a line break, then its explanation (`MailAccessProblem.hoverText` in Core, tested by `testHoverTextIsTitleAndExplanation`); e.g. "Apple Mail is not open" over "This app reads your emails from Apple Mail. A click on the menu bar envelope opens Mail for you, hidden." The words are the ones the list shows. It is set on the app's own menu bar button (`NSStatusBarButton.toolTip`) whenever the problem changes (`MailStore.problem` didSet → `SelfCheck.statusButton()`) and removed when the problem is gone, so no problem = no hint. The diary writes "hover text: …" each time. Seen with the check word `warningLook`. Before 0.9.4: no hint; the problem could only be read in the list after a click (a click still opens the list).
 - Unread mail, by Settings: blue filled envelope (default), filled envelope with the count, or envelope with a dot.
 - Optional: the time of the newest unread email next to the icon (default on; Settings switch "Show the time of the newest new email next to the icon", unchanged). Since 0.9.3 it is two stacked lines: the hour with the colon on top, the minutes below ("08:" over "09"), always two digits each, 7.5 pt, light weight, in the menu bar's own colour (template colour: dark by day, white by night). Before: one line such as "8:09" in the menu bar's normal letters, 13 pt. The owner, 26 Nov 2026: "Make the time stamp much smaller and thinner"; pick A of 2 (with the colon); "make the numbers even smaller".
 
@@ -44,7 +44,15 @@ D delete · A archive · F file in a Mail folder · P to PARAGON · M mark as re
 - To PARAGON: opens `amspara://capture?text=…&target=…` (target inbox, today, or a note path), then archives the email. The text is the task words, the #tags, and `[Mail](message://…)` as the link back.
 
 ## Problems shown in plain words (`MailAccessProblem`)
-Mail not open (button "Open Mail (hidden)"), access turned off (button to System Settings → Automation), access not yet asked, anything else with Mail's own message.
+Mail not open (since 0.9.5 no button: a click on the icon opens Mail, see below; before 0.9.5 the button "Open Mail (hidden)"), access turned off (button to System Settings → Automation), access not yet asked, anything else with Mail's own message.
+
+### Open Mail on click (0.9.5, 26 Nov 2026; the owner said yes to "Yes, do 2 - open Mail on click")
+- Rule `MailAccessProblem.opensMailOnClick`: true only for `mailNotRunning`; every other problem keeps its own button (test `testOnlyClosedMailIsOpenedOnClick`).
+- `MailStore.openMailBecauseListOpened()` is called when the list window becomes key (and on first appearance). If Mail is not running: `MailReader.launchMailHidden()` (activates false, hides true, so Mail does not come to the front). If Mail is running: no launch, so a running, visible Mail is never hidden; it only reads again.
+- It reads again after 4 s and once more after 10 s (if Mail was slow). Then the emails appear and the icon turns back to the envelope.
+- The flag `openingMail` shows "Opening Mail…" in the list in place of the button.
+- Diary lines: "click on the icon while Mail is closed: opening Mail (hidden)" or "click on the icon while Mail is closed: Mail is already open, reading again".
+- Hover and list words for Mail closed: "This app reads your emails from Apple Mail. A click on the menu bar envelope opens Mail for you, hidden." Before 0.9.5: "...Please open Mail (it may stay hidden)." and a button "Open Mail (hidden)".
 
 ## Not yet checked
 - Reading real mail on the Mac: the first build started, but no email has been read or acted on in a check yet.

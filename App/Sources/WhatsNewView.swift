@@ -22,6 +22,15 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9.5 (14)", date: "26 Nov 2026", items: [
+            "New: a click on the orange envelope now opens Apple Mail for you, hidden in the background. Before (0.9.3 and 0.9.4), when Mail was closed, a click opened the list with the problem and a button \"Open Mail (hidden)\" that you had to press yourself. Now the click opens the list and opens Mail by itself at the same time. Mail stays hidden: it does not come to the front and does not take over your screen. You said yes to this (\"Yes, do 2 - open Mail on click\").",
+            "While Mail starts, the list says \"Opening Mail…\" where the button used to be. The app reads Mail again after 4 seconds, and once more after 10 seconds if Mail was slow. Then your emails appear and the icon turns back to the envelope.",
+            "If you opened Mail yourself in the meantime, the app does not touch Mail (so a Mail you are looking at is never hidden); it only reads again.",
+            "Only for \"Mail is closed\": other problems, for example access to Mail turned off, still show their own button in the list, as before.",
+            "Changed: the words for \"Mail is closed\". Before: \"This app reads your emails from Apple Mail. Please open Mail (it may stay hidden).\" Now: \"This app reads your emails from Apple Mail. A click on the menu bar envelope opens Mail for you, hidden.\" These are also the words in the hint when you rest the pointer on the icon.",
+            "Changed: \"How it works\", parts \"The first time\" and \"The menu bar icon\", and the line for the orange envelope in \"Signs in this app\" now describe this.",
+            "Nothing else changed: the envelopes, the time next to the icon and the rest of the list look and work as before.",
+        ]),
         Release(version: "0.9.4 (13)", date: "26 Nov 2026", items: [
             "New: the orange envelope with the \"!\" now tells you what is wrong when you rest the mouse pointer on it. Before (0.9.3), you had to click the icon and read the list to learn what was wrong (for example that Mail is closed). Now a small hint box, the Mac's normal one, shows the heading of the problem and, below it, what to do. For example: \"Apple Mail is not open\" and under it \"This app reads your emails from Apple Mail. Please open Mail (it may stay hidden).\" The words are the same ones the list shows. You asked for this (\"Yes, show the problem on hover\").",
             "When nothing is wrong, the icon shows no hint, as before. When the problem goes away, the hint goes away too, and when the problem changes, the hint changes with it.",

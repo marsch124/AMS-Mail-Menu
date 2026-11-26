@@ -31,13 +31,17 @@ public enum MailAccessProblem: Error, Equatable {
         }
     }
 
+    /// A click on the menu bar icon opens Mail by itself (hidden) only when Mail is closed (the owner's yes,
+    /// 26 Nov 2026); every other problem keeps its own button in the list.
+    public var opensMailOnClick: Bool { self == .mailNotRunning }
+
     /// The hint shown when the pointer rests on the menu bar icon: the heading, then what to do.
     public var hoverText: String { "\(title)\n\(explanation)" }
 
     public var explanation: String {
         switch self {
         case .mailNotRunning:
-            return "This app reads your emails from Apple Mail. Please open Mail (it may stay hidden)."
+            return "This app reads your emails from Apple Mail. A click on the menu bar envelope opens Mail for you, hidden."
         case .permissionDenied:
             return "To fix it: System Settings → Privacy & Security → Automation → AMS Mail Menu → switch on “Mail”."
         case .permissionNotYetAsked:

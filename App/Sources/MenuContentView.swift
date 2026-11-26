@@ -51,6 +51,14 @@ struct MenuContentView: View {
         .tint(.mailBlue)
         .font(Look.f(13))
         .background(Color(nsColor: .windowBackgroundColor))
+        // A click on the menu bar icon while Mail is closed opens Mail (hidden); the list becomes key each time it opens.
+        .onAppear { store.openMailBecauseListOpened() }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notice in
+            if let window = notice.object as? NSWindow,
+               String(describing: type(of: window)).contains("MenuBarExtra") {
+                store.openMailBecauseListOpened()
+            }
+        }
     }
 
     /// The heading row. In a narrow list the words "Newest 20" give way, so nothing ever wraps.
@@ -374,9 +382,13 @@ struct ProblemView: View {
             HStack {
                 switch problem {
                 case .mailNotRunning:
-                    Button("Open Mail (hidden)") {
-                        MailReader.launchMailHidden()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { store.refresh() }
+                    if store.openingMail {
+                        Text("Opening Mail…").foregroundStyle(.secondary)
+                    } else {
+                        Button("Open Mail (hidden)") {
+                            MailReader.launchMailHidden()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) { store.refresh() }
+                        }
                     }
                 case .permissionDenied:
                     Button("Open System Settings") { MailReader.openAutomationSettings() }
