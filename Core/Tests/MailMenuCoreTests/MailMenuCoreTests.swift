@@ -329,3 +329,11 @@ final class MenuBarTimeTests: XCTestCase {
         XCTAssertTrue(MenuBarTime.lines(evening, calendar: calendar) == ("21:", "45"))
     }
 }
+
+final class HoverTextTests: XCTestCase {
+    func testHoverTextIsTitleAndExplanation() {
+        XCTAssertEqual(MailAccessProblem.mailNotRunning.hoverText,
+                       "Apple Mail is not open\nThis app reads your emails from Apple Mail. Please open Mail (it may stay hidden).")
+        XCTAssertEqual(MailAccessProblem.other("Odd answer").hoverText, "Mail could not be read\nOdd answer")
+    }
+}

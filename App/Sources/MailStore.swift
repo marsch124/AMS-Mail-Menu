@@ -8,7 +8,24 @@ import os
 @MainActor
 final class MailStore: ObservableObject {
     @Published private(set) var groups: [SenderGroup] = []
-    @Published private(set) var problem: MailAccessProblem?
+    @Published private(set) var problem: MailAccessProblem? {
+        didSet { if problem != oldValue { showProblemOnHover() } }
+    }
+
+    /// Resting the pointer on the menu bar icon shows what is wrong (the owner's yes, 26 Nov 2026);
+    /// no hint while all is well. Read back from the real button for the diary.
+    private func showProblemOnHover() {
+        let text = problem?.hoverText
+        Task { @MainActor in
+            let button = SelfCheck.statusButton()
+            button?.toolTip = text
+            let shown = button?.toolTip
+            self.diary.notice("hover text: \(shown ?? "none", privacy: .public)")
+            // Still there a moment later, after the menu bar has drawn the new icon?
+            try? await Task.sleep(for: .seconds(3))
+            self.diary.notice("hover text 3 s later: \(SelfCheck.statusButton()?.toolTip ?? "none", privacy: .public)")
+        }
+    }
     @Published private(set) var lastRefresh: Date?
     @Published private(set) var isLoading = false
 

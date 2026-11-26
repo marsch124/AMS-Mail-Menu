@@ -1,6 +1,6 @@
 # AMS Mail Menu — specification
 
-Version 0.9.3 (12), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
+Version 0.9.4 (13), 26 Nov 2026. Mac only (macOS 15+), menu bar app without a Dock icon.
 
 Status: written from the code. Nothing here has been tried on a Mac yet; see "Not yet checked".
 
@@ -23,6 +23,7 @@ See the newest emails without opening a mail app, and deal with them in a few cl
 ## Menu bar icon
 - No unread mail: outline envelope.
 - A problem (for example Mail is closed): the envelope with a small filled badge at its top right with a white "!"; the whole mark is orange (`systemOrange`, not a template image). Before 0.9.3: Apple's warning triangle in the menu bar's own black/white. The owner's pick, 26 Nov 2026: option 2 of 3 (red badge / orange badge / red filled envelope). Orange because in this app orange means only "warning" (the list's warning triangle at the bottom is orange too); red means only delete.
+- Hover hint on the warning (0.9.4, 26 Nov 2026; the owner said yes to "show the problem on hover"): resting the pointer on the orange envelope shows the Mac's normal hint with the problem's title, a line break, then its explanation (`MailAccessProblem.hoverText` in Core, tested by `testHoverTextIsTitleAndExplanation`); e.g. "Apple Mail is not open" over "This app reads your emails from Apple Mail. Please open Mail (it may stay hidden)." The words are the ones the list shows. It is set on the app's own menu bar button (`NSStatusBarButton.toolTip`) whenever the problem changes (`MailStore.problem` didSet → `SelfCheck.statusButton()`) and removed when the problem is gone, so no problem = no hint. The diary writes "hover text: …" each time. Seen with the check word `warningLook`. Before 0.9.4: no hint; the problem could only be read in the list after a click (a click still opens the list).
 - Unread mail, by Settings: blue filled envelope (default), filled envelope with the count, or envelope with a dot.
 - Optional: the time of the newest unread email next to the icon (default on; Settings switch "Show the time of the newest new email next to the icon", unchanged). Since 0.9.3 it is two stacked lines: the hour with the colon on top, the minutes below ("08:" over "09"), always two digits each, 7.5 pt, light weight, in the menu bar's own colour (template colour: dark by day, white by night). Before: one line such as "8:09" in the menu bar's normal letters, 13 pt. The owner, 26 Nov 2026: "Make the time stamp much smaller and thinner"; pick A of 2 (with the colon); "make the numbers even smaller".
 

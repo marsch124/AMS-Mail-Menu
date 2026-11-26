@@ -31,6 +31,9 @@ public enum MailAccessProblem: Error, Equatable {
         }
     }
 
+    /// The hint shown when the pointer rests on the menu bar icon: the heading, then what to do.
+    public var hoverText: String { "\(title)\n\(explanation)" }
+
     public var explanation: String {
         switch self {
         case .mailNotRunning:

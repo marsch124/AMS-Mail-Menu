@@ -22,6 +22,12 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9.4 (13)", date: "26 Nov 2026", items: [
+            "New: the orange envelope with the \"!\" now tells you what is wrong when you rest the mouse pointer on it. Before (0.9.3), you had to click the icon and read the list to learn what was wrong (for example that Mail is closed). Now a small hint box, the Mac's normal one, shows the heading of the problem and, below it, what to do. For example: \"Apple Mail is not open\" and under it \"This app reads your emails from Apple Mail. Please open Mail (it may stay hidden).\" The words are the same ones the list shows. You asked for this (\"Yes, show the problem on hover\").",
+            "When nothing is wrong, the icon shows no hint, as before. When the problem goes away, the hint goes away too, and when the problem changes, the hint changes with it.",
+            "Changed: \"How it works\", part \"The menu bar icon\", and the line for the orange envelope in \"Signs in this app\" now say that resting the pointer on it shows what is wrong, and that a click still opens the list.",
+            "Nothing else changed: clicking the icon opens the list as before; the orange envelope, the blue envelope, the outline envelope and the time next to the icon look the same.",
+        ]),
         Release(version: "0.9.3 (12)", date: "26 Nov 2026", items: [
             "Changed: the warning mark in the menu bar. Before (0.2 to 0.9.2), when something was wrong (for example Mail is closed), the icon was Apple's warning triangle, drawn in the menu bar's own black or white. Now it is the envelope with a small filled badge at its top right, with a white \"!\" in it, and the whole mark is orange. You chose option 2 of 3 (red badge, orange badge, red filled envelope).",
             "Why orange: in this app orange means only \"warning\". The list already shows an orange warning triangle at the bottom when an action fails. Red stays only for delete. So the menu bar warning and the warning in the list now look alike.",
