@@ -1,0 +1,929 @@
+<meta charset="utf-8">
+<title>Mail Menu Tour</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: chapter rail on the left, coach + a pretend Mac on the right. Reusable tour engine: LESSONS + a small simulator.
+   Based on the AMS Fan Menu tour engine. Written for AMS Mail Menu 0.9.6. Update this tour in the release that changes a taught screen. */
+:root {
+  --bg: #F3F6FA; --panel: #FFFFFF; --fg: #17212B; --muted: #5F6C7A; --line: #DCE3EB;
+  --accent: #1F69C2; --accent-soft: #E1ECF9; --good: #2F7D32; --good-soft: #E6F3E6; --warn: #A8431A;
+  --desk-a: #C9D6E2; --desk-b: #E4DCEB; --menubar: rgba(255,255,255,.8); --menubar-fg: #1B1B1D;
+  --win: #FFFFFF; --win-bar: #F1F1F3; --win-fg: #1B1B1D; --win-muted: #6F6F74; --card: rgba(0,0,0,.05); --shadow: 0 18px 40px rgba(23,33,43,.2);
+  --c-mac: #1C7347; --c-macf: #217E4F; --c-fan: #1F69C2; --c-fanf: #2673C7; --c-heat: #B8421C; --c-heatf: #C44D24;
+  --c-warn: #8F5900; --c-danger: #C71A24; --c-power: #07707A; --c-story: #6B4DBC; --c-storyf: #6B4DBC;
+  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Figtree", -apple-system, "Segoe UI", sans-serif;
+  --f-mac: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#12171D; --panel:#1B232C; --fg:#EDF2F7; --muted:#9FADBB; --line:#2E3946;
+  --accent:#80BAFA; --accent-soft:#1B2D44; --good:#8FD18F; --good-soft:#1D3320; --warn:#F2A47F;
+  --desk-a:#1C2733; --desk-b:#2E2A3A; --menubar: rgba(28,28,32,.8); --menubar-fg:#F2F2F4;
+  --win:#27272B; --win-bar:#323237; --win-fg:#F2F2F4; --win-muted:#A5A5AD; --card: rgba(255,255,255,.07); --shadow: 0 18px 40px rgba(0,0,0,.55);
+  --c-mac:#66C78F; --c-macf:#298554; --c-fan:#80BAFA; --c-fanf:#2B75CC; --c-heat:#F79470; --c-heatf:#C44D24;
+  --c-warn:#F5C25C; --c-danger:#FF6B6B; --c-power:#5CCCCC; --c-story:#B8A3F5; --c-storyf:#755CC7;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg:#12171D; --panel:#1B232C; --fg:#EDF2F7; --muted:#9FADBB; --line:#2E3946;
+  --accent:#80BAFA; --accent-soft:#1B2D44; --good:#8FD18F; --good-soft:#1D3320; --warn:#F2A47F;
+  --desk-a:#1C2733; --desk-b:#2E2A3A; --menubar: rgba(28,28,32,.8); --menubar-fg:#F2F2F4;
+  --win:#27272B; --win-bar:#323237; --win-fg:#F2F2F4; --win-muted:#A5A5AD; --card: rgba(255,255,255,.07); --shadow: 0 18px 40px rgba(0,0,0,.55);
+  --c-mac:#66C78F; --c-macf:#298554; --c-fan:#80BAFA; --c-fanf:#2B75CC; --c-heat:#F79470; --c-heatf:#C44D24;
+  --c-warn:#F5C25C; --c-danger:#FF6B6B; --c-power:#5CCCCC; --c-story:#B8A3F5; --c-storyf:#755CC7;
+  color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: 230px minmax(0,1fr); gap: 22px; }
+svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none }
+svg.g { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none }
+
+/* Rail */
+.rail { display: flex; flex-direction: column; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; }
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.brand h1 { font-family: var(--f-display); font-size: 19px; line-height: 1.1; margin: 0; text-wrap: balance }
+.brand small { color: var(--muted); font-size: 12px }
+.chap { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 9px; border: 0; background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.chap:hover { background: var(--accent-soft) }
+.chap:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.chap .n { color: var(--muted); font-size: 12px; margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap }
+.chap.cur { background: var(--accent-soft); color: var(--accent); font-weight: 600 }
+.chap.done .n { color: var(--good) }
+.bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin: 10px 2px 2px }
+.bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .4s }
+.railnote { color: var(--muted); font-size: 12px; margin: 4px 2px }
+
+/* Coach */
+.main { display: flex; flex-direction: column; gap: 14px; min-width: 0 }
+.coach { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px 16px; align-items: center; }
+.coach .eyebrow { grid-column: 1 / -1; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 600; display: flex; gap: 8px; align-items: center }
+.coach .eyebrow .kind { color: var(--muted); font-weight: 500 }
+.coach h2 { font-family: var(--f-display); font-size: 23px; line-height: 1.2; margin: 0; text-wrap: balance }
+.coach p { margin: 4px 0 0; color: var(--fg); max-width: 66ch }
+.coach .btns { display: flex; gap: 8px; align-items: center }
+.btn { font: inherit; font-weight: 600; border-radius: 9px; padding: 8px 16px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer }
+.btn.main-b { background: #2673C7; border-color: #2673C7; color: #fff }
+.btn.main-b:disabled { opacity: .45; cursor: default }
+.btn.ghost { border-color: transparent; color: var(--muted) }
+.answers { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px }
+.ans { font: inherit; padding: 8px 14px; border-radius: 9px; border: 1.5px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer }
+.ans:hover { border-color: var(--accent) }
+.ans.right { border-color: var(--good); background: var(--good-soft); color: var(--good); font-weight: 600 }
+.ans.wrong { border-color: var(--warn); color: var(--warn); text-decoration: line-through }
+.feedback { grid-column: 1 / -1; font-weight: 600; color: var(--good); min-height: 1.4em; margin: 0 }
+.feedback.no { color: var(--warn) }
+
+/* Stage = pretend Mac */
+.stagebox { position: relative; width: 100%; aspect-ratio: 960 / 560; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); max-width: 100% }
+.stage { position: absolute; left: 0; top: 0; width: 960px; height: 560px; transform-origin: 0 0; font-family: var(--f-mac); font-size: 12.5px; color: var(--win-fg);
+  background: radial-gradient(120% 90% at 15% 10%, var(--desk-b), transparent 60%), linear-gradient(160deg, var(--desk-a), var(--desk-b)); }
+.stage button { font-family: inherit }
+/* Mail Menu colours, from Colours.swift (day / night). Every pretend-screen class starts with mm- so it can never clash with the engine's own classes. */
+:root {
+  --c-blue: #0A5CC4; --c-btn: #0A5CC4; --c-violet: #7D4DD1; --c-green: #218C4D; --c-orange: #FF9500; --c-red: #E5322A;
+  --flap: #F3F3F5; --mm-win: #ECECEE; --mm-card: #FFFFFF; --mm-input: #FFFFFF; --undo-link: #8FC2FF;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --c-blue: #6BADFF; --c-btn: #1A70E0; --c-violet: #B38FFF; --c-green: #5CCC80; --c-orange: #FF9F0A; --c-red: #FF6259;
+  --flap: #1C1C20; --mm-win: #2C2C2F; --mm-card: #1F1F22; --mm-input: #1F1F22 } }
+:root[data-theme="dark"] {
+  --c-blue: #6BADFF; --c-btn: #1A70E0; --c-violet: #B38FFF; --c-green: #5CCC80; --c-orange: #FF9F0A; --c-red: #FF6259;
+  --flap: #1C1C20; --mm-win: #2C2C2F; --mm-card: #1F1F22; --mm-input: #1F1F22 }
+
+.mm-sp { flex: 1 }
+.mm-mbar { position: absolute; inset: 0 0 auto; height: 26px; background: var(--menubar); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 16px; padding: 0 12px; color: var(--menubar-fg); font-size: 13px; z-index: 30 }
+.mm-mbar b { font-weight: 700 }
+.mm-item { position: relative; height: 22px; display: flex; align-items: center; gap: 3px; padding: 0 5px; border: 0; background: none; color: inherit; font: inherit; border-radius: 5px; cursor: pointer }
+.mm-item:hover, .mm-item.open { background: rgba(127,127,127,.24) }
+.mm-item svg { display: block; flex: none }
+.mm-num { font-size: 13px }
+.mm-t2 { display: flex; flex-direction: column; font: 300 8.5px/9px ui-monospace, "SF Mono", Menlo, monospace; text-align: left; font-variant-numeric: tabular-nums }
+.mm-t2 i { font-style: normal; display: block }
+.mm-tip { display: none; position: absolute; right: 0; top: 26px; width: max-content; max-width: 250px; background: var(--win); color: var(--win-fg); border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow); padding: 4px 8px; font-size: 12px; line-height: 1.35; text-align: left; z-index: 40; pointer-events: none; font-weight: 400 }
+.mm-item:hover .mm-tip { display: block }
+.mm-item.open .mm-tip { display: none }
+.mm-tile { display: inline-grid; place-items: center; flex: none; background: #0A5CC4; color: #fff }
+.mm-glyph { display: block; flex: none }
+.mm-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none }
+
+/* The list */
+.mm-panel { position: absolute; right: 8px; top: 30px; width: 292px; background: var(--mm-win); border: 1px solid var(--line); border-radius: 11px; box-shadow: var(--shadow); padding: 6px; z-index: 25; display: flex; flex-direction: column; font-size: 12px; max-height: 520px; overflow: hidden }
+.mm-hd { display: flex; align-items: center; gap: 7px; padding: 0 4px 5px; white-space: nowrap }
+.mm-hd b { font-size: 14px; font-weight: 700 }
+.mm-key { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--win-muted) }
+.mm-cnt { font-size: 10px; color: var(--win-muted) }
+.mm-tri { font: inherit; font-size: 12px; border: 0; border-radius: 99px; padding: 1px 8px; background: var(--c-btn); color: #fff; cursor: pointer }
+.mm-cards { display: flex; flex-direction: column; gap: 4px; padding: 0 4px; overflow: hidden }
+.mm-card { background: var(--mm-card); border-radius: 5px; border: 1px solid rgba(127,127,127,.2); flex: none }
+.mm-sh { display: flex; align-items: center; gap: 8px; padding: 2px 4px }
+.mm-sname { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; text-align: left; padding: 0; cursor: pointer }
+.mm-sname svg { width: 11px; height: 11px; flex: none; color: var(--win-muted); fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round }
+.mm-sname span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.mm-mr { border: 0; background: none; color: var(--c-blue); font: inherit; font-size: 12px; cursor: pointer; padding: 0 }
+.mm-new { font-size: 11px; padding: 0 3px; border-radius: 4px; background: color-mix(in srgb, var(--c-blue) 15%, transparent); color: var(--c-blue) }
+.mm-readn { font-size: 10px; color: var(--win-muted) }
+.mm-row { border-top: 1px solid var(--line); padding: 2px 4px; cursor: pointer }
+.mm-row:hover, .mm-row.force { background: color-mix(in srgb, var(--c-blue) 10%, transparent) }
+.mm-l1 { display: flex; align-items: center; gap: 7px; min-height: 24px }
+.mm-subj { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px }
+.mm-subj.rd { color: var(--win-muted) }
+.mm-tm { font-size: 11px; color: var(--win-muted); white-space: nowrap }
+.mm-acts { display: none; gap: 4px }
+.mm-row:hover .mm-acts, .mm-row.force .mm-acts { display: flex }
+.mm-row:hover .mm-tm, .mm-row.force .mm-tm { display: none }
+.mm-ab { width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgba(127,127,127,.35); background: var(--mm-card); color: var(--c-blue); display: grid; place-items: center; padding: 0; cursor: pointer }
+.mm-ab.red { color: var(--c-red) }
+.mm-ab svg, .mm-ib svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round }
+.mm-prev { font-size: 11px; color: var(--win-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 1px }
+.mm-prob { padding: 2px 4px 4px; display: flex; flex-direction: column; gap: 3px; line-height: 1.3 }
+.mm-prob .t { font-size: 13px }
+.mm-r2 { display: flex; gap: 6px; align-items: center; color: var(--win-muted) }
+.mm-sbtn { font: inherit; font-size: 12px; padding: 2px 10px; border-radius: 6px; border: 1px solid rgba(127,127,127,.4); background: var(--mm-card); color: var(--win-fg); cursor: pointer }
+.mm-sbtn:disabled { opacity: .45; cursor: default }
+.mm-pbtn { font: inherit; font-size: 12px; padding: 2px 12px; border-radius: 6px; border: 1px solid var(--c-btn); background: var(--c-btn); color: #fff; cursor: pointer }
+.mm-pbtn:disabled { opacity: .45; cursor: default }
+.mm-lbtn { border: 0; background: none; color: var(--c-blue); font: inherit; padding: 0; cursor: pointer; text-align: left }
+.mm-undo { display: flex; justify-content: space-between; gap: 10px; background: #1C1C1E; color: #fff; border-radius: 5px; padding: 3px 6px; margin: 4px 4px 0; font-size: 12px }
+.mm-undo span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.mm-undo button { color: var(--undo-link); border: 0; background: none; cursor: pointer; font: inherit }
+.mm-err { display: flex; align-items: flex-start; gap: 6px; padding: 4px 4px 0; font-size: 11.5px; line-height: 1.3 }
+.mm-err svg { width: 14px; height: 14px; flex: none; fill: none; stroke: var(--c-orange); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round }
+.mm-err button { border: 0; background: none; color: var(--win-muted); cursor: pointer; padding: 0; flex: none }
+.mm-foot { display: flex; align-items: center; gap: 12px; padding: 3px 4px 0; margin-top: 4px; border-top: 1px solid var(--line); font-size: 10px; color: var(--win-muted) }
+.mm-ib { border: 0; background: none; color: var(--c-blue); padding: 1px; cursor: pointer; display: grid }
+.mm-ib svg { width: 15px; height: 15px }
+.mm-empty { padding: 2px 8px; color: var(--win-muted) }
+
+/* Menus: the two-finger menu and the email line menu */
+.mm-ctx { position: absolute; width: 214px; background: var(--win); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 4px; z-index: 36 }
+.mm-ctx button { display: flex; width: 100%; align-items: center; gap: 6px; border: 0; background: none; color: var(--win-fg); font: inherit; padding: 3px 8px; border-radius: 5px; text-align: left; cursor: pointer }
+.mm-ctx button:hover { background: #2673C7; color: #fff }
+.mm-ctx hr { border: 0; border-top: 1px solid var(--line); margin: 3px 4px }
+.mm-icm { right: 100px; top: 28px }
+.mm-rcm { right: 306px; top: 96px; width: 238px }
+
+/* Practice box */
+.mm-practice { position: absolute; left: 12px; bottom: 12px; width: 262px; background: var(--win); border: 1px dashed var(--win-muted); border-radius: 11px; padding: 8px; z-index: 12; display: flex; flex-direction: column; gap: 4px }
+.mm-practice small { color: var(--win-muted); font-size: 11px; line-height: 1.3; margin-bottom: 2px }
+.mm-practice button { font: inherit; padding: 4px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--win-bar); color: var(--win-fg); cursor: pointer; text-align: left }
+
+/* Windows: Email, Triage, Settings */
+.mm-win { position: absolute; background: var(--mm-win); border-radius: 11px; box-shadow: var(--shadow); border: 1px solid var(--line); overflow: hidden; z-index: 20; display: flex; flex-direction: column; color: var(--win-fg); font-size: 12px }
+.mm-tb { height: 28px; flex: none; background: var(--win-bar); display: flex; align-items: center; gap: 7px; padding: 0 11px; font-weight: 600 }
+.mm-dots { display: flex; gap: 6px; margin-right: 8px }
+.mm-dots i { width: 11px; height: 11px; border-radius: 50%; background: #E0605A; display: block; cursor: pointer }
+.mm-dots i:nth-child(2), .mm-dots i:nth-child(3) { background: rgba(127,127,127,.35); cursor: default }
+.mm-ttl { flex: 1; text-align: center; margin-right: 50px; color: var(--win-muted) }
+.mm-set { left: 220px; top: 34px; width: 500px; height: 470px }
+.mm-ewin { left: 468px; top: 36px; width: 460px; height: 410px }
+.mm-twin { left: 110px; top: 30px; width: 740px; height: 500px }
+.mm-inner { padding: 8px 10px 8px; display: flex; flex-direction: column; gap: 4px; flex: 1; min-height: 0 }
+.mm-pane { position: relative; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 4px; line-height: 1.35 }
+.mm-pane p { margin: 0 }
+.mm-seg { display: flex; background: rgba(127,127,127,.2); border-radius: 7px; padding: 2px; gap: 1px; flex: none }
+.mm-seg button { flex: 1; border: 0; background: none; font: inherit; font-size: 12px; height: 22px; border-radius: 5px; color: inherit; cursor: pointer; white-space: nowrap }
+.mm-seg button.on { background: var(--c-btn); color: #fff }
+.mm-h { color: var(--c-blue); margin: 0; font-size: 12px }
+.mm-note { font-size: 10.5px; color: var(--win-muted); line-height: 1.3 }
+.mm-hr { border: 0; border-top: 1px solid var(--line); margin: 3px 0; width: 100% }
+.mm-r { display: flex; align-items: center; gap: 7px }
+.mm-cb { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(127,127,127,.6); background: var(--mm-card); padding: 0; flex: none; cursor: pointer; display: grid; place-items: center; color: #fff }
+.mm-cb.on { background: var(--c-btn); border-color: var(--c-btn) }
+.mm-ehead svg, .mm-cb svg { fill: none } .mm-cb svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; display: none }
+.mm-cb.on svg { display: block }
+.mm-rad { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(127,127,127,.6); background: var(--mm-card); padding: 0; flex: none; cursor: pointer; display: grid; place-items: center }
+.mm-rad.on { border: 4.5px solid var(--c-btn) }
+.mm-sel { font: inherit; font-size: 12px; border: 1px solid rgba(127,127,127,.4); border-radius: 6px; background: var(--mm-card); color: var(--win-fg); height: 22px; padding: 0 4px }
+.mm-stp { display: flex; align-items: center; gap: 3px }
+.mm-stp button { width: 20px; height: 20px; border: 1px solid rgba(127,127,127,.4); border-radius: 5px; background: var(--mm-card); color: var(--win-fg); cursor: pointer; padding: 0 }
+.mm-in { font: inherit; font-size: 12px; border: 1px solid rgba(127,127,127,.45); border-radius: 5px; background: var(--mm-input); color: var(--win-fg); height: 22px; padding: 0 6px; width: 100%; min-width: 0 }
+.mm-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center }
+.mm-sfoot { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; color: var(--win-muted); flex: none; padding-top: 2px }
+.mm-gh { padding-bottom: 2px }
+.mm-gh b { color: var(--c-blue); font-weight: 400; font-size: 13px; display: block }
+.mm-rel b { color: var(--c-blue); font-weight: 400; font-size: 13px }
+.mm-rel li { margin: 0 0 3px; list-style: none; padding-left: 0 }
+.mm-sign { display: flex; align-items: flex-start; gap: 8px; padding: 2px 0; border-top: 1px solid var(--line) }
+.mm-sign > span:first-child { width: 132px; flex: none }
+.mm-sign i { width: 14px; height: 14px; border-radius: 3px; flex: none; display: block; margin-top: 1px }
+
+/* The email window */
+.mm-ehead { display: flex; justify-content: flex-end; font-size: 11px }
+.mm-esub { font-size: 15px; margin: 1px 0 5px }
+.mm-ewho { display: flex; align-items: center; gap: 10px }
+.mm-badge { width: 34px; height: 34px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-size: 13px; flex: none }
+.mm-ewho b { font-weight: 400; font-size: 14px; display: block }
+.mm-ewho small { font-size: 11px; color: var(--win-muted) }
+.mm-ebody { flex: 1; overflow: auto; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 6px 4px; margin: 4px 0 }
+.mm-ebar { display: flex; gap: 8px; align-items: center }
+.mm-rbtn { color: var(--c-red) }
+
+/* Triage */
+.mm-ttop { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-bottom: 1px solid var(--line); flex: none }
+.mm-ttop span.mu { color: var(--win-muted) }
+.mm-tbody { flex: 1; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; overflow: hidden; min-height: 0 }
+.mm-tfrom { display: flex; align-items: center; gap: 8px }
+.mm-tfrom .a { font-size: 13px } .mm-tfrom .b { font-size: 11px; color: var(--win-muted) }
+.mm-tsub { font-size: 15px }
+.mm-thandled { display: flex; align-items: center; gap: 5px; color: var(--win-muted) }
+.mm-thandled svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round }
+.mm-ttext { overflow: auto; font-size: 13px; line-height: 1.5; white-space: pre-wrap }
+.mm-tdone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 14px }
+.mm-tdone svg { width: 38px; height: 38px; fill: none; stroke: var(--c-blue); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+.mm-keys { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-top: 1px solid var(--line); flex: none }
+.mm-kb { display: flex; align-items: center; gap: 5px; border: 1px solid rgba(127,127,127,.4); border-radius: 5px; background: var(--mm-card); color: var(--win-fg); height: 23px; padding: 0 7px; font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap }
+.mm-kb.red { color: var(--c-red) }
+.mm-kb:disabled { opacity: .45; cursor: default }
+.mm-kk { font: 10px ui-monospace, "SF Mono", Menlo, monospace; border: 1px solid rgba(127,127,127,.6); border-radius: 3px; padding: 0 3px }
+.mm-dim { position: absolute; inset: 0; background: rgba(0,0,0,.18); z-index: 4 }
+.mm-sheet { position: absolute; left: 50%; top: 52px; transform: translateX(-50%); background: var(--mm-win); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); padding: 10px; z-index: 5; display: flex; flex-direction: column; gap: 5px; font-size: 12px }
+.mm-flist { height: 190px; overflow: auto; border: 1px solid var(--line); border-radius: 5px; background: var(--mm-card) }
+.mm-flist button { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: none; color: inherit; font: inherit; padding: 3px 6px; cursor: pointer }
+.mm-flist button:hover { background: color-mix(in srgb, var(--c-blue) 10%, transparent) }
+.mm-btnrow { display: flex; align-items: center; gap: 8px; justify-content: flex-end }
+
+.mm-toast { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); background: var(--good); color: #fff; font: 600 13px var(--f-body); padding: 7px 14px; border-radius: 20px; z-index: 50; animation: fmpop .3s; max-width: 92%; text-align: center }
+:root[data-theme="dark"] .mm-toast { color: #10200F }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mm-toast { color: #10200F } }
+
+.target { z-index: 2; animation: fmring 1.6s ease-in-out infinite; border-radius: 7px }
+@keyframes fmring { 0%,100% { box-shadow: 0 0 0 2px #E6B53F, 0 0 0 6px rgba(230,181,63,.35) } 50% { box-shadow: 0 0 0 2px #E6B53F, 0 0 0 11px rgba(230,181,63,0) } }
+@keyframes fmpop { from { transform: translateY(8px); opacity: .3 } to { transform: none; opacity: 1 } }
+@keyframes fmgrow { from { width: 0 } to { width: 100% } }
+/* Finish */
+.finish { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px }
+.finish h3 { font-family: var(--f-display); margin: 0 0 8px; font-size: 19px }
+.finish label { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-top: 1px solid var(--line); cursor: pointer }
+.finish input { width: 18px; height: 18px; accent-color: #2673C7; margin-top: 2px; flex: none }
+
+@media (max-width: 820px) {
+  .wrap { grid-template-columns: minmax(0,1fr) }
+  .rail { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px }
+  .brand { width: 100% }
+  .chap .n { display: none }
+  .railnote, .bar { width: 100% }
+  .coach { grid-template-columns: minmax(0,1fr) }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important } }
+</style>
+
+<div class="wrap">
+  <nav class="rail" id="rail" aria-label="Chapters"></nav>
+  <main class="main">
+    <section class="coach" id="coach" aria-live="polite"></section>
+    <div class="stagebox" id="stagebox"><div class="stage" id="stage"></div></div>
+    <section class="finish" id="finish" hidden></section>
+  </main>
+</div>
+
+
+<script>
+/* ---------- Icons: line icons on a 24-pt grid, 1.9 stroke, round ends, no fill (the same style as the app's own). ---------- */
+const ENV = 'M3 6.5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z M3.5 7l8.5 6.5L20.5 7';
+const GEAR = '<circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.3"/>' + Array.from({ length: 8 }, (_, k) => { const a = k * Math.PI / 4, c = Math.cos(a), s = Math.sin(a);
+  return `<path d="M${(12 + c * 6).toFixed(2)} ${(12 + s * 6).toFixed(2)}L${(12 + c * 8.6).toFixed(2)} ${(12 + s * 8.6).toFixed(2)}"/>`; }).join('');
+const P = {
+  tick: 'M5 12.5l4.5 4.5L19 7.5', reply: 'M9 6L4 11l5 5 M4 11h9a6 6 0 0 1 6 6v1',
+  archive: 'M4 5h16v4H4Z M5.5 9v9.5h13V9 M10 13h4', trash: 'M5 7h14 M9 7V4.5h6V7 M7 7l1 13h8l1-13 M10 11v5 M14 11v5',
+  refresh: 'M19.5 12a7.5 7.5 0 1 1-2.4-5.5 M19.5 4.5v4.5h-4.5', power: 'M12 3.5v8 M7 6.5a7 7 0 1 0 10 0',
+  chevD: 'M6 9l6 6 6-6', chevR: 'M9 6l6 6-6 6', tickc: 'M12 21a9 9 0 1 0 0-18a9 9 0 0 0 0 18Z M8 12.5l3 3 5-6',
+  warn: 'M12 4l9 16H3Z M12 10v4.5 M12 17.2v.1', x: 'M6 6l12 12 M18 6L6 18',
+};
+const ICON = {
+  mail: ENV, warn: P.warn, list: 'M5 6h14 M5 12h14 M5 18h14', open: 'M3 10l9-6 9 6v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z M3 10l9 6 9-6',
+  check: P.tickc, menu: 'M5 5.5h14 M5 12h14 M5 18.5h9', book: 'M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3Z M5 17a3 3 0 0 1 3-3h10',
+  trophy: 'M7.5 3.5h9v5a4.5 4.5 0 0 1-9 0Z M7.5 5H4.5v1.5a3 3 0 0 0 3.3 3 M16.5 5h3v1.5a3 3 0 0 1-3.3 3 M12 13v3.5 M9.5 16.5h5l1 4h-7Z',
+};
+const icon = (n, cls = 'i') => { const v = ICON[n]; return `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${v[0] === '<' ? v : `<path d="${v}"/>`}</svg>`; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sv = n => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${P[n]}"/></svg>`;
+const glyph = (size, sw, inner, color = 'currentColor') => `<svg class="mm-glyph" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+/* The app tile: a flat blue with the white envelope. */
+const tile = size => `<span class="mm-tile" style="width:${size}px;height:${size}px;border-radius:${size * .26}px" aria-hidden="true">${glyph(size * .74, 2.1, `<path d="${ENV}"/>`, '#fff')}</span>`;
+
+/* ---------- The pretend app (simulator) ---------- */
+/* Invented emails only. Times: minutes of the day for today (Thu 26 Nov); older ones are negative. */
+const MSGS0 = [
+  { id: 'm1', from: 'Harbour Books', addr: 'orders@example.com', acct: 'iCloud', subj: 'Your order has shipped', t: '08:47', d: '26 Nov 2026 at 08:47', ts: 527, read: false,
+    prev: 'Your parcel left our warehouse this morning.', body: 'Hello,\n\nYour order of two paperbacks has left our warehouse this morning. It should reach you on Monday.\n\nHappy reading,\nHarbour Books' },
+  { id: 'm2', from: 'Harbour Books', addr: 'orders@example.com', acct: 'iCloud', subj: 'Autumn reading list', t: 'Mon 23 Nov', d: '23 Nov 2026 at 17:20', ts: -2000, read: true,
+    prev: 'Twelve books for long evenings.', body: 'Hello,\n\nHere are twelve books for long evenings. We hope you find one you like.\n\nHarbour Books' },
+  { id: 'm3', from: 'Lena Berg', addr: 'lena.berg@example.com', acct: 'Gmail', subj: 'Saturday lunch?', t: '08:31', d: '26 Nov 2026 at 08:31', ts: 511, read: false,
+    prev: 'Shall we try the new place by the harbour?', body: 'Hi,\n\nShall we try the new place by the harbour on Saturday? I can book a table for 12:30.\n\nLena' },
+  { id: 'm4', from: 'Lena Berg', addr: 'lena.berg@example.com', acct: 'Gmail', subj: 'Photos from the lake', t: '07:58', d: '26 Nov 2026 at 07:58', ts: 478, read: false,
+    prev: 'Here are the ones I promised.', body: 'Hi,\n\nHere are the photos from the lake that I promised. The third one is my favourite.\n\nLena' },
+  { id: 'm5', from: 'Northwind Bank', addr: 'statements@example.com', acct: 'iCloud', subj: 'Your statement is ready', t: '06:12', d: '26 Nov 2026 at 06:12', ts: 372, read: false,
+    prev: 'Your November statement can be read now.', body: 'Dear customer,\n\nYour November statement is ready. You can read it in your online bank.\n\nNorthwind Bank' },
+  { id: 'm6', from: 'Riverside Dental', addr: 'reception@example.com', acct: 'iCloud', subj: 'Appointment reminder', t: 'Tue 24 Nov', d: '24 Nov 2026 at 09:05', ts: -1000, read: true,
+    prev: 'See you on Friday at 10:30.', body: 'Hello,\n\nThis is a reminder of your visit on Friday at 10:30.\n\nRiverside Dental' },
+];
+const SLUG = { 'Harbour Books': 'harbour', 'Lena Berg': 'lena', 'Northwind Bank': 'northwind', 'Riverside Dental': 'riverside' };
+const ACC = { iCloud: 'var(--c-violet)', Gmail: 'var(--c-green)' };
+const GMAILNEED = 'Archiving a Gmail email needs the Gmail connection. Open Settings and connect Gmail. Nothing was changed.';
+const PROBLEMS = {
+  closed: { title: 'Apple Mail is not open', words: 'This app reads your emails from Apple Mail. A click on the menu bar envelope opens Mail for you, hidden.' },
+  denied: { title: 'Access to Mail is turned off', words: 'To fix it: System Settings → Privacy & Security → Automation → AMS Mail Menu → switch on “Mail”.' },
+};
+const FOLDERS = ['Receipts', 'Travel', 'Family', 'Newsletters', 'Work'];
+const START = () => ({
+  style: 'blue', showTime: true, preview: true, acct: true, openIn: 'window', every: 60, count: 20, login: false,
+  msgs: MSGS0.map(m => ({ ...m })), gone: [], foldOpen: [], foldShut: [],
+  panel: false, ctx: false, rctx: null, win: null, keepTop: true, settings: false, spage: 'settings',
+  tri: null, sheet: null, sheetTask: '', sheetTags: '', sheetPut: 'inbox', folderQ: '', recent: ['Receipts', 'Travel'],
+  undo: null, note: '', err: '', problem: null, opening: false, loading: false, practice: [], toast: '', force: null, checked: '14:40',
+  gmail: { on: false, addr: '', pw: '', acct: 'Gmail', problem: '', asking: false },
+});
+let S = START();
+const set = o => Object.assign(S, o);
+const timers = [];
+const later = (fn, ms) => { const h = setTimeout(fn, ms); timers.push(h); return h; };
+const clearTimers = () => { while (timers.length) clearTimeout(timers.pop()); };
+/* Every step starts from a full reset, then says what it needs. */
+const scene = o => { clearTimers(); S = Object.assign(START(), o); };
+const allRead = () => MSGS0.map(m => ({ ...m, read: true }));
+
+const find = id => S.msgs.find(m => m.id === id);
+const visible = () => S.msgs.filter(m => !S.gone.includes(m.id));
+const unreadMsgs = () => visible().filter(m => !m.read);
+function groups() {
+  const map = new Map();
+  visible().forEach(m => { if (!map.has(m.from)) map.set(m.from, []); map.get(m.from).push(m); });
+  const gs = [...map].map(([name, ms]) => ({ name, ms: ms.sort((a, b) => b.ts - a.ts), unread: ms.filter(x => !x.read).length }));
+  return gs.sort((a, b) => b.ms[0].ts - a.ms[0].ts);
+}
+const isOpen = g => S.foldOpen.includes(g.name) ? true : S.foldShut.includes(g.name) ? false : g.unread > 0;
+const two = n => String(n).padStart(2, '0');
+const lines = ts => [two(Math.floor(ts / 60)) + ':', two(ts % 60)];
+const newestUnread = () => { const u = unreadMsgs(); return u.length ? Math.max(...u.map(m => m.ts)) : null; };
+function hint() {
+  if (S.problem) return PROBLEMS[S.problem].title + '\n' + PROBLEMS[S.problem].words;
+  const n = unreadMsgs().length, t = newestUnread();
+  if (!n) return 'No new emails';
+  const c = n === 1 ? '1 new email' : n + ' new emails';
+  return t == null ? c : c + ', newest at ' + lines(t).join('');
+}
+
+/* The envelope in the menu bar (MenuBarArt + MenuBarLabel) */
+const envSvg = kind => {
+  const base = 'width="23" height="19" viewBox="0 0 23 19" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+  const box = '<rect x="1.5" y="3.5" width="17" height="13" rx="2.6"', flap = 'M3 6L10 11.2L17 6';
+  if (kind === 'warn') return `<svg ${base} fill="none" stroke="var(--c-orange)" stroke-width="1.5">${box}/><path d="${flap}"/><circle cx="18" cy="5" r="4.6" fill="var(--c-orange)" stroke="none"/><text x="18" y="7.8" font-size="7.6" font-weight="700" fill="#fff" stroke="none" text-anchor="middle">!</text></svg>`;
+  if (kind === 'blue') return `<svg ${base} stroke-width="1.5">${box} fill="#0A5CC4" stroke="#0A5CC4"/><path d="${flap}" fill="none" stroke="#fff"/></svg>`;
+  if (kind === 'count') return `<svg ${base} stroke-width="1.5">${box} fill="currentColor" stroke="currentColor"/><path d="${flap}" fill="none" stroke="var(--flap)"/></svg>`;
+  if (kind === 'dot') return `<svg ${base} fill="none" stroke="currentColor" stroke-width="1.5">${box}/><path d="${flap}"/><circle cx="18" cy="5" r="3.3" fill="currentColor" stroke="none"/></svg>`;
+  return `<svg ${base} fill="none" stroke="currentColor" stroke-width="1.5">${box}/><path d="${flap}"/></svg>`;
+};
+function barLabel() {
+  if (S.problem) return envSvg('warn');
+  const n = unreadMsgs().length;
+  if (!n) return envSvg('none');
+  let h = S.style === 'count' ? envSvg('count') + `<span class="mm-num">${n}</span>` : S.style === 'dot' ? envSvg('dot') : envSvg('blue');
+  const t = newestUnread();
+  if (S.showTime && t != null) { const l = lines(t); h += `<span class="mm-t2"><i>${l[0]}</i><i>${l[1]}</i></span>`; }
+  return h;
+}
+
+/* ---- The list ---- */
+const ab = (act, ic, label, id, red) => `<button class="mm-ab ${red ? 'red' : ''}" data-act="${act}" data-id="${id}" data-t="ab-${act}-${id}" title="${label}" aria-label="${label}">${sv(ic)}</button>`;
+function rowHTML(m) {
+  return `<div class="mm-row ${S.force === m.id ? 'force' : ''}" data-act="open" data-id="${m.id}" data-ctx="${m.id}" data-t="row-${m.id}">
+    <div class="mm-l1">${S.acct ? `<i class="mm-dot" style="background:${ACC[m.acct]}" title="${m.acct}"></i>` : ''}<span class="mm-subj ${m.read ? 'rd' : ''}">${esc(m.subj)}</span><span class="mm-tm">${m.t}</span>
+    <span class="mm-acts">${m.read ? '' : ab('markone', 'tick', 'Mark as read', m.id)}${ab('reply', 'reply', 'Reply', m.id)}${ab('archive', 'archive', 'Archive', m.id)}${ab('delete', 'trash', 'Delete', m.id, true)}</span></div>
+    ${S.preview && m.prev ? `<div class="mm-prev" style="padding-left:${S.acct ? 15 : 0}px">${esc(m.prev)}</div>` : ''}</div>`;
+}
+function cardHTML(g) {
+  const open = isOpen(g), sl = SLUG[g.name];
+  const right = g.unread > 0
+    ? (open ? `<button class="mm-mr" data-act="markread" data-n="${esc(g.name)}" data-t="mr-${sl}" title="Mark all emails of this sender as read">Mark read</button>` : '') + `<span class="mm-new" data-t="new-${sl}">${g.unread} new</span>`
+    : `<span class="mm-readn" data-t="new-${sl}">${g.ms.length} read</span>`;
+  return `<div class="mm-card" data-t="card-${sl}"><div class="mm-sh"><button class="mm-sname" data-act="fold" data-n="${esc(g.name)}" data-t="fold-${sl}" aria-label="${esc(g.name)}, ${g.ms.length} emails, ${open ? 'open' : 'closed'}">${sv(open ? 'chevD' : 'chevR')}<span>${esc(g.name)}</span></button>${right}</div>${open ? g.ms.map(rowHTML).join('') : ''}</div>`;
+}
+function panelHTML() {
+  const head = `<div class="mm-hd" data-t="hdr"><b>Mail</b><span class="mm-key"><i class="mm-dot" style="background:var(--c-violet)"></i>iCloud</span><span class="mm-key"><i class="mm-dot" style="background:var(--c-green)"></i>Gmail</span><span class="mm-sp"></span><span class="mm-cnt">Newest ${S.count}</span><button class="mm-tri" data-act="triage" data-t="triage-btn" title="Go through the emails one by one: delete, archive, file, or send to PARAGON">Triage</button></div>`;
+  let body;
+  if (S.problem) {
+    const p = PROBLEMS[S.problem];
+    body = `<div class="mm-prob" data-t="problem"><span class="t">${p.title}</span><span>${p.words}</span><div class="mm-r2">${S.problem === 'closed' ? (S.opening ? 'Opening Mail…' : '') : `<button class="mm-sbtn" data-act="syssettings" data-t="sysset">Open System Settings</button>`}<button class="mm-sbtn" data-act="retry" data-t="retry">Try again</button></div></div>`;
+  } else if (!visible().length) body = `<div class="mm-empty">No emails in your inboxes.</div>`;
+  else body = `<div class="mm-cards" data-t="cards">${groups().map(cardHTML).join('')}</div>`;
+  const err = S.err ? `<div class="mm-err" data-t="err"><svg viewBox="0 0 24 24"><path d="${P.warn}"/></svg><span style="flex:1">${esc(S.err)}</span><button data-act="errx" data-t="errx" aria-label="Close message">${sv('x').replace('<svg', '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4"')}</button></div>` : '';
+  const undo = S.undo ? `<div class="mm-undo" data-t="undo-bar"><span>${esc(S.undo.text)}</span><button data-act="undo" data-t="undo">Undo</button></div>` : '';
+  const left = S.note ? `<span data-t="worknote">${S.note}</span>` : S.loading || S.opening ? `<span>Reading Mail…</span>` : `<span>Checked ${S.checked}</span>`;
+  const foot = `<div class="mm-foot" data-t="footer">${left}<span class="mm-sp"></span><button class="mm-ib" data-act="check" data-t="check-btn" title="Check now" aria-label="Check now">${sv('refresh')}</button><button class="mm-ib" data-act="gear" data-t="gear" title="Settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${GEAR}</svg></button><button class="mm-ib" data-act="quit" data-t="quit" title="Quit AMS Mail Menu" aria-label="Quit AMS Mail Menu">${sv('power')}</button></div>`;
+  return `<div class="mm-panel" data-t="panel">${head}${body}${err}${undo}${foot}</div>`;
+}
+
+/* ---- Menus ---- */
+function iconMenuHTML() {
+  return `<div class="mm-ctx mm-icm" data-t="icm" role="menu"><button data-act="im-check" data-t="im-check">Check for new mail now</button><button data-act="im-mail" data-t="im-mail">Open Apple Mail</button><button data-act="im-triage" data-t="im-triage">Triage</button><button data-act="im-settings" data-t="im-settings">Settings…</button><hr><button data-act="im-quit" data-t="im-quit">Quit AMS Mail Menu</button></div>`;
+}
+function rowMenuHTML() {
+  const m = find(S.rctx); if (!m) return '';
+  return `<div class="mm-ctx mm-rcm" data-t="rcm" role="menu"><button data-act="rc-open" data-t="rc-open">Open</button><button data-act="rc-apple" data-t="rc-apple">Open in Apple Mail</button><button data-act="rc-spark" data-t="rc-spark">Open in Spark (brings Spark forward)</button><hr><button data-act="rc-reply" data-t="rc-reply">Reply</button>${m.read ? '' : `<button data-act="rc-read" data-t="rc-read">Mark as read</button>`}<button data-act="rc-archive" data-t="rc-archive">Archive</button><button data-act="rc-delete" data-t="rc-delete">Delete</button></div>`;
+}
+const PRACTICE = {
+  rclick: () => 'Two-finger click on the envelope',
+  rowctx: () => 'Right-click “Saturday lunch?”',
+  mailoff: () => 'Mail gets closed',
+  denied: () => 'The Mac says no to Mail',
+  newmail: () => 'A new email arrives',
+};
+
+/* ---- The email window ---- */
+const initials = n => n.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+function emailWinHTML() {
+  const m = find(S.win); if (!m) return '';
+  return `<div class="mm-win mm-ewin" data-t="ewin"><div class="mm-tb"><span class="mm-dots"><i data-act="ewin-close" data-t="edots"></i><i></i><i></i></span><span class="mm-ttl">Email</span></div>
+   <div class="mm-inner"><div class="mm-ehead"><span class="mm-r"><button class="mm-cb ${S.keepTop ? 'on' : ''}" role="checkbox" aria-checked="${S.keepTop}" data-act="keeptop" data-t="keeptop">${sv('tick')}</button>Keep on top</span></div>
+   <div class="mm-esub">${esc(m.subj)}</div>
+   <div class="mm-ewho"><span class="mm-badge" style="background:${ACC[m.acct]}">${initials(m.from)}</span><span><b>${esc(m.from)} &lt;${esc(m.addr)}&gt;</b><small>${m.acct} · ${m.d.replace(' at ', ', ')}</small></span></div>
+   <div class="mm-ebody">${esc(m.body)}</div>
+   <div class="mm-ebar"><button class="mm-pbtn" data-act="ew-reply" data-t="ew-reply">Reply</button><button class="mm-sbtn" data-act="ew-archive" data-t="ew-archive">Archive</button><button class="mm-sbtn mm-rbtn" data-act="ew-delete" data-t="ew-delete">Delete</button><span class="mm-sp"></span><button class="mm-sbtn" data-act="ew-apple" data-t="ew-apple">Open in Apple Mail</button><button class="mm-sbtn" data-act="ew-spark" data-t="ew-spark" title="Brings Spark to the front. Spark cannot be told which email to show.">Spark</button></div></div></div>`;
+}
+
+/* ---- Triage ---- */
+const KB = (k, label, title, act, red, dis) => `<button class="mm-kb ${red ? 'red' : ''}" data-act="${act}" data-t="k-${k}" ${dis ? 'disabled' : ''} title="${title} (key ${label})"><span class="mm-kk">${label}</span>${title}</button>`;
+function triageHTML() {
+  const T = S.tri, id = T.ids[T.i], m = id && find(id), dis = !!S.sheet;
+  const top = `<div class="mm-ttop" data-t="tri-top"><span style="font-size:13px">Triage</span>${T.ids.length ? `<span class="mu">${Math.min(T.i + 1, T.ids.length)} of ${T.ids.length}</span>` : ''}<span class="mm-sp"></span><span class="mm-r"><button class="mm-cb ${T.unreadOnly ? 'on' : ''}" role="checkbox" aria-checked="${T.unreadOnly}" data-act="unreadonly" data-t="unread-only">${sv('tick')}</button>Unread only</span><button class="mm-sbtn" data-act="startover" data-t="start-over">Start over</button></div>`;
+  let body;
+  if (m) body = `<div class="mm-tbody"><div class="mm-tfrom"><i class="mm-dot" style="background:${ACC[m.acct]}"></i><span class="a">${esc(m.from)}</span><span class="b">${esc(m.addr)}</span><span class="mm-sp"></span><span class="b">${m.d.replace(' at ', ', ')}</span></div><div class="mm-tsub">${esc(m.subj)}</div>${T.done.includes(m.id) ? `<div class="mm-thandled" data-t="handled">${sv('tickc')}Already handled</div>` : ''}<div class="mm-ttext">${esc(m.body)}</div></div>`;
+  else body = `<div class="mm-tdone" data-t="tri-end">${sv('tickc')}<span>${T.ids.length ? 'All done.' : 'No emails to go through.'}</span><button class="mm-pbtn" data-act="tri-close" data-t="tri-close">Close</button></div>`;
+  const keys = `<div class="mm-keys" data-t="keybar">${KB('d', 'D', 'Delete', 'k-delete', true, dis)}${KB('a', 'A', 'Archive', 'k-archive', false, dis)}${KB('f', 'F', 'File…', 'k-file', false, dis)}${KB('p', 'P', 'PARAGON…', 'k-paragon', false, dis)}${KB('m', 'M', 'Read', 'k-read', false, dis)}${KB('r', 'R', 'Reply', 'k-reply', false, dis)}<span class="mm-sp"></span>${KB('z', 'Z', 'Undo', 'k-undo', false, dis || !S.undo)}${KB('left', '←', 'Back', 'k-back', false, dis)}${KB('space', 'Space', 'Next', 'k-next', false, dis)}</div>`;
+  let sheet = '';
+  if (S.sheet === 'file' && m) sheet = `<div class="mm-dim"></div><div class="mm-sheet" data-t="sheet" style="width:380px"><b style="font-weight:400;font-size:13px">File in a folder of “${esc(m.acct)}”</b><input class="mm-in" data-in="fq" data-t="fq" placeholder="Type to find a folder" value="${esc(S.folderQ)}"><div class="mm-flist" data-t="flist">${folderList()}</div><div class="mm-btnrow"><span class="mm-note" style="flex:1">Enter files in the first folder shown.</span><button class="mm-sbtn" data-act="sheet-cancel" data-t="sheet-cancel">Cancel</button></div></div>`;
+  if (S.sheet === 'paragon' && m) sheet = `<div class="mm-dim"></div><div class="mm-sheet" data-t="sheet" style="width:420px"><b style="font-weight:400;font-size:13px">To PARAGON</b><input class="mm-in" data-in="ptask" data-t="ptask" placeholder="Task" value="${esc(S.sheetTask)}"><input class="mm-in" data-in="ptags" data-t="ptags" placeholder="Tags, e.g. family bills" value="${esc(S.sheetTags)}">
+    <div class="mm-seg" data-t="pput">${[['inbox', 'Inbox'], ['today', 'Today'], ['note', 'A project or note…']].map(([k, l]) => `<button class="${S.sheetPut === k ? 'on' : ''}" data-act="put" data-id="${k}">${l}</button>`).join('')}</div>
+    ${S.sheetPut === 'note' ? `<input class="mm-in" placeholder="Note path, e.g. Projects/Shed.md">` : ''}<span class="mm-note">The task gets a link back to this email. Afterwards the email is archived.</span>
+    <div class="mm-btnrow"><button class="mm-sbtn" data-act="sheet-cancel" data-t="sheet-cancel">Cancel</button><button class="mm-pbtn" data-act="send-paragon" data-t="send-paragon" ${S.sheetTask.trim() ? '' : 'disabled'}>Send to PARAGON</button></div></div>`;
+  return `<div class="mm-win mm-twin" data-t="twin"><div class="mm-tb"><span class="mm-dots"><i data-act="tri-close" data-t="tdots"></i><i></i><i></i></span><span class="mm-ttl">Triage</span></div>${top}${body}${keys}${sheet}</div>`;
+}
+function folderList() {
+  const rec = S.recent.filter(f => FOLDERS.includes(f)), all = rec.concat(FOLDERS.filter(f => !rec.includes(f)));
+  const shown = S.folderQ ? all.filter(f => f.toLowerCase().includes(S.folderQ.toLowerCase())) : all;
+  return shown.map(f => `<button data-act="pickfolder" data-n="${f}" data-t="folder-${f}">${f}</button>`).join('');
+}
+
+/* ---- Settings window ---- */
+const TICK = sv('tick');
+const cb = (k, label, t) => `<div class="mm-r" data-t="${t}"><button class="mm-cb ${S[k] ? 'on' : ''}" role="checkbox" aria-checked="${!!S[k]}" aria-label="${esc(label)}" data-act="tog" data-k="${k}">${TICK}</button><span>${label}</span></div>`;
+const sel = (k, t, opts, cur) => `<select class="mm-sel" data-sel="${k}" data-t="${t}">${opts.map(([v, l]) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+const rad = (id, label) => `<div class="mm-r"><button class="mm-rad ${S.openIn === id ? 'on' : ''}" role="radio" aria-checked="${S.openIn === id}" data-act="openin" data-id="${id}" data-t="open-${id}" aria-label="${esc(label)}"></button><span>${label}</span></div>`;
+function generalHTML() {
+  return `<div data-t="sec-list"><p class="mm-h">List</p>
+    <div class="mm-r" style="margin-top:3px"><span>Show the newest ${S.count} emails</span><span class="mm-stp"><button data-act="step" data-id="-5" aria-label="Fewer">−</button><button data-act="step" data-id="5" aria-label="More">+</button></span></div>
+    ${cb('preview', 'Show the first line of text', 'sw-preview')}
+    <p class="mm-note">The first lines appear a moment after the list, one by one: Mail has to open each email for them.</p>
+    ${cb('acct', 'Show the account as a coloured dot (iCloud violet, Gmail green)', 'sw-acct')}</div><hr class="mm-hr">
+    <div data-t="sec-icon"><p class="mm-h">Menu bar icon</p><div class="mm-r" style="margin:3px 0"><span>While new mail waits, the icon</span>${sel('style', 'sel-style', [['blue', 'Turns blue'], ['count', 'Shows the count'], ['dot', 'Dot only']], S.style)}</div>
+    ${cb('showTime', 'Show the time of the newest new email next to the icon', 'sw-time')}</div><hr class="mm-hr">
+    <div data-t="sec-open"><p class="mm-h">Clicking an email opens it in</p>${rad('window', 'Small window in this app')}${rad('apple', 'Apple Mail, at that email')}${rad('spark', 'Spark (only brings Spark to the front)')}
+    ${S.openIn === 'spark' ? `<p class="mm-note">Spark cannot be told by another app which email to show. This choice only brings Spark to the front.</p>` : ''}</div><hr class="mm-hr">
+    <div><p class="mm-h">Checking for new mail</p><div class="mm-r" style="margin-top:3px"><span>Check every</span>${sel('every', 'sel-every', [[30, '30 seconds'], [60, '1 minute'], [120, '2 minutes'], [300, '5 minutes']], S.every)}</div></div><hr class="mm-hr">
+    <div><p class="mm-h">Start</p>${cb('login', 'Open at login', 'sw-login')}<p class="mm-note">While this is on, the app also comes back by itself if it ever stops unexpectedly.</p></div>`;
+}
+function gmailHTML() {
+  const g = S.gmail;
+  let h = `<div class="mm-gh" data-t="gmail-note"><b>Gmail connection</b><p class="mm-note">Apple Mail does not pass an Archive from this app on to Gmail. With this connection the app archives a Gmail email straight at Gmail: it leaves the inbox and stays in “All Mail”, as with Archive in Gmail itself.</p></div><hr class="mm-hr">`;
+  if (g.on) h += `<p data-t="g-status">Connected to Gmail as ${esc(g.addr)}.</p><p>Archive on an email of the Mail account “${esc(g.acct)}” goes straight to Gmail.</p><div style="margin:3px 0"><button class="mm-sbtn" data-act="gdisconnect" data-t="g-disconnect">Disconnect</button></div><p class="mm-note">Disconnect removes the app password from this Mac's Keychain. Archiving a Gmail email then stops working until you connect again.</p>`;
+  else h += `<p data-t="g-status">Not connected.</p>
+    <div class="mm-grid" style="margin:3px 0"><span>Gmail address</span><input class="mm-in" data-in="gaddr" data-t="g-addr" placeholder="name@gmail.com" value="${esc(g.addr)}"><span>App password</span><input class="mm-in" type="password" data-in="gpw" data-t="g-pw" placeholder="the 16 letters from Google" value="${esc(g.pw)}"><span>Account in Mail</span>${sel('gacct', 'g-acct', [['iCloud', 'iCloud'], ['Gmail', 'Gmail']], g.acct)}</div>
+    <p class="mm-note">The app password is not your Google password. Google makes it for you: open the page below, give it the name “AMS Mail Menu”, and paste the 16 letters here. For this, 2-Step Verification must be on in your Google account.</p>
+    <button class="mm-lbtn" data-act="glink" data-t="g-link">Open Google's app password page</button>
+    <p class="mm-note">The app password is kept in this Mac's Keychain and is sent only to Google, on an encrypted line.</p>
+    <div class="mm-r" style="margin-top:3px"><button class="mm-pbtn" data-act="gconnect" data-t="g-connect">Connect</button>${g.asking ? '<span style="color:var(--win-muted)">Asking Gmail…</span>' : ''}</div>`;
+  if (g.problem) h += `<div class="mm-err" data-t="g-problem"><svg viewBox="0 0 24 24"><path d="${P.warn}"/></svg><span>${esc(g.problem)}</span></div>`;
+  return h;
+}
+const GUIDE = [
+  ['What this app is for', 'AMS Mail Menu shows your newest emails from Apple Mail without opening a mail app.'],
+  ['The first time', 'The Mac asks once if AMS Mail Menu may control Mail. Say yes.'],
+  ['The menu bar icon', 'The icon is an envelope.'],
+  ['The list', 'Click the icon and a list drops down.'],
+  ['Dealing with one email', 'Move the mouse over an email line.'],
+  ['Opening an email', 'Click an email line.'],
+  ['The message window', 'The small window shows the subject, who wrote, which account, when it arrived, and the text.'],
+  ['Triage', 'Triage goes through your emails one at a time, newest first.'],
+  ['The Gmail connection', 'Apple Mail does not pass an archive on to Gmail when another app asks for it.'],
+  ['Settings', 'Open Settings with the gear at the bottom of the list.'],
+  ['Open at login', 'While “Open at login” is on, the app opens by itself every time you log in to your Mac.'],
+  ['Quit', 'Click the power button at the bottom right of the list.'],
+];
+const SIGNS = [
+  ['#0A5CC4', 'Blue envelope in the menu bar', 'New mail waits.'],
+  ['#8a8a90', 'Outline envelope in the menu bar', 'No new mail.'],
+  ['#FF9500', 'Orange envelope with a "!" in the menu bar', 'Something is wrong, for example Mail is closed. Rest the pointer on it to see what; click it to open the list (if Mail is closed, the click also opens Mail for you, hidden). Orange is only ever the warning.'],
+  ['#8a8a90', 'Time next to the icon', 'When the newest new email arrived, in two small lines: hour with colon above, minutes below. Rest the pointer on the icon to see the count in words, for example "22 new emails, newest at 08:47".'],
+  ['#8a8a90', 'Subject in full-strength letters', 'A new email, not yet read.'],
+  ['#c0c0c6', 'Subject in grey letters', 'An email you have read.'],
+  ['#0A5CC4', 'Blue, anywhere', 'The app\'s own colour. It marks what you can press, the headings, and new mail: the envelope in the menu bar and the "new" tag. An account is never blue.'],
+  ['#7D4DD1', 'Violet dot', 'The email is in an iCloud account.'],
+  ['#218C4D', 'Green dot', 'The email is in a Gmail account.'],
+  ['#8a8a90', 'Grey dot', 'The email is in another account.'],
+  ['#0A5CC4', 'Blue tag "3 new"', 'How many new emails this sender has.'],
+  ['#8a8a90', 'Grey text "4 read"', 'This sender has no new mail; the number is how many emails it has in the list.'],
+  ['#E5322A', 'Red bin', 'Delete. Red always means delete.'],
+  ['#1C1C1E', 'Dark bar with a blue "Undo"', 'The last delete, archive or filing can be taken back for 10 seconds.'],
+  ['#FF9500', 'Orange warning triangle at the bottom', 'An action did not work; the words say why. Orange is only ever the warning, here and in the menu bar.'],
+  ['#0A5CC4', 'Small blue button "Triage"', 'Opens Triage, to go through the emails one by one.'],
+  ['#8a8a90', 'Letter in a small box on a button (D, A, F, P, M, R, Z)', 'The key that does the same as the button.'],
+  ['#0A5CC4', 'Button filled with blue', 'The main button of a window: Reply, Send to PARAGON, Close, Done.'],
+];
+const guideHTML = () => `<div>${GUIDE.map(([t, s]) => `<div style="margin-bottom:5px"><p class="mm-h" style="font-size:13px">${t}</p><p>${s}</p></div>`).join('')}
+  <div data-t="signs"><p class="mm-h" style="font-size:13px">Signs in this app</p><p style="margin-bottom:3px">Each mark or colour means one thing everywhere in the app.</p>${SIGNS.map(([c, a, b]) => `<div class="mm-sign"><span>${a}</span><span style="flex:1">${b}</span></div>`).join('')}</div></div>`;
+const NEWS = [
+  ['0.9.6 (15) · 26 Nov 2026', ['New: resting the pointer on the menu bar icon now also shows a hint when all is well. Now it also tells you how many new emails wait: "22 new emails, newest at 08:47", or "1 new email, newest at 08:47", or "No new emails". When something is wrong, the words of the problem show instead, as before.',
+    'New: a two-finger click on the menu bar envelope (or a click with the Control key held) now opens a small menu: "Check for new mail now", "Open Apple Mail", "Triage", "Settings…", a line, and "Quit AMS Mail Menu".',
+    'A normal click on the envelope still opens the list, as before.']],
+  ['0.9.5 (14) · 26 Nov 2026', ['New: a click on the orange envelope now opens Apple Mail for you, hidden in the background. While Mail starts, the list says "Opening Mail…" where the button used to be.']],
+];
+const newsHTML = () => `<div class="mm-rel">${NEWS.map(([v, items]) => `<div style="margin-bottom:6px"><b>${v}</b><ul style="margin:2px 0 0;padding:0">${items.map(i => `<li>– ${esc(i)}</li>`).join('')}</ul></div>`).join('')}</div>`;
+function settingsHTML() {
+  const tabs = [['settings', 'Settings'], ['gmail', 'Gmail'], ['guide', 'How it works'], ['news', 'What\'s new']];
+  const page = { settings: generalHTML, gmail: gmailHTML, guide: guideHTML, news: newsHTML }[S.spage]();
+  return `<div class="mm-win mm-set" data-t="swin"><div class="mm-tb"><span class="mm-dots"><i data-act="close-settings" data-t="sdots"></i><i></i><i></i></span><span class="mm-ttl">Settings</span></div>
+    <div class="mm-inner"><div class="mm-seg" data-t="tabs">${tabs.map(([k, l]) => `<button class="${S.spage === k ? 'on' : ''}" data-act="spage" data-p="${k}" data-t="page-${k}">${l}</button>`).join('')}</div>
+    <div class="mm-pane" data-t="pane">${page}</div>
+    <div class="mm-sfoot"><span data-t="version">Version 0.9.6 (15)</span><button class="mm-pbtn" data-act="close-settings" data-t="done">Done</button></div></div></div>`;
+}
+
+/* ---- The whole pretend Mac ---- */
+function renderStage() {
+  const st = document.getElementById('stage'), oldPane = st.querySelector('.mm-pane'), keep = oldPane ? oldPane.scrollTop : 0;
+  const bar = `<div class="mm-mbar"><b>Finder</b><span>File</span><span>Edit</span><span>View</span><span>Go</span><span class="mm-sp"></span>
+      <button class="mm-item ${S.panel || S.ctx ? 'open' : ''}" data-act="item" data-t="item" aria-label="AMS Mail Menu">${barLabel()}<span class="mm-tip">${esc(hint()).replace('\n', '<br>')}</span></button>
+      <span>Thu 26 Nov&nbsp; 14:40</span></div>`;
+  const practice = S.practice.length ? `<div class="mm-practice" data-t="practice"><small>Practice box. It is not in the real app. It stands in for things that happen on your Mac.</small>${S.practice.map(k => `<button data-act="p-${k}" data-t="p-${k}">${PRACTICE[k]()}</button>`).join('')}</div>` : '';
+  st.innerHTML = `${bar}${S.panel ? panelHTML() : ''}${S.ctx ? iconMenuHTML() : ''}${S.rctx ? rowMenuHTML() : ''}${practice}${S.win ? emailWinHTML() : ''}${S.tri ? triageHTML() : ''}${S.settings ? settingsHTML() : ''}${S.toast ? `<div class="mm-toast">${esc(S.toast)}</div>` : ''}`;
+  const np = st.querySelector('.mm-pane'); if (np) np.scrollTop = keep;
+  markTarget();
+}
+function toast(t) { S.toast = t; renderStage(); clearTimeout(toast.h); toast.h = setTimeout(() => { S.toast = ''; renderStage(); }, 3200); }
+
+/* ---- What the buttons do ---- */
+function removeMail(kind, id, from, path) {
+  const m = find(id); if (!m) return false;
+  if (kind === 'archive' && m.acct === 'Gmail' && !S.gmail.on) {
+    if (from === 'triage') toast(GMAILNEED); else { S.err = GMAILNEED; renderStage(); }
+    emit('gmail-needed'); return false;
+  }
+  S.gone.push(id); S.rctx = null; S.err = '';
+  S.note = kind === 'archive' ? 'Archiving…' : kind === 'delete' ? 'Deleting…' : 'Filing…'; S.undo = null; renderStage();
+  const text = kind === 'archive' ? `Archived “${m.subj}”` : kind === 'delete' ? `Deleted “${m.subj}”` : `Filed “${m.subj}” in ${path}`;
+  later(() => { S.note = ''; const u = S.undo = { id, kind, text }; renderStage(); later(() => { if (S.undo === u) { S.undo = null; renderStage(); } }, 10000); }, 700);
+  emit(kind, id); return true;
+}
+function undoLast() {
+  const u = S.undo; if (!u) return;
+  S.gone = S.gone.filter(x => x !== u.id); S.undo = null; S.note = 'Putting the email back…'; renderStage();
+  later(() => { S.note = ''; renderStage(); }, 600);
+  emit('undo');
+}
+function openEmail(id) { const m = find(id); m.read = true; set({ win: id, panel: false, rctx: null, force: null }); renderStage(); emit('win-open', id); }
+function openRow(id) {
+  if (S.openIn === 'apple') { set({ panel: false }); toast('Apple Mail opens at that email. (Nothing opens in this practice copy.)'); emit('open-apple'); }
+  else if (S.openIn === 'spark') { set({ panel: false }); toast('Spark comes to the front. It cannot be told which email to show. (Practice copy: nothing opens.)'); emit('open-spark'); }
+  else openEmail(id);
+}
+function reply() { toast('Mail’s reply window opens. (Practice copy: nothing opens.)'); emit('reply'); }
+function triStart(unreadOnly) {
+  const all = visible().sort((a, b) => b.ts - a.ts);
+  S.tri = { ids: (unreadOnly ? all.filter(m => !m.read) : all).map(m => m.id), i: 0, done: [], unreadOnly };
+}
+function triNext() { const T = S.tri; if (T.i < T.ids.length) T.i++; renderStage(); }
+function triAct(kind) {
+  const T = S.tri; if (!T || S.sheet) return;
+  const id = T.ids[T.i];
+  if (kind === 'undo') { undoLast(); return; }
+  if (kind === 'back') { if (T.i > 0) T.i--; renderStage(); emit('tri-back'); return; }
+  if (kind === 'next') { triNext(); emit('tri-next'); return; }
+  if (!id) return;
+  const m = find(id);
+  if (kind === 'read') { m.read = true; triNext(); emit('tri-read'); }
+  else if (kind === 'reply') reply();
+  else if (kind === 'file') { S.sheet = 'file'; S.folderQ = ''; renderStage(); emit('sheet', 'file'); }
+  else if (kind === 'paragon') { S.sheet = 'paragon'; S.sheetTask = m.subj + ' – ' + m.from; S.sheetTags = ''; S.sheetPut = 'inbox'; renderStage(); emit('sheet', 'paragon'); }
+  else if (kind === 'archive' || kind === 'delete') { removeMail(kind, id, 'triage'); T.done.push(id); triNext(); }
+}
+function pickFolder(path) {
+  const T = S.tri, id = T.ids[T.i]; S.sheet = null; S.recent = [path, ...S.recent.filter(f => f !== path)];
+  removeMail('file', id, 'triage', path); T.done.push(id); triNext(); emit('filed', path);
+}
+function openIconMenu() { set({ panel: false, rctx: null, ctx: !S.ctx }); renderStage(); if (S.ctx) emit('icm-open'); }
+function openRowMenu(id) { set({ ctx: false, rctx: id }); renderStage(); emit('rctx-open', id); }
+function closeTop() {
+  if (S.sheet) { S.sheet = null; renderStage(); }
+  else if (S.win) { S.win = null; renderStage(); emit('win-close'); }
+  else if (S.tri) { S.tri = null; renderStage(); emit('tri-close'); }
+  else if (S.settings) { S.settings = false; renderStage(); emit('settings-close'); }
+  else if (S.rctx || S.ctx) { S.rctx = null; S.ctx = false; renderStage(); }
+  else if (S.panel) { S.panel = false; renderStage(); emit('panel-close'); }
+}
+
+const stage = document.getElementById('stage');
+stage.addEventListener('contextmenu', ev => {
+  if (ev.target.closest('.mm-item')) { ev.preventDefault(); openIconMenu(); return; }
+  const r = ev.target.closest('[data-ctx]'); if (r) { ev.preventDefault(); openRowMenu(r.dataset.ctx); }
+});
+stage.addEventListener('mouseover', ev => { if (ev.target.closest('.mm-item')) emit('hover'); if (ev.target.closest('.mm-row')) emit('hover-row'); });
+stage.addEventListener('input', ev => {
+  const k = ev.target.dataset && ev.target.dataset.in; if (!k) return; const v = ev.target.value;
+  if (k === 'gaddr' || k === 'gpw') { S.gmail[k === 'gaddr' ? 'addr' : 'pw'] = v; if (S.gmail.addr.trim() && S.gmail.pw) emit('typed'); }
+  else if (k === 'ptask') { S.sheetTask = v; const b = stage.querySelector('[data-t="send-paragon"]'); if (b) b.disabled = !v.trim(); }
+  else if (k === 'ptags') S.sheetTags = v;
+  else if (k === 'fq') { S.folderQ = v; const l = stage.querySelector('.mm-flist'); if (l) l.innerHTML = folderList(); markTarget(); }
+});
+stage.addEventListener('keydown', ev => {
+  if (ev.key === 'Enter' && ev.target.dataset && ev.target.dataset.in === 'fq') { const f = [...folderListNames()][0]; if (f) pickFolder(f); }
+});
+const folderListNames = () => { const rec = S.recent.filter(f => FOLDERS.includes(f)), all = rec.concat(FOLDERS.filter(f => !rec.includes(f))); return S.folderQ ? all.filter(f => f.toLowerCase().includes(S.folderQ.toLowerCase())) : all; };
+stage.addEventListener('change', ev => {
+  const k = ev.target.dataset && ev.target.dataset.sel; if (!k) return; const v = ev.target.value;
+  if (k === 'style') { S.style = v; renderStage(); emit('style', v); }
+  else if (k === 'every') { S.every = +v; renderStage(); }
+  else if (k === 'gacct') S.gmail.acct = v;
+});
+
+/* Clicks inside the pretend Mac */
+stage.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-act]');
+  if (!el) {
+    if (S.rctx && !ev.target.closest('.mm-rcm')) { S.rctx = null; renderStage(); }
+    else if (S.ctx && !ev.target.closest('.mm-icm, .mm-practice')) { S.ctx = false; renderStage(); }
+    else if (S.panel && !ev.target.closest('.mm-panel, .mm-practice, .mm-ctx')) { S.panel = false; renderStage(); emit('panel-close'); }
+    return; }
+  const a = el.dataset.act, id = el.dataset.id;
+  switch (a) {
+    case 'item':
+      if (ev.ctrlKey) { openIconMenu(); break; }
+      set({ ctx: false, rctx: null, panel: !S.panel }); if (S.panel) set({ settings: false });
+      if (S.panel && S.problem === 'closed' && !S.opening) {
+        S.opening = true;
+        later(() => { S.problem = null; S.opening = false; S.checked = '14:41'; renderStage(); emit('mail-opened'); }, 2500);
+      }
+      renderStage(); emit(S.panel ? 'panel-open' : 'panel-close'); break;
+    case 'fold': { const n = el.dataset.n, g = groups().find(x => x.name === n), was = isOpen(g);
+      if (was) { S.foldOpen = S.foldOpen.filter(x => x !== n); S.foldShut.push(n); } else { S.foldShut = S.foldShut.filter(x => x !== n); S.foldOpen.push(n); }
+      renderStage(); emit('fold', { name: n, open: !was }); break; }
+    case 'markread': { const n = el.dataset.n; visible().filter(m => m.from === n).forEach(m => m.read = true); renderStage(); emit('markread', n); break; }
+    case 'markone': find(id).read = true; renderStage(); emit('markone', id); break;
+    case 'reply': reply(); break;
+    case 'archive': removeMail('archive', id, 'list'); break;
+    case 'delete': removeMail('delete', id, 'list'); break;
+    case 'open': openRow(id); break;
+    case 'undo': undoLast(); break;
+    case 'errx': S.err = ''; renderStage(); break;
+    case 'check': S.loading = true; renderStage(); emit('check');
+      later(() => { S.loading = false; S.checked = '14:41'; renderStage(); }, 900); break;
+    case 'gear': set({ panel: false, settings: true, spage: 'settings', rctx: null }); renderStage(); emit('settings'); break;
+    case 'quit': toast('On your Mac this quits the app. In this practice copy it stays open.'); break;
+    case 'triage': set({ panel: false, ctx: false, rctx: null }); triStart(false); renderStage(); emit('triage-open'); break;
+    case 'retry': S.problem = null; S.opening = false; S.checked = '14:41'; renderStage(); toast('The Mac now says yes (practice copy). The list is back.'); emit('retry'); break;
+    case 'syssettings': toast('On your Mac this opens System Settings, where you switch Mail on under Automation.'); break;
+    /* the short menu on the icon */
+    case 'im-check': S.ctx = false; S.checked = '14:41'; renderStage(); toast('Mail is read again at once. The list says “Checked 14:41”.'); emit('im-check'); break;
+    case 'im-mail': S.ctx = false; renderStage(); toast('Apple Mail comes to the front. (Practice copy: nothing opens.)'); emit('im-mail'); break;
+    case 'im-triage': set({ ctx: false }); triStart(false); renderStage(); emit('triage-open'); break;
+    case 'im-settings': set({ ctx: false, settings: true, spage: 'settings' }); renderStage(); emit('settings'); break;
+    case 'im-quit': S.ctx = false; renderStage(); toast('On your Mac this quits the app. In this practice copy it stays open.'); emit('im-quit'); break;
+    /* the menu on an email line */
+    case 'rc-open': openEmail(S.rctx); break;
+    case 'rc-apple': S.rctx = null; renderStage(); toast('Apple Mail opens at that email. (Practice copy: nothing opens.)'); break;
+    case 'rc-spark': S.rctx = null; renderStage(); toast('Spark comes to the front. It cannot be told which email to show.'); break;
+    case 'rc-reply': S.rctx = null; reply(); break;
+    case 'rc-read': find(S.rctx).read = true; S.rctx = null; renderStage(); emit('markone'); break;
+    case 'rc-archive': removeMail('archive', S.rctx, 'list'); break;
+    case 'rc-delete': removeMail('delete', S.rctx, 'list'); break;
+    /* the email window */
+    case 'ewin-close': S.win = null; renderStage(); emit('win-close'); break;
+    case 'keeptop': S.keepTop = !S.keepTop; renderStage(); break;
+    case 'ew-reply': reply(); break;
+    case 'ew-archive': { const i = S.win; S.win = null; removeMail('archive', i, 'win'); renderStage(); break; }
+    case 'ew-delete': { const i = S.win; S.win = null; removeMail('delete', i, 'win'); renderStage(); break; }
+    case 'ew-apple': toast('Apple Mail opens at that email. (Practice copy: nothing opens.)'); break;
+    case 'ew-spark': toast('Spark comes to the front. It cannot be told which email to show.'); break;
+    /* Triage */
+    case 'k-delete': triAct('delete'); break;
+    case 'k-archive': triAct('archive'); break;
+    case 'k-file': triAct('file'); break;
+    case 'k-paragon': triAct('paragon'); break;
+    case 'k-read': triAct('read'); break;
+    case 'k-reply': triAct('reply'); break;
+    case 'k-undo': triAct('undo'); break;
+    case 'k-back': triAct('back'); break;
+    case 'k-next': triAct('next'); break;
+    case 'unreadonly': S.tri.unreadOnly = !S.tri.unreadOnly; triStart(S.tri.unreadOnly); renderStage(); emit('unread-only'); break;
+    case 'startover': triStart(S.tri.unreadOnly); renderStage(); break;
+    case 'tri-close': S.tri = null; S.sheet = null; renderStage(); emit('tri-close'); break;
+    case 'sheet-cancel': S.sheet = null; renderStage(); break;
+    case 'pickfolder': pickFolder(el.dataset.n); break;
+    case 'put': S.sheetPut = id; renderStage(); break;
+    case 'send-paragon': { const T = S.tri, i = T.ids[T.i]; S.sheet = null; removeMail('archive', i, 'triage'); T.done.push(i); triNext(); emit('paragon-sent'); break; }
+    /* Settings */
+    case 'close-settings': S.settings = false; renderStage(); emit('settings-close'); break;
+    case 'spage': S.spage = el.dataset.p; renderStage(); emit('tab', S.spage); break;
+    case 'tog': { const k = el.dataset.k; S[k] = !S[k]; renderStage(); emit('tog', k); break; }
+    case 'step': S.count = Math.min(100, Math.max(5, S.count + +id)); renderStage(); break;
+    case 'openin': S.openIn = id; renderStage(); emit('openin', id); break;
+    case 'glink': toast('On your Mac this opens Google’s page for app passwords. Nothing opens in this practice copy.'); break;
+    case 'gconnect': {
+      const g = S.gmail; if (g.asking) break;
+      if (!g.addr.trim() || !g.pw) { g.problem = 'Fill in the Gmail address and the app password first.'; renderStage(); emit('g-problem'); break; }
+      g.problem = ''; g.asking = true; renderStage();
+      later(() => { g.asking = false; g.on = true; g.pw = ''; renderStage(); emit('g-connected'); }, 1200); break; }
+    case 'gdisconnect': S.gmail = { on: false, addr: S.gmail.addr, pw: '', acct: S.gmail.acct, problem: '', asking: false }; renderStage(); emit('g-disconnected'); break;
+    /* the practice box */
+    case 'p-rclick': openIconMenu(); break;
+    case 'p-rowctx': openRowMenu('m3'); break;
+    case 'p-mailoff': set({ problem: 'closed', panel: false, opening: false }); renderStage(); emit('problem'); break;
+    case 'p-denied': set({ problem: 'denied', panel: false }); renderStage(); emit('problem'); break;
+    case 'p-newmail': if (!find('m7')) S.msgs.push({ id: 'm7', from: 'Lena Berg', addr: 'lena.berg@example.com', acct: 'Gmail', subj: 'Are you coming on Saturday?', t: '14:41', d: '26 Nov 2026 at 14:41', ts: 881, read: false, prev: 'Just checking.', body: 'Hi,\n\nJust checking that you are coming on Saturday.\n\nLena' });
+      renderStage(); emit('newmail'); break;
+    default: break;
+  }
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') { closeTop(); return; }
+  if (!S.tri || S.sheet || ev.target.tagName === 'INPUT' || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  const map = { d: 'delete', a: 'archive', f: 'file', p: 'paragon', m: 'read', r: 'reply', z: 'undo', ArrowLeft: 'back', ArrowRight: 'next', ' ': 'next' };
+  const k = map[ev.key.length === 1 ? ev.key.toLowerCase() : ev.key]; if (k) { ev.preventDefault(); triAct(k); }
+});
+
+/* ---------- Lessons (see → try → check). Every step's setup resets what that step needs. ---------- */
+const SETTINGS_ON = { settings: true, spage: 'settings' };
+const ICL = ['m1', 'm5', 'm6', 'm2'];   // the iCloud emails, so a step on filing or archiving never meets Gmail
+const TRI = (ids, i = 0, extra = {}) => scene({ tri: { ids, i, done: [], unreadOnly: false }, ...extra });
+const WIN = id => { scene({ win: id }); find(id).read = true; };
+const LESSONS = [
+  { title: 'The envelope', icon: 'mail', steps: [
+    { kind: 'look', head: 'Always in your menu bar', text: 'A small envelope in the menu bar at the top of the screen. The app has no Dock icon. An outline envelope means: no new mail.', target: 'item', setup: () => scene({ msgs: allRead() }) },
+    { kind: 'look', head: 'Blue: new mail waits', text: 'The envelope is blue while new mail waits. Next to it, two small thin lines show when the newest new email arrived: the hour with the colon on top, the minutes below. Here: "08:" over "47". A switch in Settings turns the time off.', target: 'item', setup: () => scene({}) },
+    { kind: 'try', head: 'Point at the envelope', text: 'Move the pointer onto the envelope and wait a moment.', target: 'item', setup: () => scene({}), wait: 'hover', ok: 'A small hint says how many new emails wait and when the newest came: "4 new emails, newest at 08:47". With one it says "1 new email, newest at 08:47", with none "No new emails". A click opens the list.' },
+    { kind: 'look', head: 'Count or dot', text: 'In Settings you can choose another look for the envelope while new mail waits: "Turns blue", "Shows the count" (the envelope with the number, as here) or "Dot only" (the envelope with a dot).', target: 'item', setup: () => scene({ style: 'count' }) },
+    { kind: 'check', head: 'Quick check', text: 'What do the two small lines next to the envelope show?', answers: ['When the newest new email arrived', 'The time now', 'When the list last checked'], right: 0, ok: 'Right. "Checked" at the bottom of the list says when the app last looked.', setup: () => scene({}) },
+  ]},
+  { title: 'The warning', icon: 'warn', steps: [
+    { kind: 'try', head: 'Mail gets closed', text: 'In the practice box, press "Mail gets closed".', target: 'p-mailoff', setup: () => scene({ practice: ['mailoff'] }), wait: 'problem', ok: 'The envelope is orange, with a small orange badge and a white "!". Orange is only ever the warning.' },
+    { kind: 'try', head: 'Point at the orange envelope', text: 'Move the pointer onto the orange envelope and wait a moment.', target: 'item', setup: () => scene({ problem: 'closed' }), wait: 'hover', ok: 'The hint shows the heading of the problem, "Apple Mail is not open", and under it what to do: "This app reads your emails from Apple Mail. A click on the menu bar envelope opens Mail for you, hidden."' },
+    { kind: 'try', head: 'Click it', text: 'Click the orange envelope and wait a few seconds.', target: 'item', setup: () => scene({ problem: 'closed' }), wait: 'mail-opened', ok: 'The list opened and the app opened Mail for you, hidden: it does not come to the front. The list said "Opening Mail…" until your emails appeared, and the envelope came back.' },
+    { kind: 'look', head: 'Other problems keep their button', text: 'Only "Mail is closed" is opened for you. If you said no when the Mac asked, the list says "Access to Mail is turned off", how to fix it, and has the button "Open System Settings", where you switch Mail on under Automation. "Try again" reads Mail again.', target: 'problem', setup: () => scene({ problem: 'denied', panel: true }) },
+    { kind: 'try', head: 'Try again', text: 'Press "Try again".', target: 'retry', setup: () => scene({ problem: 'denied', panel: true }), wait: 'retry', ok: 'The app reads Mail again. When the problem is gone, the envelope is back. (In this practice copy the Mac now says yes.)' },
+    { kind: 'check', head: 'Quick check', text: 'Mail is closed and you click the orange envelope. What happens?', answers: ['Mail opens hidden and the list says "Opening Mail…"', 'Mail comes to the front', 'Nothing until you press a button'], right: 0, ok: 'Right. If Mail is already open, the app does not touch it; it only reads again.', setup: () => scene({ problem: 'closed' }) },
+  ]},
+  { title: 'The list', icon: 'list', steps: [
+    { kind: 'try', head: 'Open the list', text: 'Click the envelope.', target: 'item', setup: () => scene({}), wait: 'panel-open', ok: 'A narrow list drops down with your newest emails from all your inboxes in Apple Mail. At first it shows the newest 20.' },
+    { kind: 'look', head: 'Grouped by sender', text: 'The emails are grouped by sender. The sender with the newest email is on top, and inside a sender the newest email is on top. A sender with new mail is open; a sender without new mail is closed.', target: 'card-harbour', setup: () => scene({ panel: true }) },
+    { kind: 'look', head: 'The heading row', text: '"Mail", the two account dots (violet: iCloud, green: Gmail), "Newest 20", the number you set in Settings, and the small blue button "Triage".', target: 'hdr', setup: () => scene({ panel: true }) },
+    { kind: 'look', head: 'Tags and letters', text: 'A blue tag "2 new" says how many new emails a sender has. Grey "1 read" says the sender has no new mail. A new email has its subject in full-strength letters, a read one in grey. Nothing is bold. Today shows the time; before that, the day and the month.', target: 'new-lena', setup: () => scene({ panel: true }) },
+    { kind: 'try', head: 'Open a closed sender', text: 'Click the name "Riverside Dental".', target: 'fold-riverside', setup: () => scene({ panel: true }), wait: 'fold', when: d => d.name === 'Riverside Dental' && d.open, ok: 'Its email shows. What you open or close by hand stays as you left it.' },
+    { kind: 'try', head: 'Mark read', text: 'Press "Mark read" in the bar of Lena Berg.', target: 'mr-lena', setup: () => scene({ panel: true }), wait: 'markread', when: d => d === 'Lena Berg', ok: 'All of that sender’s emails turn grey, the tag says "2 read", the sender closes, and the envelope in the menu bar counts fewer new emails.' },
+    { kind: 'try', head: 'The bottom row', text: 'Press the round arrow at the bottom. (Beside it: the gear is Settings, the power button quits the app. At the left, "Checked 14:40" says when the app last looked.)', target: 'check-btn', setup: () => scene({ panel: true }), wait: 'check', ok: 'It says "Reading Mail…" for a moment, then "Checked" with the new time. The list also checks by itself, every minute at first, and after every action.' },
+    { kind: 'check', head: 'Quick check', text: 'Which sender is at the top of the list?', answers: ['The one with the newest email', 'The one with the most emails', 'The first one in the alphabet'], right: 0, ok: 'Right.', setup: () => scene({ panel: true }) },
+  ]},
+  { title: 'One email', icon: 'open', steps: [
+    { kind: 'try', head: 'Point at a line', text: 'Move the pointer over the line "Your order has shipped".', target: 'row-m1', setup: () => scene({ panel: true }), wait: 'hover-row', ok: 'Four small buttons take the place of the time: a tick (only for new mail) to mark as read, reply, archive and, in red, delete.' },
+    { kind: 'try', head: 'Archive', text: 'The buttons are showing on the first line. Press the archive button (the box).', target: 'ab-archive-m1', setup: () => scene({ panel: true, force: 'm1' }), wait: 'archive', ok: 'The email leaves the list at once. The bottom left says "Archiving…" until Mail is done, then a dark bar says “Archived …” with a blue "Undo".' },
+    { kind: 'try', head: 'Undo', text: 'Press "Undo" in the dark bar.', target: 'undo', setup: () => scene({ panel: true, gone: ['m1'], undo: { id: 'm1', kind: 'archive', text: 'Archived “Your order has shipped”' } }), wait: 'undo', ok: 'The email is back in the list. You have 10 seconds for Undo after archive, delete or filing.' },
+    { kind: 'try', head: 'Delete', text: 'On the line "Your statement is ready", press the red bin.', target: 'ab-delete-m5', setup: () => scene({ panel: true, force: 'm5' }), wait: 'delete', ok: 'Delete moves the email to the bin, with the same dark bar and Undo. Red always means delete.' },
+    { kind: 'try', head: 'Right-click a line', text: 'Right-click the line "Saturday lunch?", or hold the control key and click it.', hint: 'No right button? The practice box has a button for it.', target: 'row-m3', setup: () => scene({ panel: true, practice: ['rowctx'] }), wait: 'rctx-open', ok: 'A menu: "Open", "Open in Apple Mail", "Open in Spark (brings Spark forward)", then "Reply", "Mark as read" (only for new mail), "Archive" and "Delete".' },
+    { kind: 'try', head: 'Open an email', text: 'Click the line "Your order has shipped" (not on a small button).', target: 'row-m1', setup: () => scene({ panel: true }), wait: 'win-open', ok: 'The email opens in its own small window and is marked as read. (You can change where a click opens an email in Settings.)' },
+    { kind: 'look', head: 'The small window', text: 'The subject, a round badge with the sender’s first letters in the account’s colour, who wrote, the account and the time, then the text. At the bottom: "Reply", "Archive", "Delete", "Open in Apple Mail" and "Spark". "Keep on top" at the top right is on at first.', target: 'ewin', setup: () => WIN('m1') },
+    { kind: 'try', head: 'Close with Escape', text: 'Press the Escape key, or click the red dot at the top left of the window.', target: 'edots', setup: () => WIN('m1'), wait: 'win-close', ok: 'The window closes. Archive and Delete in this window close it too.' },
+  ]},
+  { title: 'Triage', icon: 'check', steps: [
+    { kind: 'try', head: 'The small blue button', text: 'Press "Triage" at the top right of the list.', target: 'triage-btn', setup: () => scene({ panel: true }), wait: 'triage-open', ok: 'The list closes and Triage opens. It goes through your emails one at a time, newest first.' },
+    { kind: 'look', head: 'Where you are', text: 'At the top: "Triage" and where you are, for example "1 of 4". "Unread only" shows only new emails. "Start over" begins again from the newest.', target: 'tri-top', setup: () => TRI(ICL) },
+    { kind: 'look', head: 'The keys', text: 'The buttons at the bottom show their keys in small boxes: D Delete, A Archive, F File…, P PARAGON…, M Read, R Reply, Z Undo, ← Back and Space Next. Press the key alone; no other key is held.', target: 'keybar', setup: () => TRI(ICL) },
+    { kind: 'try', head: 'Next', text: 'Press the Space key, or the button "Next".', target: 'k-space', setup: () => TRI(ICL), wait: 'tri-next', ok: 'The next email shows, and nothing was done to the first. The right arrow does the same; the left arrow goes back.' },
+    { kind: 'try', head: 'Archive', text: 'Press the key A, or the button "Archive".', target: 'k-a', setup: () => TRI(ICL), wait: 'archive', ok: 'The email is archived and the next one shows. If you come back to it, it says "Already handled".' },
+    { kind: 'try', head: 'File…', text: 'Press "File…" (key F). A small window lists the folders of that email’s account, the ones you used lately first. Pick "Receipts".', hint: 'You can also type to find a folder; Enter files in the first folder shown.', target: 'k-f', on: { sheet: 'folder-Receipts' }, setup: () => TRI(ICL), wait: 'filed', ok: 'The email is filed in that folder and the next one shows. The dark bar with Undo is there for 10 seconds.' },
+    { kind: 'try', head: 'PARAGON…', text: 'Press "PARAGON…" (key P). The small window asks for the task (already filled in), the tags, and where the task goes: Inbox, Today or "A project or note…". Then press "Send to PARAGON".', target: 'k-p', on: { sheet: 'send-paragon' }, setup: () => TRI(['m5', 'm6', 'm2']), wait: 'paragon-sent', ok: 'The task gets a link back to the email, and then the email is archived.' },
+    { kind: 'try', head: 'Undo', text: 'You archived by mistake. Press "Undo" (key Z).', target: 'k-z', setup: () => TRI(ICL, 1, { gone: ['m1'], undo: { id: 'm1', kind: 'archive', text: 'Archived “Your order has shipped”' } }), wait: 'undo', ok: 'The last delete, archive or filing is taken back.' },
+    { kind: 'look', head: 'All done', text: 'When no email is left you see a blue tick, "All done." and the button "Close". Escape closes Triage at any time.', target: 'tri-close', setup: () => TRI(ICL, 4) },
+  ]},
+  { title: 'The icon menu and Settings', icon: 'menu', steps: [
+    { kind: 'try', head: 'A two-finger click', text: 'Click the envelope with two fingers, or hold the control key and click it.', hint: 'No trackpad? The practice box has a button for it.', target: 'item', setup: () => scene({ practice: ['rclick'] }), wait: 'icm-open', ok: 'A short menu: "Check for new mail now", "Open Apple Mail", "Triage", "Settings…", a line, and "Quit AMS Mail Menu". A normal click still opens the list.' },
+    { kind: 'try', head: 'Check for new mail now', text: 'Click "Check for new mail now".', target: 'im-check', setup: () => scene({ ctx: true }), wait: 'im-check', ok: 'Mail is read again at once. "Open Apple Mail" brings Mail to the front, "Triage" opens Triage, and "Quit AMS Mail Menu" closes the app.' },
+    { kind: 'try', head: 'Settings…', text: 'Click "Settings…".', target: 'im-settings', setup: () => scene({ ctx: true }), wait: 'settings', ok: 'Settings opens with four tabs: Settings, Gmail, How it works and What\'s new. The version shows at the bottom left. "Done", or Escape, closes the window.' },
+    { kind: 'look', head: 'The Settings tab', text: 'Groups with blue headings. "List": how many emails (5 to 100), the first line of text, the account dot. Then "Menu bar icon", "Clicking an email opens it in", "Checking for new mail" and "Start" with "Open at login". Every change counts at once.', target: 'sec-list', setup: () => scene(SETTINGS_ON) },
+    { kind: 'try', head: 'Change the icon', text: 'Under "Menu bar icon", open the menu "While new mail waits, the icon" and pick "Shows the count".', target: 'sel-style', setup: () => scene(SETTINGS_ON), wait: 'style', when: d => d === 'count', ok: 'The envelope in the menu bar now shows the number of new emails.' },
+    { kind: 'try', head: 'Where a click opens an email', text: 'Under "Clicking an email opens it in", pick "Apple Mail, at that email".', target: 'open-apple', setup: () => scene(SETTINGS_ON), wait: 'openin', when: d => d === 'apple', ok: 'Now a click on an email line opens Apple Mail at that email. With Spark, a click only brings Spark to the front: Spark cannot be told which email to show.' },
+  ]},
+  { title: 'Gmail, guide and signs', icon: 'book', steps: [
+    { kind: 'look', head: 'Gmail needs one more step', text: 'Apple Mail does not pass an Archive from this app on to Gmail. With the Gmail connection the app archives a Gmail email straight at Gmail: it leaves the inbox and stays in “All Mail”. Other accounts do not need it.', target: 'gmail-note', setup: () => scene({ settings: true, spage: 'gmail' }) },
+    { kind: 'try', head: 'Archive without it', text: 'On the Gmail line "Saturday lunch?", press the archive button.', target: 'ab-archive-m3', setup: () => scene({ panel: true, force: 'm3' }), wait: 'gmail-needed', ok: 'Nothing is changed, and the bottom of the list says so, with an orange warning triangle: "Archiving a Gmail email needs the Gmail connection. Open Settings and connect Gmail. Nothing was changed."' },
+    { kind: 'try', head: 'Connect with nothing typed', text: 'In the Gmail tab, press "Connect" without typing anything.', target: 'g-connect', setup: () => scene({ settings: true, spage: 'gmail' }), wait: 'g-problem', ok: 'A line says "Fill in the Gmail address and the app password first."' },
+    { kind: 'try', head: 'Fill in and connect', text: 'Type any address (for example reader@example.com) and any letters as the app password, then press "Connect". On your Mac, the app password is the 16 letters Google makes for you; it is not your Google password.', hint: 'Practice only: nothing is sent to Google here.', target: 'g-addr', on: { typed: 'g-connect' }, setup: () => scene({ settings: true, spage: 'gmail' }), wait: 'g-connected', ok: 'It says "Connected to Gmail as …", with a button "Disconnect". On your Mac the app password is kept in the Keychain and sent only to Google, on an encrypted line.' },
+    { kind: 'try', head: 'How it works', text: 'Click the tab "How it works".', target: 'page-guide', setup: () => scene(SETTINGS_ON), wait: 'tab', when: d => d === 'guide', ok: 'A guide to the whole app, in plain words, part by part. At the end: "Signs in this app".' },
+    { kind: 'look', head: 'Signs in this app', text: 'Every mark and colour with its meaning. Blue is the app’s own colour (what you can press, headings, new mail). Orange is only ever the warning. Red is only ever delete. Violet dot: iCloud. Green dot: Gmail. A small blue button, "Triage", opens Triage.', target: 'signs', setup: () => scene({ settings: true, spage: 'guide' }) },
+    { kind: 'try', head: 'What\'s new', text: 'Click the tab "What\'s new".', target: 'page-news', setup: () => scene(SETTINGS_ON), wait: 'tab', when: d => d === 'news', ok: 'Every version, newest first. This one is 0.9.6.' },
+    { kind: 'check', head: 'Quick check', text: 'What does red mean in this app?', answers: ['Delete, only ever delete', 'Something is wrong', 'A Gmail account'], right: 0, ok: 'Right. Something wrong is orange, and a Gmail account is green.', setup: () => scene({ panel: true, force: 'm5' }) },
+  ]},
+];
+
+/* ---------- Tour engine (reusable) ---------- */
+let ci = 0, si = 0, solved = false, targetOff = false;
+const store = { get(k) { try { return localStorage.getItem(k) } catch { return null } }, set(k, v) { try { localStorage.setItem(k, v) } catch {} } };
+let doneChapters = new Set(JSON.parse(store.get('mailmenu-done') || '[]'));
+
+function emit(name, data) {
+  const st = LESSONS[ci]?.steps[si]; if (!st || solved || st.kind !== 'try') return;
+  if (st.on && st.on[name]) { markTarget(st.on[name]); return; }
+  if ((st.wait === name || st.alt === name) && (!st.when || st.when(data))) succeed(st.ok);
+}
+function succeed(msg) {
+  solved = true; targetOff = true; const fb = document.getElementById('fb'); if (fb) { fb.textContent = '✓ ' + msg; fb.className = 'feedback'; }
+  const nx = document.getElementById('next'); if (nx) { nx.disabled = false; nx.focus({ preventScroll: true }); }
+  markTarget();
+}
+let curTarget = null;
+function markTarget(t) {
+  if (t !== undefined) curTarget = t;
+  document.querySelectorAll('.target').forEach(e => e.classList.remove('target'));
+  if (!curTarget || targetOff) return;
+  const q = n => document.querySelector(`#stage [data-t="${CSS.escape(n)}"]`);
+  // If the thing to click is out of sight (a window or the panel was closed), point at the way back to it.
+  const el = q(curTarget) || (S.sheet ? q('sheet-cancel') : S.settings ? q('done') : S.tri ? q('tdots') : S.win ? q('edots') : S.panel ? q('gear') : q('item'));
+  if (el) {
+    el.classList.add('target');
+    const pane = el.closest('.mm-pane');
+    if (pane && pane !== el) { let top = 0, n = el; while (n && n !== pane) { top += n.offsetTop; n = n.offsetParent; } const bot = top + el.offsetHeight; if (top < pane.scrollTop || bot > pane.scrollTop + pane.clientHeight) pane.scrollTop = Math.max(0, top - 40); }
+  }
+}
+function renderRail() {
+  const total = LESSONS.reduce((n, l) => n + l.steps.length, 0);
+  const before = LESSONS.slice(0, ci).reduce((n, l) => n + l.steps.length, 0) + si;
+  document.getElementById('rail').innerHTML = `<div class="brand">${tile(40)}<div><h1>Mail Menu Tour</h1><small>Learn the app in about 12 minutes</small></div></div>
+    ${LESSONS.map((l, i) => `<button class="chap ${i === ci ? 'cur' : ''} ${doneChapters.has(i) ? 'done' : ''}" data-ch="${i}">${icon(l.icon)}<span>${l.title}</span><span class="n">${doneChapters.has(i) ? '✓' : l.steps.length + ' steps'}</span></button>`).join('')}
+    <button class="chap ${ci === LESSONS.length ? 'cur' : ''}" data-ch="${LESSONS.length}">${icon('trophy')}<span>On your Mac</span></button>
+    <div class="bar"><i style="width:${Math.round(100 * Math.min(before, total) / total)}%"></i></div>
+    <p class="railnote">Everything here is a practice copy. Nothing changes on your Mac.</p>`;
+}
+document.getElementById('rail').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) goChapter(+b.dataset.ch); });
+
+function goChapter(i) {
+  ci = i; si = 0; clearTimers(); S = START();
+  const L = LESSONS[i]; if (L && L.setup) L.setup();   // bring the pretend Mac to where that chapter starts
+  renderStep();
+}
+
+function renderStep() {
+  renderRail();
+  const coach = document.getElementById('coach'), fin = document.getElementById('finish');
+  if (ci >= LESSONS.length) { renderFinish(); coach.hidden = true; return; }
+  coach.hidden = false; fin.hidden = true;
+  const L = LESSONS[ci], st = L.steps[si];
+  solved = st.kind === 'look'; targetOff = false;
+  if (st.setup) st.setup();
+  S.toast = '';
+  const kindName = { look: 'Look', try: 'Try it', check: 'Check' }[st.kind];
+  coach.innerHTML = `<div class="eyebrow">${icon(L.icon)} ${esc(L.title)} <span class="kind">· ${kindName} · step ${si + 1} of ${L.steps.length}</span></div>
+    <div><h2>${esc(st.head)}</h2><p>${esc(st.text)}</p>${st.hint ? `<p style="color:var(--muted);font-size:13px">${esc(st.hint)}</p>` : ''}</div>
+    <div class="btns">${ci + si > 0 ? '<button class="btn ghost" id="back">Back</button>' : ''}<button class="btn main-b" id="next" ${solved ? '' : 'disabled'}>${si === L.steps.length - 1 ? 'Finish chapter' : 'Next'}</button></div>
+    ${st.kind === 'check' ? `<div class="answers">${st.answers.map((a, i) => `<button class="ans" data-a="${i}">${esc(a)}</button>`).join('')}</div>` : ''}
+    <p class="feedback" id="fb"></p>`;
+  curTarget = st.target || null;
+  renderStage();
+  if (st.kind === 'check') coach.querySelectorAll('.ans').forEach(b => b.onclick = () => {
+    const fb = document.getElementById('fb');
+    if (+b.dataset.a === st.right) { coach.querySelectorAll('.ans').forEach(x => x.disabled = true); b.classList.add('right'); succeed(st.ok); }
+    else { b.classList.add('wrong'); fb.textContent = 'Not quite. Try another answer.'; fb.className = 'feedback no'; }
+  });
+  document.getElementById('next').onclick = next;
+  const bk = document.getElementById('back'); if (bk) bk.onclick = back;
+}
+function next() {
+  const L = LESSONS[ci];
+  if (si < L.steps.length - 1) { si++; renderStep(); return; }
+  doneChapters.add(ci); store.set('mailmenu-done', JSON.stringify([...doneChapters]));
+  goChapter(ci + 1);
+}
+function back() { if (si > 0) { si--; renderStep(); } else if (ci > 0) { goChapter(ci - 1); } }
+
+function renderFinish() {
+  const fin = document.getElementById('finish'); fin.hidden = false;
+  clearTimers(); S = START(); curTarget = null; renderStage();
+  const items = ['Rest the pointer on the envelope in your menu bar and read the hint.',
+    'Click the envelope. Open and close a sender by clicking its name.',
+    'Click an email line and see it open in the small window. Press Escape to close it.',
+    'Press the small blue "Triage" button, step through two emails with the Space key, then press Escape.',
+    'Click the envelope with two fingers (or hold the control key and click) and look at the short menu.',
+    'Open Settings with the gear at the bottom of the list. Look at the four tabs, then read "Signs in this app" at the end of "How it works".',
+    'If you use Gmail: in the Gmail tab, press "Open Google\'s app password page", make an app password and press "Connect".'];
+  let ticks = JSON.parse(store.get('mailmenu-real') || '[]');
+  fin.innerHTML = `<h3>Now try it on your real Mac</h3>${items.map((t, i) => `<label><input type="checkbox" id="real-${i}" ${ticks.includes(i) ? 'checked' : ''}><span>${esc(t)}</span></label>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:12px"><button class="btn main-b" id="again">Start the tour again</button></div>`;
+  fin.querySelectorAll('input').forEach((c, i) => c.onchange = () => { ticks = ticks.filter(x => x !== i); if (c.checked) ticks.push(i); store.set('mailmenu-real', JSON.stringify(ticks)); });
+  document.getElementById('again').onclick = () => goChapter(0);
+}
+
+/* Fit the 960×560 pretend Mac into its box */
+function fit() { const box = document.getElementById('stagebox'); document.getElementById('stage').style.transform = `scale(${box.clientWidth / 960})`; }
+new ResizeObserver(fit).observe(document.getElementById('stagebox'));
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName !== 'INPUT') { const n = document.getElementById('next'); if (n && !n.disabled && document.activeElement !== n) n.click(); } });
+goChapter(0); fit();
+</script>
