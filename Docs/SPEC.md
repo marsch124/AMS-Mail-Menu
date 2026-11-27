@@ -158,7 +158,7 @@ How it talks to Gmail: IMAP over TLS with Network.framework (`GmailConnection.sw
 - Archive: LOGIN, SELECT INBOX, UID SEARCH HEADER Message-ID, UID STORE +FLAGS.SILENT (\Deleted), UID EXPUNGE, then a second search must find nothing (otherwise the archive is reported as not done).
 - Undo: LIST "" "[Gmail]/%" to find the folder flagged \All, SELECT it, UID SEARCH HEADER Message-ID, UID COPY to INBOX.
 
-- Tried so far (23 Nov 2026): only against a scripted stand-in server (`testGmailArchiveConversation`, `testGmailSafetyRules`). NOT yet tried at Gmail itself: the owner has to make the app password and connect first. Then: the notice `show` with the word `archiveUndoTest` archives and undoes only the email with the subject "Mail Menu test".
+- Tried at Gmail itself on 27 Nov 2026 (0.9.8, with the owner's yes, on a fresh test email "Mail Menu test" sent to his own Gmail): the check word `archiveUndoTest` archived it at Gmail in 8.8 s (the second search found it gone from the inbox) and put it back with Undo in 4.6 s; Gmail's own labels then showed INBOX again, and the app's list had it back. Also tested against a scripted stand-in (`testGmailArchiveConversation`, `testGmailSafetyRules`). The first test email of 23 Nov had been removed from Gmail meanwhile.
 
 ## The list closes for a window (0.6)
 Before Triage or the message window opens, the list panel closes (`SelfCheck.closePanel`: a click on the app's own menu bar button, only while the panel is open), so the window is not hidden under it. The owner, 23 Nov 2026: "The triage window is under the list."

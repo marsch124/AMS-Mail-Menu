@@ -208,7 +208,7 @@ final class MailStore: ObservableObject {
                 self.diary.notice("check: archive FAILED: \(self.actionError ?? "no answer in a minute", privacy: .public)")
                 return
             }
-            self.diary.notice("check: archive done in \(Date().timeIntervalSince(began), format: .fixed(precision: 1)) s, the email is now in \(info.fromBoxes.joined(separator: " or "), privacy: .public)")
+            self.diary.notice("check: archive done in \(Date().timeIntervalSince(began), format: .fixed(precision: 1)) s, the email is now \(info.atGmail ? "archived at Gmail" : "in " + info.fromBoxes.joined(separator: " or "), privacy: .public)")
             let undoBegan = Date()
             self.undoLast()
             self.waitUntil({ self.workNote == nil }, tries: 90) {

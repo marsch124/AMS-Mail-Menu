@@ -22,6 +22,11 @@ struct Release: Identifiable {
 enum WhatsNew {
     /// Newest first.
     static let releases: [Release] = [
+        Release(version: "0.9.9 (18)", date: "27 Nov 2026", items: [
+            "Tried on a real email: archiving a Gmail email works. On 27 Nov a test email \"Mail Menu test\" was archived straight at Gmail (9 seconds) and put back with Undo (5 seconds). Gmail itself showed it back in the inbox. Before, this was only tested against a stand-in, because the Gmail connection was not set up yet.",
+            "Fixed: the app's own diary now says \"archived at Gmail\" after a Gmail archive. Before, the line ended with an empty place name.",
+            "Not tried yet on a Gmail email: delete, filing in a folder, mark as read and reply. They still go through Apple Mail.",
+        ]),
         Release(version: "0.9.8 (17)", date: "26 Nov 2026", items: [
             "Only words changed: the sample names and examples no longer use real names. The app works as before.",
             "Changed: the invented email used for the test picture. Before, it began \"Hello Martin\". Now it begins \"Hello Sam\".",
